@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+title>خود آموز لند پیترن IPC — با سیمولاتور</title>
+<style>
+  body { font-family: Tahoma, Arial, sans-serif; background: #f5f7fa; color: #1a202c; line-height: 1.7; padding: 20px; max-width: 1000px; margin: 0 auto; direction: rtl; }
+  header { background: #1e3a8a; color: #fff; padding: 24px; border-radius: 10px; margin-bottom: 24px; }
+  header h1 { font-size: 22px; margin-bottom: 6px; }
+  header p { font-size: 14px; opacity: 0.9; }
+  h2 { color: #1e3a8a; border-bottom: 2px solid #3b82f6; padding-bottom: 6px; margin: 26px 0 14px; font-size: 18px; }
+  h3 { color: #2563eb; margin: 18px 0 10px; font-size: 15px; }
+  p { font-size: 14px; margin-bottom: 10px; }
+  ul { margin: 6px 0 14px 20px; }
+  li { margin-bottom: 5px; font-size: 14px; }
+  .card { background: #fff; border: 1px solid #dbe3ee; border-radius: 10px; padding: 18px; margin: 18px 0; box-shadow: 0 3px 10px rgba(0,0,0,0.06); }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+  th, td { border: 1px solid #c3cfe2; padding: 10px; text-align: right; }
+  th { background: #eef2f7; color: #1e3a8a; }
+  .formula { text-align: center; font-size: 16px; font-weight: bold; color: #1e3a8a; margin: 12px 0; }
+  .note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 14px; }
+  .warning { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 14px; margin: 16px 0; font-size: 14px; color: #991b1b; }
+  .result { background: #f0fdf4; border: 1px solid #86efac; border-radius: 8px; padding: 16px; margin-top: 16px; display: none; }
+  .result.show { display: block; }
+  canvas { border: 1px solid #c3cfe2; border-radius: 8px; background: #fff; display: block; margin: 14px auto; max-width: 100%; }
+  input[type="number"] { padding: 8px 12px; border: 1px solid #c3cfe2; border-radius: 7px; font-size: 14px; width: 100%; max-width: 180px; }
+  label { font-weight: 600; color: #334155; margin-top: 10px; display: block; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 14px; }
+  button { background: #2563eb; color: #fff; border: none; padding: 8px 18px; border-radius: 7px; cursor: pointer; font-size: 14px; margin: 6px 6px 0 0; }
+  button:hover { background: #1d4ed8; }
+  button.secondary { background: #64748b; }
+  button.secondary:hover { background: #475569; }
+  button.sim { background: #059669; }
+  button.sim:hover { background: #047857; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 2px solid #c3cfe2; }
+  .tabs button { background: transparent; border: none; border-bottom: 3px solid transparent; padding: 10px 16px; cursor: pointer; font-size: 14px; color: #64748b; }
+  .tabs button.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 700; }
+  .tabcontent { display: none; }
+  .tabcontent.active { display: block; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>خود آموز لند پیترن (Land Pattern) بر پایه استاندارد IPC</h1>
+  <p>بر اساس فایل‌های IPC-7351 و IPC-7352 موجود در پوشه IPC در درایو گوگل</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="openTab('intro')">معرفی و استانداردها</button>
+  <button class="tab-btn" onclick="openTab('theory')">مفاهیم طراحی</button>
+  <button class="tab-btn" onclick="openTab('sim')">سیمولاتور لند پیترن</button>
+  <button class="tab-btn" onclick="openTab('quiz')">تست کوتاه</button>
+</div>
+
+<div id="intro" class="tabcontent active">
+  <div class="card">
+    <h2>۱. لند پیترن چیست؟</h2>
+    <p><strong>لند پیترن</strong> یا فوت‌پرینت، مجموعه‌ای از پدهای روی برد PCB است که قطعات رقیبلو (SMT) را لحیم می‌کند. درست بودن ابعاد لند پیترن بر کیفیت لحیم، کارایی حرارتی و قابلیت بازسازی تاثیر می‌گذارد.</p>
+    <ul>
+      <li><strong>IPC-7351</strong> — استاندارد طراحی لند پیترن برای تکنولوژی رقیبلو (فوریه ۲۰۰۵)</li>
+      <li><strong>IPC-7352</strong> — راهنمای کلی طراحی لند پیترن (می ۲۰۲۳)</li>
+    </ul>
+    <div class="note"><strong>نکته:</strong> محتوای این صفحه از استخراج متنی دو فایل PDF پوشه IPC در درایو گوگل مرتب شده است.</div>
+  </div>
+
+  <div class="card">
+    <h2>۲. چرا لند پیترن درست مهم است؟</h2>
+    <ul>
+      <li>جلوگیری از اتصال ناخواسته بین پدهای مجاور</li>
+      <li>ضمان تشکیل لحیم مناسبی در نقاط لحیم</li>
+      <li>قابلیت بازسازی و جایگزینی قطعه با سادگی</li>
+      <li>بهبود کارایی حرارتی و الکتریکی مدار</li>
+    </ul>
+  </div>
+</div>
+
+<div id="theory" class="tabcontent">
+  <div class="card">
+    <h2>۳. ابعاد اصلی لند پیترن</h2>
+    <p>برای محاسبه ابعاد لند، ابعاد زیر از دیتاشیت قطعه مورد نیاز است:</p>
+    <table>
+      <tr><th>نماد</th><th>معنی</th><th>توضیح</th></tr>
+      <tr><td>L</td><td>طول لینک</td><td>طول انتهایی لینک</td></tr>
+      <tr><td>W</td><td>عرض لینک</td><td>عرض انتهایی لینک</td></tr>
+      <tr><td>P</td><td>پچ (mm)</td><td>فاصله مرکز به مرکز بین لینک‌های مجاور</td></tr>
+      <tr><td>T</td><td>ضد لحیم</td><td>حداکثر تفاوت ابعاد در هنگام تولید</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>۴. فرمول محاسبه (ساختگی IPC-7351)</h2>
+    <p class="formula">طول لند Z = L + 2 × T + ورانه</p>
+    <p class="formula">عرض لند G = W + 2 × T</p>
+    <div class="note">ورانه مقدار اضافی لحیم است که معمولاً ۰.۲ تا ۰.۵ mm در نظر گرفته می‌شود.</div>
+  </div>
+</div>
+
+<div id="sim" class="tabcontent">
+  <div class="card">
+    <h2>۵.سیمولاتور لند پیترن</h2>
+    <p>ابعاد لینک را وارد کنید و ابعاد پیشنهادی لند را دریافت کنید.</p>
+
+    <div class="grid">
+      <div class="field">
+        <label>طول لینک L (mm)</label>
+        <input type="number" id="inL" value="3.0" step="0.1">
+      </div>
+      <div class="field">
+        <label>عرض لینک W (mm)</label>
+        <input type="number" id="inW" value="1.0" step="0.1">
+      </div>
+      <div class="field">
+        <label>پچ P (mm)</label>
+        <input type="number" id="inP" value="1.27" step="0.1">
+      </div>
+      <div class="field">
+        <label>ضد لحیم T (mm)</label>
+        <input type="number" id="inT" value="0.1" step="0.05">
+      </div>
+    </div>
+
+    <div style="margin-top:16px;">
+      <button class="btn sim" onclick="calcSim()">محاسبه و رسم لند</button>
+      <button class="btn secondary" onclick="resetSim()">بازنشانی</button>
+    </div>
+
+    <canvas id="simCanvas" width="700" height="320"></canvas>
+
+    <div id="simResult" class="result">
+      <h3>نتیجه محاسبه</h3>
+      <table>
+        <tr><th>طول لند Z</th><td id="outZ">—</td> mm</tr>
+        <tr><th>عرض لند G</th><td id="outG">—</td> mm</tr>
+        <tr><th>فاصله بین پدها</th><td id="outGap">—</td> mm</tr>
+      </table>
+      <p id="simMsg"></p>
+    </div>
+  </div>
+</div>
+
+<div id="quiz" class="tabcontent">
+  <div class="card">
+    <h2>۶. تست کوتاه خودآموزی</h2>
+    <form id="quizForm">
+      <div style="margin-bottom:16px;">
+        <p>۱. لند پیترن برای چه است؟</p>
+        <label><input type="radio" name="q1" value="a"> طراحی پدهای لحیم قطعات</label><br>
+        <label><input type="radio" name="q1" value="b"> رنگ کردن برد</label><br>
+        <label><input type="radio" name="q1" value="c"> ایجاد کابل</label>
+      </div>
+      <div style="margin-bottom:16px;">
+        <p>۲. هر دو استاندارد IPC-7351 و IPC-7352 مربوط به چه هستند؟</p>
+        <label><input type="radio" name="q2" value="a"> لند پیترن PCB</label><br>
+        <label><input type="radio" name="q2" value="b"> کابل USB</label><br>
+        <label><input type="radio" name="q2" value="c"> سوئچ برای بافت</label>
+      </div>
+      <button type="button" class="btn" onclick="checkQuiz()">بررسی پاسخ</button>
+      <div id="quizResult" class="result" style="margin-top:14px;"></div>
+    </form>
+  </div>
+</div>
+
+<script>
+  function openTab(id) {
+    document.querySelectorAll('.tabcontent').forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function calcSim() {
+    const L = parseFloat(document.getElementById('inL').value) || 0;
+    const W = parseFloat(document.getElementById('inW').value) || 0;
+    const P = parseFloat(document.getElementById('inP').value) || 0;
+    const T = parseFloat(document.getElementById('inT').value) || 0;
+    const overhang = 0.3;
+
+    const Z = L + 2 * T + overhang;
+    const G = W + 2 * T;
+    const gap = P - G;
+
+    document.getElementById('outZ').textContent = Z.toFixed(2);
+    document.getElementById('outG').textContent = G.toFixed(2);
+    document.getElementById('outGap').textContent = gap.toFixed(2);
+    document.getElementById('simResult').classList.add('show');
+
+    const msg = document.getElementById('simMsg');
+    if (gap < 0.2) {
+      msg.style.color = '#991b1b';
+      msg.textContent = 'هشدار: فاصله بین پدها بسیار کم است، خطر اتصال ناخواسته وجود دارد.';
+    } else {
+      msg.style.color = '#166534';
+      msg.textContent = 'ابعاد لند مناسب است.';
+    }
+
+    drawSim(L, W, P, Z, G, gap);
+  }
+
+  function resetSim() {
+    document.getElementById('inL').value = '3.0';
+    document.getElementById('inW').value = '1.0';
+    document.getElementById('inP').value = '1.27';
+    document.getElementById('inT').value = '0.1';
+    document.getElementById('simResult').classList.remove('show');
+    const ctx = document.getElementById('simCanvas').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  }
+
+  function drawSim(L, W, P, Z, G, gap) {
+    const c = document.getElementById('simCanvas');
+    const ctx = c.getContext('2d');
+    const scale = 90;
+    const cx = c.width / 2;
+    const cy = c.height / 2;
+
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    // رسم قطعه
+    ctx.fillStyle = '#e2e8f0';
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 2;
+    ctx.fillRect(cx - L/2*scale - 20, cy - W/2*scale - 10, L*scale + 40, W*scale + 20);
+    ctx.strokeRect(cx - L/2*scale - 20, cy - W/2*scale - 10, L*scale + 40, W*scale + 20);
+
+    // رسم پد لند
+    ctx.fillStyle = '#3b82f6';
+    const padW = G * scale;
+    const padH = Z * scale;
+    ctx.fillRect(cx - padW/2, cy - padH/2, padW, padH);
+    ctx.fillRect(cx - padW/2 + P*scale, cy - padH/2, padW, padH);
+
+    // ابعاد
+    ctx.strokeStyle = '#1e3a8a';
+    ctx.font = '14px tahoma';
+    ctx.fillStyle = '#1e3a8a';
+    ctx.fillText('طول لند Z = ' + Z.toFixed(2) + ' mm', cx - padW/2 - 120, cy - padH/2 - 10);
+    ctx.fillText('فاصله P = ' + P.toFixed(2) + ' mm', cx + padW/2 + 10, cy);
+  }
+
+  function checkQuiz() {
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const q2 = document.querySelector('input[name="q2"]:checked');
+    const res = document.getElementById('quizResult');
+    let score = 0;
+    let txt = '';
+    if (q1 && q1.value === 'a') score++; else txt += 'سوال ۱ پاسخ صحیح: طراحی پدهای لحیم قطعات.<br>';
+    if (q2 && q2.value === 'a') score++; else txt += 'سوال ۲ پاسخ صحیح: لند پیترن PCB.<br>';
+    res.innerHTML = '<strong>نمره: ' + score + ' از ۲</strong><br>' + txt;
+    res.classList.add('show');
+  }
+</script>
+
+</body>
+</html>
