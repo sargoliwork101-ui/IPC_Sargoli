@@ -3,76 +3,77 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-title>خود آموز لند پیترن IPC — با سيمولاتور</title>
+<title>خود آموز لند پیترن IPC — با سیمولاتور</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Vazirmatn';
-    background: linear-gradient(135deg, #f0f4f8 0%, #e9ecef 100%);
-    color: #222;
-    line-height: 1.7;
+    font-family: Tahoma, 'Segoe UI', Arial, sans-serif;
+    background: #f5f7fa;
+    color: #1a202c;
+    line-height: 1.8;
     padding: 20px;
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
   }
   header {
     background: linear-gradient(90deg, #1e3a8a, #3b82f6);
     color: #fff;
-    padding: 28px 32px;
-    border-radius: 14px;
-    margin-bottom: 30px;
-    box-shadow: 0 8px 24px rgba(30,58,138,0.25);
+    padding: 26px 30px;
+    border-radius: 12px;
+    margin-bottom: 28px;
+    box-shadow: 0 6px 20px rgba(30,58,138,0.22);
   }
-  header h1 { font-size: 26px; margin-bottom: 8px; }
-  header p { font-size: 15px; opacity: 0.95; }
+  header h1 { font-size: 24px; margin-bottom: 6px; }
+  header p { font-size: 14px; opacity: 0.95; }
   h2 {
     color: #1e3a8a;
-    border-bottom: 3px solid #3b82f6;
+    border-bottom: 2px solid #3b82f6;
     padding-bottom: 8px;
-    margin: 34px 0 18px;
-    font-size: 21px;
+    margin: 30px 0 16px;
+    font-size: 20px;
   }
-  h3 { color: #2563eb; margin: 22px 0 10px; font-size: 17px; }
-  p, li { font-size: 15px; }
+  h3 { color: #2563eb; margin: 20px 0 10px; font-size: 16px; }
+  p { font-size: 14px; margin-bottom: 10px; }
+  ul { margin: 6px 0 14px 22px; }
+  li { margin-bottom: 6px; font-size: 14px; }
   .card {
     background: #fff;
     border: 1px solid #dbe3ee;
-    border-radius: 12px;
-    padding: 22px;
-    margin: 24px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    border-radius: 10px;
+    padding: 20px;
+    margin: 22px 0;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.06);
   }
   .btn {
     background: #2563eb;
     color: #fff;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 9px 18px;
+    border-radius: 7px;
     cursor: pointer;
     font-size: 14px;
-    margin: 6px 4px 0 0;
+    margin: 5px 5px 0 0;
   }
   .btn:hover { background: #1d4ed8; }
   .btn.secondary { background: #64748b; }
   .btn.secondary:hover { background: #475569; }
   .btn.sim { background: #059669; }
   .btn.sim:hover { background: #047857; }
-  input, select, textarea {
+  input, select {
     padding: 9px 12px;
     border: 1px solid #c3cfe2;
-    border-radius: 8px;
+    border-radius: 7px;
     font-size: 14px;
     width: 100%;
-    max-width: 260px;
+    max-width: 220px;
   }
   label { font-weight: 600; color: #334155; margin-top: 10px; display: block; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 14px; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  canvas { border: 1px solid #c3cfe2; border-radius: 10px; background: #fff; display: block; margin: 14px auto; max-width: 100%; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-top: 14px; }
+  canvas { border: 1px solid #c3cfe2; border-radius: 8px; background: #fff; display: block; margin: 14px auto; max-width: 100%; }
   .result {
     background: #f0fdf4;
     border: 1px solid #86efac;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
     display: none;
@@ -85,7 +86,7 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
   .note {
     background: #fffbeb;
     border: 1px solid #fde68a;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 14px;
     margin: 16px 0;
     font-size: 14px;
@@ -93,64 +94,58 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
   .warning {
     background: #fef2f2;
     border: 1px solid #fecaca;
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 14px;
     margin: 16px 0;
     font-size: 14px;
     color: #991b1b;
   }
-  .progress {
-    height: 8px; background: #e2e8f0; border-radius: 4px; margin: 10px 0; overflow: hidden;
-  }
-  .progress > div { height: 100%; background: #3b82f6; width: 0%; transition: width 0.4s; }
   .tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 2px solid #c3cfe2; }
   .tabs button {
     background: transparent; border: none; border-bottom: 3px solid transparent;
-    padding: 10px 18px; cursor: pointer; font-size: 14px; color: #64748b;
+    padding: 10px 16px; cursor: pointer; font-size: 14px; color: #64748b;
   }
   .tabs button.active { color: #2563eb; border-bottom-color: #2563eb; font-weight: 700; }
   .tabcontent { display: none; }
   .tabcontent.active { display: block; }
-  ul { margin: 8px 0 14px 20px; }
   .highlight { color: #2563eb; font-weight: 700; }
+  .formula { text-align: center; font-size: 17px; font-weight: bold; color: #1e3a8a; margin: 12px 0; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>خود آموز لند پیترن (Footprint) بر پایه استاندارد IPC</h1>
-  <p>ساخته شده با استفاده از مواد فایل‌های IPC-7351 و IPC-7352 موجود در پوشه IPC در درایو گوگل</p>
+  <h1>خود آموز لند پیترن (Land Pattern) بر پایه استاندارد IPC</h1>
+  <p>ساخته شده بر اساس مواد فایل‌های IPC-7351 و IPC-7352 موجود در پوشه IPC در درایو گوگل</p>
 </header>
 
-<div class="progress"><div id="prog"></div></div>
-
-<!-- démarrer contenu -->
 <div class="tabs">
-  <button class="tab-btn active" onclick="openTab(event,'intro')">معرفی و استانداردها</button>
-  <button class="tab-btn" onclick="openTab(event,'theory')">مفاهیم طراحی</button>
-  <button class="tab-btn" onclick="openTab(event,'sim')">سيمولاتور لند پیترن</button>
-  <button class="tab-btn" onclick="openTab(event,'quiz')">تست 짧은</button>
+  <button class="tab-btn active" onclick="openTab('intro')">معرفی و استانداردها</button>
+  <button class="tab-btn" onclick="openTab('theory')">مفاهیم طراحی</button>
+  <button class="tab-btn" onclick="openTab('sim')">سیمولاتور لند پیترن</button>
+  <button class="tab-btn" onclick="openTab('quiz')">تست کوتاه</button>
 </div>
 
 <!-- تب ۱: معرفی -->
 <div id="intro" class="tabcontent active">
   <div class="card">
-    <h2>۱. معرفی لند پیترن (Land Pattern / Footprint)</h2>
-    <p><span class="highlight">لند پیترن</span> مجموعه ابعاد پدهای acquiring بایستی در برد PCB طراحی شود تا}pقطعه بر روی برد لحیم شود. درست بودن ابعاد لند پیترن تاثیر مستقیم بر کیفیت لحیم، کارایی حرارتی و قابلیت تعمیرACE دارد.</p>
+    <h2>۱. لند پیترن چیست؟</h2>
+    <p><span class="highlight">لند پیترن</span> یا همان <span class="highlight">فوت‌پرینت</span>، مجموعه‌ای از پدهای لوله‌ای است که روی برد PCB طراحی می‌شود تا قطعات رقیبلو (SMT) لحیم شوند. درست بودن ابعاد لند پیترن تاثیر مستقیم بر کیفیت لحیم، کارایی حرارتی و قابلیت بازسازی دارد.</p>
     <p>در این خود آموز به استانداردهای زیر مراجعه شده است:</p>
     <ul>
-      <li><strong>IPC-7351</strong> — استاندارد گذرا لند پیترن برای تکنولوژی رقیبliku (SMT) (فوریه ۲۰۰۵)</li>
+      <li><strong>IPC-7351</strong> — استاندارد طراحی لند پیترن برای تکنولوژی رقیبلو (فوریه ۲۰۰۵)</li>
       <li><strong>IPC-7352</strong> — راهنمای کلی طراحی لند پیترن (می ۲۰۲۳)</li>
     </ul>
-    <div class="note"><strong>نکته:</strong> هر دو فایل PDF از پوشه IPC در درایو خوانده و محتوای آموزشی این صفحه بر اساس آنها مرتب شده است.</div>
+    <div class="note"><strong>نکته:</strong> محتوای این صفحه بر اساس استخراج متنی دو فایل PDF موجود در پوشه IPC در درایو گوگل مرتب شده است.</div>
   </div>
 
   <div class="card">
-    <h2>۲. 왜 لند پیترن درست مهم است؟</h2>
+    <h2>۲. چرا لند پیترن درست مهم است؟</h2>
     <ul>
-      <li>جلوگیری از لühت (bridge) بین پدهای مجاور</li>
-      <li>ضمان Formation مناسبت لühت کاری (solder joint)</li>
-      <td>قابلیت بازسازی و تغییر linh kiện با ق fondateur</li>
+      <li>جلوگیری از اتصال ناخواسته بین پدهای مجاور</li>
+      <li>ضمان تشکیل لحیم مناسبی در نقاط لحیم</li>
+      <li>قابلیت بازسازی و جایگزینی قطعه با سادگی</li>
+      <li>بهبود کارایی حرارتی و الکتریکی مدار</li>
     </ul>
   </div>
 </div>
@@ -159,52 +154,50 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
 <div id="theory" class="tabcontent">
   <div class="card">
     <h2>۳. ابعاد اصلی لند پیترن</h2>
-    <p>برای محاسبه ابعاد لند، سهionu ابعاد اجزا مورد نیاز است:</p>
+    <p>برای محاسبه ابعاد لند، ابعاد زیر از دیتاشیت قطعه مورد نیاز است:</p>
     <table>
-      <tr><th>نماد</th><th>معنى</th><th>توضیح</th></tr>
-      <tr><td>L</td><td>طول لينک</td><td>طول verbunden结尾대의 فاز/レンדת</td></tr>
-      <tr><td>W</td><td>عرض لينك</td><td>عرض verbunden结尾대의 فاز</td></tr>
-      <tr><td>P</td><td>فاصله گując (Pitch)</td><td>فاصله مرکز به مرکز بين لينک‌های مجاور</td></tr>
-      <tr><td>T</td><td>ضد لحيم (Tolerance)</td><td>در maksimum 차이가 ابعاد لühت production</td></tr>
+      <tr><th>نماد</th><th>معنی</th><th>توضیح</th></tr>
+      <tr><td>L</td><td>طول لینک</td><td>طول انتهایی لینک</td></tr>
+      <tr><td>W</td><td>عرض لینک</td><td>عرض انتهایی لینک</td></tr>
+      <tr><td>P</td><td>پچ (mm)</td><td>فاصله مرکز به مرکز بین لینک‌های مجاور</td></tr>
+      <tr><td>T</td><td>ضد لحیم</td><td>حداکثر تفاوت ابعاد در هنگام تولید</td></tr>
     </table>
   </div>
 
   <div class="card">
     <h2>۴. فرمول محاسبه (ساختگی IPC-7351)</h2>
-    <p>طول لند:</p>
-    <p style="text-align:center; font-size:18px; font-weight:bold; color:#1e3a8a;">Z = L + 2 × T + Overhang</p>
-    <p>عرض لند:</p>
-    <p style="text-align:center; font-size:18px; font-weight:bold; color:#1e3a8a;">G = W + 2 × T</p>
-    <p class="note">Overhang مقدار 추가 لحيم است که معمولاً ۰.۲ تا ۰.۵ mm در نظر گرفته می‌شود.</p>
+    <p class="formula">طول لند Z = L + 2 × T + ورانه</p>
+    <p class="formula">عرض لند G = W + 2 × T</p>
+    <div class="note">ورانه مقدار اضافی لحیم است که معمولاً ۰.۲ تا ۰.۵ mm در نظر گرفته می‌شود.</div>
   </div>
 </div>
 
-<!-- تب ۳: سيمولاتور -->
+<!-- تب ۳: سیمولاتور -->
 <div id="sim" class="tabcontent">
   <div class="card">
-    <h2>۵.سيمولاتور لند پیترن</h2>
-    <p>ابعاد连結 린ک را وارد کنید و به صورت لحظه‌ای لند پیشنهادی را دریافت کنید.</p>
+    <h2>۵.سیمولاتور لند پیترن</h2>
+    <p>ابعاد لینک را وارد کنید و ابعاد پیشنهادی لند را دریافت کنید.</p>
 
     <div class="grid">
       <div class="field">
-        <label>طول لينک L (mm)</label>
+        <label>طول لینک L (mm)</label>
         <input type="number" id="inL" value="3.0" step="0.1">
       </div>
       <div class="field">
-        <label>عرض لينک W (mm)</label>
+        <label>عرض لینک W (mm)</label>
         <input type="number" id="inW" value="1.0" step="0.1">
       </div>
       <div class="field">
-        <label>فاصله گ يؤثر P (mm)</label>
+        <label>پچ P (mm)</label>
         <input type="number" id="inP" value="1.27" step="0.1">
       </div>
       <div class="field">
-        <label>ضد لحيم T (mm)</label>
+        <label>ضد لحیم T (mm)</label>
         <input type="number" id="inT" value="0.1" step="0.05">
       </div>
     </div>
 
-    <div style="margin-top:16px; text-align:left;">
+    <div style="margin-top:16px;">
       <button class="btn sim" onclick="calcSim()">محاسبه و رسم لند</button>
       <button class="btn secondary" onclick="resetSim()">بازنشانی</button>
     </div>
@@ -230,15 +223,15 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
     <form id="quizForm">
       <div style="margin-bottom:16px;">
         <p>۱. لند پیترن برای چه است؟</p>
-        <label><input type="radio" name="q1" value="a"> طراحی پدهای لحيم linh kiện</label><br>
-        <label><input type="radio" name="q1" value="b">ನೆンガ کردن برد</label><br>
-        <label><input type="radio" name="q1" value="c"> peint کردن برد</label>
+        <label><input type="radio" name="q1" value="a"> طراحی پدهای لحیم قطعات</label><br>
+        <label><input type="radio" name="q1" value="b"> رنگ کردن برد</label><br>
+        <label><input type="radio" name="q1" value="c"> ایجاد کابل</label>
       </div>
       <div style="margin-bottom:16px;">
         <p>۲. هر دو استاندارد IPC-7351 و IPC-7352 مربوط به چه هستند؟</p>
         <label><input type="radio" name="q2" value="a"> لند پیترن PCB</label><br>
         <label><input type="radio" name="q2" value="b"> کابل USB</label><br>
-        <label><input type="radio" name="q2" value="c">brochen سوئچ</label>
+        <label><input type="radio" name="q2" value="c"> سوئچ برای بافت</label>
       </div>
       <button type="button" class="btn" onclick="checkQuiz()">بررسی پاسخ</button>
       <div id="quizResult" class="result" style="margin-top:14px;"></div>
@@ -247,18 +240,11 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
 </div>
 
 <script>
-  let step = 0;
-  const tabs = document.querySelectorAll('.tabcontent');
-  const prog = document.getElementById('prog');
-
-  function openTab(evt, id) {
-    tabs.forEach(t => t.classList.remove('active'));
+  function openTab(id) {
+    document.querySelectorAll('.tabcontent').forEach(t => t.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    step = Array.from(tabs).indexOf(document.getElementById(id));
-    prog.style.width = ((step + 1) / tabs.length * 100) + '%';
   }
 
-  /* ---------- simetor ---------- */
   function calcSim() {
     const L = parseFloat(document.getElementById('inL').value) || 0;
     const W = parseFloat(document.getElementById('inW').value) || 0;
@@ -278,7 +264,7 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
     const msg = document.getElementById('simMsg');
     if (gap < 0.2) {
       msg.style.color = '#991b1b';
-      msg.textContent = 'هشدار: فاصله بین پدها بسیار کم است، خطر لühت (bridge) وجود دارد.';
+      msg.textContent = 'هشدار: فاصله بین پدها بسیار کم است، خطر اتصال ناخواسته وجود دارد.';
     } else {
       msg.style.color = '#166534';
       msg.textContent = 'ابعاد لند مناسب است.';
@@ -300,13 +286,13 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
   function drawSim(L, W, P, Z, G, gap) {
     const c = document.getElementById('simCanvas');
     const ctx = c.getContext('2d');
-    const scale = 90; // px per mm
+    const scale = 90;
     const cx = c.width / 2;
     const cy = c.height / 2;
 
     ctx.clearRect(0, 0, c.width, c.height);
 
-    // رسم componente (نما 극단)
+    // رسم قطعه
     ctx.fillStyle = '#e2e8f0';
     ctx.strokeStyle = '#475569';
     ctx.lineWidth = 2;
@@ -328,14 +314,13 @@ title>خود آموز لند پیترن IPC — با سيمولاتور</title>
     ctx.fillText('فاصله P = ' + P.toFixed(2) + ' mm', cx + padW/2 + 10, cy);
   }
 
-  /* ---------- quiz ---------- */
   function checkQuiz() {
     const q1 = document.querySelector('input[name="q1"]:checked');
     const q2 = document.querySelector('input[name="q2"]:checked');
     const res = document.getElementById('quizResult');
     let score = 0;
     let txt = '';
-    if (q1 && q1.value === 'a') score++; else txt += 'سوال ۱ پاسخ صحیح: طراحی پدهای لحيم linh kiện.<br>';
+    if (q1 && q1.value === 'a') score++; else txt += 'سوال ۱ پاسخ صحیح: طراحی پدهای لحیم قطعات.<br>';
     if (q2 && q2.value === 'a') score++; else txt += 'سوال ۲ پاسخ صحیح: لند پیترن PCB.<br>';
     res.innerHTML = '<strong>نمره: ' + score + ' از ۲</strong><br>' + txt;
     res.classList.add('show');
