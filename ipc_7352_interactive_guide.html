@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>شبیه‌ساز و راهنمای کامل استاندارد IPC-7352</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.3/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif !important;
+            background-color: #090d16;
+            color: #f1f5f9;
+        }
+        .code-font {
+            font-family: monospace, sans-serif;
+            direction: ltr;
+            text-align: left;
+        }
+        .tab-btn.active {
+            background-color: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-[#090d16] text-slate-100 antialiased font-['Vazirmatn']">
+
+    <!-- Header Section -->
+    <header class="bg-slate-900/95 backdrop-blur text-white shadow-xl sticky top-0 z-50 border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="bg-blue-600 text-xs px-2.5 py-1 rounded-md font-bold">IPC-7352 (2023)</span>
+                <h1 class="text-lg md:text-xl font-bold">خودآموز و شبیه‌ساز پویا طراحی فوت‌پریانت (Land Pattern Generator)</h1>
+            </div>
+            <nav class="flex flex-wrap gap-2 text-xs">
+                <button onclick="switchTab('sim')" id="tab-btn-sim" class="tab-btn active px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">⚡ شبیه‌ساز پویا (Interactive Canvas)</button>
+                <button onclick="switchTab('rms')" id="tab-btn-rms" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">📐 محاسبات RMS تلرانس</button>
+                <button onclick="switchTab('pth')" id="tab-btn-pth" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">🔌 محاسبه سوراخ PTH</button>
+                <button onclick="switchTab('guide')" id="tab-btn-guide" class="tab-btn px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800 hover:bg-slate-700 transition">📚 راهنمای استاندارد</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-8">
+
+        <!-- TAB 1: DYNAMIC INTERACTIVE SIMULATOR -->
+        <section id="tab-sim" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                <!-- Left Column: Dynamic Inputs -->
+                <div class="lg:col-span-5 bg-slate-900 p-5 rounded-2xl border border-slate-800 space-y-5">
+                    <div class="border-b border-slate-800 pb-3 flex justify-between items-center">
+                        <h2 class="font-bold text-base text-amber-400 flex items-center gap-2">
+                            <span>⚙️</span> تنظیمات پویا و ورودی‌های قطعه
+                        </h2>
+                        <span class="text-xs text-slate-400">ابعاد به میلی‌متر (mm)</span>
+                    </div>
+
+                    <!-- Package Selector & Density Level -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-xs text-slate-300 font-semibold block mb-1">تعداد پایه‌های قطعه (N):</label>
+                            <select id="pinCount" onchange="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-blue-500 focus:outline-none">
+                                <option value="2">۲ پایه (Chip / Resistor / Diode)</option>
+                                <option value="4">۴ پایه (Small Outline)</option>
+                                <option value="6">۶ پایه (SOT-23-6 / SOP)</option>
+                                <option value="8" selected>۸ پایه (SOIC-8 / SOP-8)</option>
+                                <option value="14">۱۴ پایه (SOIC-14)</option>
+                                <option value="16">۱۶ پایه (SOIC-16)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300 font-semibold block mb-1">سطح تراکم پد (Density Level):</label>
+                            <select id="densityLevel" onchange="applyDensityLevel()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white focus:border-blue-500 focus:outline-none">
+                                <option value="A">سطح A - بیشترین برآمدگی (Most)</option>
+                                <option value="B" selected>سطح B - متوسط / نامی (Nominal)</option>
+                                <option value="C">سطح C - کمترین تراکم (Least)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Datasheet Dimensions Inputs -->
+                    <div class="space-y-3 pt-2">
+                        <h3 class="text-xs font-bold text-slate-200 border-r-2 border-blue-500 pr-2">۱. ابعاد قطعه از روی دیتاشیت (Datasheet Dimensions):</h3>
+                        
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">L max (طول کل قطعه با پایه - E):</label>
+                                <input type="number" id="inp-lmax" value="6.20" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-amber-400 font-bold code-font">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">S max (فاصله داخلی پایه‌ها - E1):</label>
+                                <input type="number" id="inp-smax" value="3.80" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-amber-400 font-bold code-font">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">W max (عرض پایه قطعه - b):</label>
+                                <input type="number" id="inp-wmax" value="0.45" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-amber-400 font-bold code-font">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">Pitch e (گام مرکز تا مرکز پین):</label>
+                                <input type="number" id="inp-pitch" value="1.27" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-cyan-400 font-bold code-font">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Solder Fillet Goals Inputs -->
+                    <div class="space-y-3 pt-2">
+                        <h3 class="text-xs font-bold text-slate-200 border-r-2 border-emerald-500 pr-2">۲. ضرایب برآمدگی قلع (Solder Fillet Goals):</h3>
+                        
+                        <div class="grid grid-cols-3 gap-2">
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">J_T (نوک پد):</label>
+                                <input type="number" id="inp-jt" value="0.35" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-emerald-400 code-font">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">J_H (پاشنه):</label>
+                                <input type="number" id="inp-jh" value="0.35" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-emerald-400 code-font">
+                            </div>
+                            <div>
+                                <label class="text-[11px] text-slate-300 block">J_S (جانبی):</label>
+                                <input type="number" id="inp-js" value="0.03" step="0.01" oninput="runSim()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-emerald-400 code-font">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calculated Output Display Card -->
+                    <div class="bg-slate-950 rounded-xl p-4 border border-slate-800 space-y-3">
+                        <h4 class="text-xs font-bold text-slate-300 border-b border-slate-800 pb-2">📊 نتایج نهایی ابعاد فوت‌پریانت (PCB Pad Layout):</h4>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-center">
+                            <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block">Z (طول کل پدها):</span>
+                                <span id="out-z" class="text-base font-extrabold text-emerald-400 code-font">6.90 mm</span>
+                                <span class="text-[9px] text-slate-500 block font-mono">L_max + 2×J_T</span>
+                            </div>
+                            <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block">G (فاصله داخلی پدها):</span>
+                                <span id="out-g" class="text-base font-extrabold text-amber-400 code-font">3.10 mm</span>
+                                <span class="text-[9px] text-slate-500 block font-mono">S_max - 2×J_H</span>
+                            </div>
+                            <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block">X (عرض هر پد):</span>
+                                <span id="out-x" class="text-base font-extrabold text-indigo-400 code-font">0.51 mm</span>
+                                <span class="text-[9px] text-slate-500 block font-mono">W_max + 2×J_S</span>
+                            </div>
+                            <div class="bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                                <span class="text-[10px] text-slate-400 block">فاصله پدهای مجاور:</span>
+                                <span id="out-clearance" class="text-base font-extrabold text-cyan-400 code-font">0.76 mm</span>
+                                <span class="text-[9px] text-slate-500 block font-mono">Pitch - X</span>
+                            </div>
+                        </div>
+
+                        <!-- Solder Bridge Status -->
+                        <div id="bridge-warning" class="text-[11px] p-2 rounded-lg text-center font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-800">
+                            ✓ فاصله پدها استاندارد است (عدم ایجاد پل زدن قلع).
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Interactive Canvas Visualizer -->
+                <div class="lg:col-span-7 bg-slate-900 p-5 rounded-2xl border border-slate-800 flex flex-col space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="font-bold text-sm text-slate-200">پیش‌نمایش تعاملی و ابعادگذاری گرافیکی (Dynamic Canvas Rendering)</h3>
+                            <p class="text-[11px] text-slate-400">تمام تغییرات ورودی مستقیماً روی تصویر زیر رسم می‌شوند.</p>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="changeZoom(1.15)" class="bg-slate-800 hover:bg-slate-700 text-xs px-2.5 py-1 rounded-md border border-slate-700 font-bold">🔍 +</button>
+                            <button onclick="changeZoom(0.85)" class="bg-slate-800 hover:bg-slate-700 text-xs px-2.5 py-1 rounded-md border border-slate-700 font-bold">🔍 -</button>
+                            <button onclick="resetCanvasZoom()" class="bg-slate-800 hover:bg-slate-700 text-xs px-2.5 py-1 rounded-md border border-slate-700">⟲ ریست</button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Container -->
+                    <div class="w-full flex-grow bg-[#050811] rounded-xl border border-slate-800 overflow-hidden relative flex items-center justify-center p-2">
+                        <canvas id="dynamicCanvas" width="850" height="650" class="w-full h-auto cursor-grab"></canvas>
+                    </div>
+
+                    <!-- Canvas Legend -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-300 bg-slate-950 p-3 rounded-xl border border-slate-800">
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-blue-500/70 border border-blue-400 inline-block rounded-sm"></span><span>پد مس PCB (Pad)</span></div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-amber-400 inline-block rounded-sm"></span><span>پایه‌های قطعه (Lead)</span></div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-slate-800 border border-slate-600 inline-block rounded-sm"></span><span>بدنه پلاستیکی (IC Body)</span></div>
+                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-400 inline-block rounded-sm"></span><span>خطوط ابعاد (Dimensions)</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: RMS TOLERANCE CALCULATOR -->
+        <section id="tab-rms" class="hidden bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-xl font-bold text-amber-400">محاسبه آماری تلرانس S_max به روش RMS (Root Mean Square)</h2>
+                <p class="text-xs text-slate-400 mt-1">جلوگیری از بزرگ‌تر شدن نامناسب پدها به علت جمع خطاهای ابعادی بدترین حالت (Worst-case)</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-200">ورودی تلرانس قطعه از دیتاشیت (mm):</h3>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-slate-300">L min (حداقل طول کل):</label>
+                            <input type="number" id="rms-lmin" value="5.80" step="0.01" oninput="calcRMS()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white code-font">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300">L max (حداکثر طول کل):</label>
+                            <input type="number" id="rms-lmax" value="6.20" step="0.01" oninput="calcRMS()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white code-font">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300">T min (حداقل طول پایه):</label>
+                            <input type="number" id="rms-tmin" value="0.40" step="0.01" oninput="calcRMS()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white code-font">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300">T max (حداکثر طول پایه):</label>
+                            <input type="number" id="rms-tmax" value="1.27" step="0.01" oninput="calcRMS()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white code-font">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-indigo-400 border-b border-slate-800 pb-2">خروجی محاسبات RMS:</h4>
+                        <div class="text-xs space-y-3 text-slate-300 mt-3">
+                            <div class="flex justify-between"><span>مجموع تلرانس بدترین حالت (Worst-case):</span><span id="rms-worst" class="code-font font-bold text-rose-400">2.14 mm</span></div>
+                            <div class="flex justify-between"><span>تلرانس آماری RMS (تعدیل شده):</span><span id="rms-val" class="code-font font-bold text-emerald-400">1.30 mm</span></div>
+                            <hr class="border-slate-800">
+                            <div class="flex justify-between text-sm"><span>S max اصلاح شده برای فرمول:</span><span id="rms-smax" class="code-font font-bold text-amber-400">4.98 mm</span></div>
+                            <div class="flex justify-between text-sm"><span>S min اصلاح شده:</span><span id="rms-smin" class="code-font font-bold text-amber-400">3.68 mm</span></div>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-400 bg-slate-900 p-2.5 rounded-lg border border-slate-800">
+                        💡 <strong>نکته استاندارد:</strong> مقدار S_max بدست آمده از این فرمول، به عنوان ورودی معادله <span class="code-font text-amber-300">G = S_max - 2×J_H</span> استفاده می‌شود.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: PTH HOLE CALCULATOR -->
+        <section id="tab-pth" class="hidden bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-xl font-bold text-emerald-400">محاسبه اندازه مته سوراخکاری و پد مس (Through-Hole Padstack)</h2>
+                <p class="text-xs text-slate-400 mt-1">محاسبه قطر مته (Drill Size) و حلقه مس (Annular Ring) برای قطعات PTH</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-200">مشخصات پایه قطعه و روش مونتاژ:</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-300 block mb-1">حداکثر ابعاد پایه قطعه (قطر پایه گرد یا قطر قطری پایه مستطیلی - mm):</label>
+                            <input type="number" id="pth-pin" value="0.80" step="0.01" oninput="calcPTH()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white code-font">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300 block mb-1">روش فرآیند لحیم‌کاری (Soldering Process):</label>
+                            <select id="pth-process" onchange="calcPTH()" class="w-full bg-slate-950 border border-slate-800 rounded-lg p-2 text-xs text-white">
+                                <option value="infinite">Wave / Selective / Hand Soldering (Infinite Solder Flow)</option>
+                                <option value="finite">Pin-in-Paste / Reflow (Finite Solder Flow)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950 p-5 rounded-xl border border-slate-800 space-y-4 flex flex-col justify-between">
+                    <div>
+                        <h4 class="text-sm font-bold text-amber-400 border-b border-slate-800 pb-2">ابعاد مته و پد مس پیشنهادی استاندارد:</h4>
+                        <div class="text-xs space-y-4 text-slate-300 mt-3">
+                            <div class="flex justify-between items-center"><span class="text-slate-400">قطر سوراخ نهایی مته (Drill Diameter):</span><span id="pth-drill" class="text-lg font-bold text-amber-400 code-font">1.20 mm</span></div>
+                            <div class="flex justify-between items-center"><span class="text-slate-400">حداقل قطر پد مس (Pad Outer Diameter):</span><span id="pth-pad" class="text-lg font-bold text-emerald-400 code-font">1.95 mm</span></div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] text-slate-400 bg-slate-900 p-3 rounded-lg border border-slate-800">
+                        <strong>فرمول استاندارد IPC-7352:</strong>
+                        <p class="mt-1 font-mono text-[10px] text-slate-400">Drill = Max_Pin_Diagonal + Adder (0.40mm for Wave / 0.15mm for PiP)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: STANDARD GUIDE & DOCUMENTATION -->
+        <section id="tab-guide" class="hidden bg-slate-900 p-6 rounded-2xl border border-slate-800 space-y-6">
+            <div class="border-b border-slate-800 pb-4">
+                <h2 class="text-xl font-bold text-blue-400">توضیحات و مستندات استاندارد IPC-7352 (May 2023)</h2>
+                <p class="text-xs text-slate-400 mt-1">اصول کلیدی، جداول ضرایب و قوانین نام‌گذاری پدها</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="font-bold text-sm text-amber-400">ضرایب پدهای Gull-Wing (جدول ۳-۱)</h3>
+                    <ul class="text-xs space-y-1.5 text-slate-300">
+                        <li><strong>Level A:</strong> Toe=0.55mm | Heel=0.45mm | Side=0.05mm</li>
+                        <li><strong>Level B:</strong> Toe=0.35mm | Heel=0.35mm | Side=0.03mm</li>
+                        <li><strong>Level C:</strong> Toe=0.15mm | Heel=0.25mm | Side=0.00mm</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="font-bold text-sm text-indigo-400">ضرایب قطعات چیپ (جدول ۳-۳)</h3>
+                    <ul class="text-xs space-y-1.5 text-slate-300">
+                        <li><strong>Level A:</strong> Toe=0.55mm | Heel=0.00mm | Side=0.05mm</li>
+                        <li><strong>Level B:</strong> Toe=0.35mm | Heel=0.00mm | Side=0.00mm</li>
+                        <li><strong>Level C:</strong> Toe=0.15mm | Heel=0.00mm | Side=0.00mm</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="font-bold text-sm text-emerald-400">ساختار نام‌گذاری Padstack (بخش ۵)</h3>
+                    <ul class="text-xs space-y-1.5 text-slate-300">
+                        <li><span class="code-font text-amber-300">c150h90</span>: پد گرد قطر 1.50mm با مته 0.90mm</li>
+                        <li><span class="code-font text-amber-300">r200_100</span>: پد مستطیلی 2.00mm × 1.00mm</li>
+                        <li><span class="code-font text-amber-300">s350</span>: پد مربعی اندازه 3.50mm</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Global Application Logic Script -->
+    <script>
+        // State Variables
+        let zoomLevel = 1.0;
+
+        // Density Level Presets for Gull-Wing Leads (Table 3-1)
+        const densityPresets = {
+            'A': { jt: 0.55, jh: 0.45, js: 0.05 },
+            'B': { jt: 0.35, jh: 0.35, js: 0.03 },
+            'C': { jt: 0.15, jh: 0.25, js: 0.00 }
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-btn-' + tabId).classList.add('active');
+
+            document.getElementById('tab-sim').classList.add('hidden');
+            document.getElementById('tab-rms').classList.add('hidden');
+            document.getElementById('tab-pth').classList.add('hidden');
+            document.getElementById('tab-guide').classList.add('hidden');
+
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+
+            if (tabId === 'sim') runSim();
+            if (tabId === 'rms') calcRMS();
+            if (tabId === 'pth') calcPTH();
+        }
+
+        function applyDensityLevel() {
+            const lvl = document.getElementById('densityLevel').value;
+            const preset = densityPresets[lvl];
+            if (preset) {
+                document.getElementById('inp-jt').value = preset.jt;
+                document.getElementById('inp-jh').value = preset.jh;
+                document.getElementById('inp-js').value = preset.js;
+            }
+            runSim();
+        }
+
+        function changeZoom(factor) {
+            zoomLevel *= factor;
+            if (zoomLevel < 0.4) zoomLevel = 0.4;
+            if (zoomLevel > 3.0) zoomLevel = 3.0;
+            runSim();
+        }
+
+        function resetCanvasZoom() {
+            zoomLevel = 1.0;
+            runSim();
+        }
+
+        function runSim() {
+            const pinCount = parseInt(document.getElementById('pinCount').value) || 8;
+            const lmax = parseFloat(document.getElementById('inp-lmax').value) || 0;
+            const smax = parseFloat(document.getElementById('inp-smax').value) || 0;
+            const wmax = parseFloat(document.getElementById('inp-wmax').value) || 0;
+            const pitch = parseFloat(document.getElementById('inp-pitch').value) || 1.27;
+
+            const jt = parseFloat(document.getElementById('inp-jt').value) || 0;
+            const jh = parseFloat(document.getElementById('inp-jh').value) || 0;
+            const js = parseFloat(document.getElementById('inp-js').value) || 0;
+
+            // IPC-7352 Equations
+            const z = lmax + (2 * jt);
+            const g = smax - (2 * jh);
+            const x = wmax + (2 * js);
+
+            const clearance = pitch - x;
+
+            // Update UI Labels
+            document.getElementById('out-z').innerText = z.toFixed(2) + " mm";
+            document.getElementById('out-g').innerText = g.toFixed(2) + " mm";
+            document.getElementById('out-x').innerText = x.toFixed(2) + " mm";
+            document.getElementById('out-clearance').innerText = clearance.toFixed(2) + " mm";
+
+            // Solder Bridge Warning Check
+            const warnBox = document.getElementById('bridge-warning');
+            if (clearance < 0.20) {
+                warnBox.className = "text-[11px] p-2 rounded-lg text-center font-bold bg-rose-950/80 text-rose-300 border border-rose-800";
+                warnBox.innerText = "⚠️ هشدار: فاصله پدها کمتر از 0.20mm است! احتمال پل زدن قلع (Solder Bridge) بالا است.";
+            } else {
+                warnBox.className = "text-[11px] p-2 rounded-lg text-center font-bold bg-emerald-950/60 text-emerald-300 border border-emerald-800";
+                warnBox.innerText = "✓ فاصله پدهای مجاور استاندارد است (عدم ایجاد اتصال کوتاه).";
+            }
+
+            // Draw Graphic on Canvas
+            renderDynamicCanvas(pinCount, lmax, smax, wmax, pitch, z, g, x);
+        }
+
+        function renderDynamicCanvas(pins, lmax, smax, wmax, pitch, z, g, x) {
+            const canvas = document.getElementById('dynamicCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2 + 10;
+            const baseScale = 42;
+            const scale = baseScale * zoomLevel;
+
+            const pinsPerSide = Math.max(1, Math.floor(pins / 2));
+            const bodyLengthD = Math.max(pinsPerSide * pitch, 3.8);
+
+            const padLength = (z - g) / 2;
+            const padW = Math.max(x * scale, 14);
+            const padL = Math.max(padLength * scale, 30);
+            const padG = Math.max(g * scale, 45);
+
+            const leftPadX = cx - (padG / 2) - padL;
+            const rightPadX = cx + (padG / 2);
+            const pitchPx = pitch * scale;
+
+            const startY = cy - ((pinsPerSide - 1) * pitchPx / 2);
+
+            // 1. Draw Copper Pads (Blue)
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.65)';
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 2;
+
+            for (let i = 0; i < pinsPerSide; i++) {
+                const py = startY + (i * pitchPx);
+
+                // Left Pads
+                ctx.fillRect(leftPadX, py - (padW / 2), padL, padW);
+                ctx.strokeRect(leftPadX, py - (padW / 2), padL, padW);
+
+                // Right Pads (if multi-pin)
+                if (pins > 1) {
+                    ctx.fillRect(rightPadX, py - (padW / 2), padL, padW);
+                    ctx.strokeRect(rightPadX, py - (padW / 2), padL, padW);
+                }
+            }
+
+            // 2. Draw Component IC Body (Dark Slate)
+            const bodyW = smax * scale;
+            const bodyL = bodyLengthD * scale;
+
+            ctx.fillStyle = '#1e293b';
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2.5;
+            ctx.fillRect(cx - (bodyW / 2), cy - (bodyL / 2), bodyW, bodyL);
+            ctx.strokeRect(cx - (bodyW / 2), cy - (bodyL / 2), bodyW, bodyL);
+
+            // Pin 1 Indicator Dot
+            ctx.fillStyle = '#94a3b8';
+            ctx.beginPath();
+            ctx.arc(cx - (bodyW / 2) + 14, startY, 5, 0, Math.PI * 2);
+            ctx.fill();
+
+            // 3. Draw Component Pins/Leads (Amber)
+            const leadL = ((lmax - smax) / 2) * scale;
+            const leadW = wmax * scale;
+
+            ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
+            for (let i = 0; i < pinsPerSide; i++) {
+                const py = startY + (i * pitchPx);
+
+                // Left leads
+                ctx.fillRect(cx - (bodyW / 2) - leadL, py - (leadW / 2), leadL, leadW);
+
+                // Right leads
+                if (pins > 1) {
+                    ctx.fillRect(cx + (bodyW / 2), py - (leadW / 2), leadL, leadW);
+                }
+            }
+
+            // -------------------------------------------------------------
+            // DYNAMIC DIMENSION LINES & LABELS
+            // -------------------------------------------------------------
+            ctx.font = 'bold 13px Vazirmatn, sans-serif';
+            ctx.lineWidth = 1.5;
+
+            function drawDim(x1, y1, x2, y2, label, color = '#34d399', isAbove = true) {
+                ctx.strokeStyle = color;
+                ctx.fillStyle = color;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1 - 5); ctx.lineTo(x1, y1 + 5);
+                ctx.moveTo(x2, y2 - 5); ctx.lineTo(x2, y2 + 5);
+                ctx.stroke();
+
+                ctx.textAlign = 'center';
+                const textY = isAbove ? y1 - 7 : y1 + 18;
+                ctx.fillText(label, (x1 + x2) / 2, textY);
+            }
+
+            // Z Dimension (Top Green)
+            const zY = cy - (bodyL / 2) - 40;
+            const rightEdge = (pins > 1) ? (rightPadX + padL) : (leftPadX + padL);
+            drawDim(leftPadX, zY, rightEdge, zY, `Z (طول کل پدها) = ${z.toFixed(2)}mm`, '#34d399', true);
+
+            // L max Dimension (Top Amber)
+            const lY = cy - (bodyL / 2) - 12;
+            const leftLeadX = cx - (bodyW / 2) - leadL;
+            const rightLeadX = (pins > 1) ? (cx + (bodyW / 2) + leadL) : (cx + (bodyW / 2));
+            drawDim(leftLeadX, lY, rightLeadX, lY, `L max (دیتاشیت E) = ${lmax.toFixed(2)}mm`, '#fbbf24', true);
+
+            // G Dimension (Bottom Green)
+            const gY = cy + (bodyL / 2) + 18;
+            if (pins > 1) {
+                drawDim(leftPadX + padL, gY, rightPadX, gY, `G (فاصله داخلی) = ${g.toFixed(2)}mm`, '#34d399', false);
+            }
+
+            // S max Dimension (Bottom Amber)
+            const sY = cy + (bodyL / 2) + 45;
+            drawDim(cx - (bodyW / 2), sY, cx + (bodyW / 2), sY, `S max (دیتاشیت E1) = ${smax.toFixed(2)}mm`, '#fbbf24', false);
+
+            // Pitch e Dimension (Vertical Right Cyan)
+            if (pinsPerSide > 1) {
+                const pitchX = rightPadX + padL + 20;
+                const pY1 = startY;
+                const pY2 = startY + pitchPx;
+
+                ctx.strokeStyle = '#22d3ee';
+                ctx.fillStyle = '#22d3ee';
+                ctx.beginPath();
+                ctx.moveTo(pitchX, pY1); ctx.lineTo(pitchX, pY2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(pitchX - 4, pY1); ctx.lineTo(pitchX + 4, pY1);
+                ctx.moveTo(pitchX - 4, pY2); ctx.lineTo(pitchX + 4, pY2);
+                ctx.stroke();
+                ctx.textAlign = 'right';
+                ctx.fillText(`e (Pitch) = ${pitch}mm`, pitchX - 8, (pY1 + pY2) / 2 + 4);
+            }
+
+            // Pad Width X (Vertical Left Indigo)
+            const xX = leftPadX - 20;
+            const xY1 = startY - (padW / 2);
+            const xY2 = startY + (padW / 2);
+
+            ctx.strokeStyle = '#818cf8';
+            ctx.fillStyle = '#818cf8';
+            ctx.beginPath();
+            ctx.moveTo(xX, xY1); ctx.lineTo(xX, xY2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(xX - 4, xY1); ctx.lineTo(xX + 4, xY1);
+            ctx.moveTo(xX - 4, xY2); ctx.lineTo(xX + 4, xY2);
+            ctx.stroke();
+            ctx.textAlign = 'left';
+            ctx.fillText(`X (عرض پد) = ${x.toFixed(2)}mm`, xX + 8, startY + 4);
+        }
+
+        function calcRMS() {
+            const lmin = parseFloat(document.getElementById('rms-lmin').value) || 0;
+            const lmax = parseFloat(document.getElementById('rms-lmax').value) || 0;
+            const tmin = parseFloat(document.getElementById('rms-tmin').value) || 0;
+            const tmax = parseFloat(document.getElementById('rms-tmax').value) || 0;
+
+            const ltol = lmax - lmin;
+            const ttol = tmax - tmin;
+
+            const sminWorst = lmin - (2 * tmax);
+            const smaxWorst = lmax - (2 * tmin);
+            const worstTol = smaxWorst - sminWorst;
+
+            const rmsTol = Math.sqrt(Math.pow(ltol, 2) + (2 * Math.pow(ttol, 2)));
+            const diff = worstTol - rmsTol;
+
+            const smaxRMS = smaxWorst - (diff / 2);
+            const sminRMS = sminWorst + (diff / 2);
+
+            document.getElementById('rms-worst').innerText = worstTol.toFixed(2) + " mm";
+            document.getElementById('rms-val').innerText = rmsTol.toFixed(2) + " mm";
+            document.getElementById('rms-smax').innerText = smaxRMS.toFixed(2) + " mm";
+            document.getElementById('rms-smin').innerText = sminRMS.toFixed(2) + " mm";
+        }
+
+        function calcPTH() {
+            const pin = parseFloat(document.getElementById('pth-pin').value) || 0;
+            const process = document.getElementById('pth-process').value;
+
+            let adder = (process === 'infinite') ? 0.40 : 0.15;
+            const drill = pin + adder;
+
+            let padAdder = 0.50;
+            if (drill > 1.0 && drill <= 1.25) padAdder = 0.75;
+            else if (drill > 1.25 && drill <= 1.75) padAdder = 1.00;
+            else if (drill > 1.75) padAdder = 1.25;
+
+            const pad = drill + padAdder;
+
+            document.getElementById('pth-drill').innerText = drill.toFixed(2) + " mm";
+            document.getElementById('pth-pad').innerText = pad.toFixed(2) + " mm";
+        }
+
+        window.onload = function() {
+            runSim();
+        };
+    </script>
+</body>
+</html>
