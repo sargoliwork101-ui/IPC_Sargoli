@@ -250,9 +250,9 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 <div><label>روش نصب / مدل هندسی (پیشرفته)</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
-<div class="wide"><label for="footprintSearch">جستجوی فوت‌پرینت / پکیج / نمونه<small>مثلاً SOT-23، SN74LVC1G04، مقاومت یا 0603؛ جستجو در همهٔ گروه‌ها</small></label><input id="footprintSearch" type="search" autocomplete="off" placeholder="نام قطعه یا پکیج…" aria-controls="footprintSearchResults"><div id="footprintSearchResults" aria-live="polite" style="display:grid;gap:6px;margin-top:8px;max-height:260px;overflow:auto"></div></div>
 <div><label>۱. نوع قطعه</label><select id="component"><option value="resistor">مقاومت</option><option value="capacitor">خازن</option><option value="inductor">سلف</option><option value="ferrite">فریت‌بید</option><option value="diode">دیود</option><option value="led">LED</option><option value="transistor">ترانزیستور / قطعهٔ قدرت</option><option value="ic" selected>آی‌سی</option><option value="crystal">کریستال</option><option value="oscillator">اسیلاتور</option><option value="fuse">فیوز</option><option value="thermistor">ترمیستور</option><option value="varistor">واریستور</option><option value="connector">کانکتور / هدر / سوکت</option><option value="jumper">جامپر</option><option value="switch">کلید / رله</option><option value="transformer">ترانس / قطعات مغناطیسی خاص</option><option value="custom">طراحی سفارشی / سایر قطعات</option></select></div>
 <div><label>۲. نوع پکیج</label><select id="package"></select></div>
+<div class="wide"><label for="footprintSearch">جستجوی فوت‌پرینت / پکیج / نمونه<small>مثلاً SOT-23، SN74LVC1G04، مقاومت یا 0603؛ فقط در نوع قطعهٔ انتخاب‌شده</small></label><input id="footprintSearch" type="search" autocomplete="off" placeholder="نام قطعه یا پکیج…" aria-controls="footprintSearchResults"><div id="footprintSearchResults" aria-live="polite" style="display:grid;gap:6px;margin-top:8px;max-height:260px;overflow:auto"></div></div>
 <div id="padShapeControl"><label>شکل پد SMD — نقشه و خروجی<small>انتخاب مستقل از ویرایش دستی؛ بند 3.2 الزام شکل واحدی ندارد.</small></label><select id="pShape"><option value="auto">پیش‌فرض خانواده (نه الزام استاندارد)</option><option value="o">دو‌سرگرد (Oblong)</option><option value="r">مستطیلی (Rectangular)</option></select></div>
 <div class="note wide" id="sampleComment" role="status"></div><div class="note wide" id="manufacturerReference" hidden></div><div class="note wide" id="packageStatus" role="status" aria-live="polite"></div><div class="note wide" id="methodReadout" aria-live="polite"></div>
 <div><label>۳. اندازه / نمونهٔ آماده<small>ابعاد نمونه‌ها نقطهٔ شروع‌اند؛ دیتاشیت سازنده مرجع نهایی است.</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="ti-pw16">TI PW0016A · TSSOP-16 · مرجع سازنده</option><option value="tssop">TSSOP-16 عمومی</option><option value="ti-db5">TI SN74LVC1G04DBVR · SOT-23-5</option><option value="ti-db6">TI TLV4062-Q1 · SOT-23-6</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48</option><option value="chip">1206 اینچی / 3216 متریک</option><option value="chip0805">0805 اینچی / 2012 متریک</option><option value="chip0603">0603 اینچی / 1608 متریک</option><option value="sot23">SOT-23-3 · نمونهٔ هندسی</option><option value="dip">DIP-14</option></select></div>
@@ -1738,6 +1738,9 @@ var PACKAGE_TYPES={
  ],
  "ic": [
   "soic",
+  "sot23",
+  "sot23-5",
+  "sot23-6",
   "tssop",
   "qfp",
   "qfn",
@@ -1851,15 +1854,19 @@ $('leaveReference').onclick=function(){$('libraryMode').checked=false;$('smp').v
 
 var REFERENCE_FOOTPRINTS=JSON.parse($('referenceFootprintData').textContent);
 Object.keys(REFERENCE_FOOTPRINTS).forEach(function(key){var option=document.createElement('option');option.value='lib-'+key;option.textContent='مرجع KiCad: '+REFERENCE_FOOTPRINTS[key].name;$('smp').appendChild(option)});
+var ALL_SAMPLE_OPTIONS=Array.from($('smp').options).map(function(o){return o.cloneNode(true)});
 function presetPackage(id){if(id.indexOf('lib-')===0)return id.slice(4);if(id==='ti-db5')return 'sot23-5';if(id==='ti-db6')return 'sot23-6';if(id==='ti-pw16')return 'tssop';return /^chip/.test(id)?'chip':/^soic/.test(id)?'soic':id==='bga100'?'bga':id}
 function refreshPackages(selected){
  $('package').innerHTML=PACKAGE_TYPES[$('component').value].map(function(id){var p=PACKAGE_CATALOG[id],status={sample:'نمونه دارد',configure:'ابعاد دیتاشیت لازم',unavailable:'هنوز پشتیبانی نمی‌شود',blocked:'نیازمند اصلاح محاسبه',custom:'پیشرفته'}[p.state];if(REFERENCE_FOOTPRINTS[id])status+='؛ مرجع واقعی KiCad دارد';return '<option value="'+id+'">'+p.label+' — '+status+'</option>'}).join('');
  if(selected&&PACKAGE_TYPES[$('component').value].indexOf(selected)>=0)$('package').value=selected;
  filterSamples();
 }
-function filterSamples(){var pk=$('package').value;
- Array.from($('smp').options).forEach(function(o){o.hidden=!!o.value&&presetPackage(o.value)!==pk});
+function filterSamples(){var pk=$('package').value,previous=$('smp').value;
+ // Remove unrelated options: hidden <option> is not reliably respected by native/mobile pickers.
+ $('smp').replaceChildren.apply($('smp'),ALL_SAMPLE_OPTIONS.filter(function(o){return !o.value||presetPackage(o.value)===pk}).map(function(o){var copy=o.cloneNode(true);copy.hidden=false;return copy}));
+ if(Array.from($('smp').options).some(function(o){return o.value===previous}))$('smp').value=previous;
 }
+
 function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp=$('component').value;
  if(!PACKAGE_TYPES[comp]||PACKAGE_TYPES[comp].indexOf(pk)<0)comp=pk==='chip'?'resistor':/^sot23/.test(pk)?'transistor':'ic';
  $('component').value=comp;refreshPackages(pk);
@@ -1867,18 +1874,19 @@ function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp
 
 function searchKey(text){return String(text).toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\s\-–—_\u200c]/g,'')}
 function searchFootprints(){
+ var allowed=PACKAGE_TYPES[$('component').value]||[];
  var root=$('footprintSearchResults'),query=searchKey($('footprintSearch').value);root.textContent='';if(!query)return;
  var matches=[];
  function groupText(pkg){return Object.keys(PACKAGE_TYPES).filter(function(c){return PACKAGE_TYPES[c].indexOf(pkg)>=0}).map(function(c){var opt=Array.from($('component').options).find(function(o){return o.value===c});return opt?opt.textContent:c}).join(' ')}
- Array.from($('tExample').options).forEach(function(o){if(o.value&&searchKey(o.textContent+' '+o.value).indexOf(query)>=0)matches.push({thExample:o.value,pkg:'axial',label:o.textContent+' — نمونهٔ پایه‌دار سازنده'})});
- Array.from($('smp').options).forEach(function(o){if(o.value&&searchKey(o.textContent+' '+o.value+' '+groupText(presetPackage(o.value))).indexOf(query)>=0)matches.push({sample:o.value,pkg:presetPackage(o.value),label:o.textContent+' — نمونهٔ آماده'})});
- Object.keys(PACKAGE_CATALOG).forEach(function(pkg){var spec=PACKAGE_CATALOG[pkg];if(searchKey(pkg+' '+spec.label+' '+groupText(pkg)).indexOf(query)>=0)matches.push({pkg:pkg,label:spec.label+' — '+({sample:'نمونه دارد',configure:'قابل تنظیم',unavailable:'هنوز پیاده‌سازی نشده',blocked:'نیازمند اصلاح',custom:'سفارشی'}[spec.state])})});
+ Array.from($('tExample').options).forEach(function(o){if(allowed.includes('axial')&&o.value&&($('component').value===(o.value==='cfr25'?'resistor':'diode'))&&searchKey(o.textContent+' '+o.value).indexOf(query)>=0)matches.push({thExample:o.value,pkg:'axial',label:o.textContent+' — نمونهٔ پایه‌دار سازنده'})});
+ ALL_SAMPLE_OPTIONS.forEach(function(o){if(o.value&&allowed.includes(presetPackage(o.value))&&searchKey(o.textContent+' '+o.value+' '+groupText(presetPackage(o.value))).indexOf(query)>=0)matches.push({sample:o.value,pkg:presetPackage(o.value),label:o.textContent+' — نمونهٔ آماده'})});
+ Object.keys(PACKAGE_CATALOG).forEach(function(pkg){var spec=PACKAGE_CATALOG[pkg];if(allowed.includes(pkg)&&searchKey(pkg+' '+spec.label+' '+groupText(pkg)).indexOf(query)>=0)matches.push({pkg:pkg,label:spec.label+' — '+({sample:'نمونه دارد',configure:'قابل تنظیم',unavailable:'هنوز پیاده‌سازی نشده',blocked:'نیازمند اصلاح',custom:'سفارشی'}[spec.state])})});
  if(!matches.length){root.textContent='نتیجه‌ای پیدا نشد؛ نام دیگری امتحان کن.';return}
  var info=document.createElement('small');info.textContent=matches.length+' نتیجه'+(matches.length>30?'؛ ۳۰ مورد اول نمایش داده می‌شود، جستجو را دقیق‌تر کن.':'');root.appendChild(info);
  matches.slice(0,30).forEach(function(item){var button=document.createElement('button');button.type='button';button.className='btn';button.style.cssText='white-space:normal;text-align:right;justify-content:flex-start';button.textContent=item.label;
  button.onclick=function(){
   if(item.thExample){rememberPackage();$('tExample').value=item.thExample;$('tExample').onchange();activePackage=$('component').value+':'+$('package').value}
-  else if(item.sample){rememberPackage();$('smp').value=item.sample;$('smp').onchange()}
+  else if(item.sample){rememberPackage();refreshPackages(item.pkg);$('smp').value=item.sample;$('smp').onchange()}
   else{var comp=$('component').value;if(PACKAGE_TYPES[comp].indexOf(item.pkg)<0)comp=Object.keys(PACKAGE_TYPES).find(function(c){return PACKAGE_TYPES[c].indexOf(item.pkg)>=0});if(!comp)return;$('component').value=comp;refreshPackages(item.pkg);choosePackage()}
   $('footprintSearch').value='';root.textContent='';
  };root.appendChild(button)});
@@ -1922,7 +1930,7 @@ function choosePackage(){rememberPackage();$('libraryMode').checked=false;active
  run();
 }
 }
-$('component').onchange=function(){refreshPackages();choosePackage()};
+$('component').onchange=function(){refreshPackages();choosePackage();searchFootprints()};
 $('package').onchange=choosePackage;
 // خانواده و مدل هندسی برای کار عادی خودکارند؛ دسترسی دستی برای کاربر حرفه‌ای حفظ می‌شود.
 var advanced=document.createElement('details');advanced.id='advancedGeometry';advanced.className='box';
@@ -1975,7 +1983,7 @@ $('previewPackage').onclick=function(){
  run();
  $('packageStatus').textContent+=' نمونهٔ هندسی آموزشی بارگذاری شد؛ این اعداد از دیتاشیت یک قطعهٔ مشخص نیستند. پیش از ساخت همهٔ ابعاد را تأیید کن.';
 };
-$('restoreDrawing').onclick=function(){$('man').checked=false;$('smp').value='soic';$('smp').onchange()};
+$('restoreDrawing').onclick=function(){$('man').checked=false;$('component').value='ic';refreshPackages('soic');$('smp').value='soic';$('smp').onchange()};
 document.addEventListener('change',function(e){
  if(e.target&&e.target.id==='fam'){var f=e.target.value,c=$('cType');if(!c)return;
   if(f==='chip'&&!/C$/.test(c.value)||c.value===''){c.value='RESC'}

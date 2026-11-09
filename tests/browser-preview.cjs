@@ -8,10 +8,16 @@ const engine = chromiumPackage.default || chromiumPackage;
  const browser = await chromium.launch({args:engine.args, executablePath:await engine.executablePath(), headless:true});
  try {
   const page = await browser.newPage({viewport:{width:1440,height:1000}});
+ const selectSample=async(value)=>{await page.evaluate(v=>{
+ const d=document,pk=v.startsWith('lib-')?v.slice(4):({'ti-db5':'sot23-5','ti-db6':'sot23-6','ti-pw16':'tssop','bga100':'bga'}[v]||(/^chip/.test(v)?'chip':/^soic/.test(v)?'soic':v));
+ const comp=d.getElementById('component'),pkg=d.getElementById('package'),change=e=>e.dispatchEvent(new Event('change',{bubbles:true}));
+ if(!Array.from(pkg.options).some(o=>o.value===pk)){comp.value=pk==='chip'?'resistor':/^(sot|dpak|to-th)/.test(pk)?'transistor':/^(connector|hdr|socket|npth|pressfit)/.test(pk)?'connector':'ic';change(comp)}
+ pkg.value=pk;change(pkg);
+ },value);await page.selectOption('#smp',value)};
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://localhost:8080/tool.html');
   for (const sample of ['soic','chip','bga100','dip','sot23']) {
-   await page.selectOption('#smp',sample);
+   await selectSample(sample);
    const result=await page.evaluate(()=>{
     const svg=document.querySelector('#svg'),r=svg.getBoundingClientRect();
     return {mode:document.compatMode,width:r.width,height:r.height,empty:document.querySelector('#stageEmpty').hidden,count:+document.querySelector('#mCount').textContent,shapes:svg.querySelectorAll('rect,circle').length};
@@ -21,11 +27,11 @@ const engine = chromiumPackage.default || chromiumPackage;
    console.log(sample,'visible:',result.count,'pads');
   }
   await page.locator('#advancedGeometry').evaluate(e=>e.open=true);
-  await page.selectOption('#smp','chip');
+  await selectSample('chip');
   assert.equal(await page.locator('#fam').inputValue(),'chip');
   await page.selectOption('#fam','gull');
   assert.equal(await page.locator('#smp').inputValue(),'');
-  await page.selectOption('#smp','soic');
+  await selectSample('soic');
   assert.equal(await page.locator('#fam').inputValue(),'gull');
   await page.locator('#Lmax').fill('6.3');
   assert.equal(await page.locator('#smp').inputValue(),'');
@@ -33,10 +39,10 @@ const engine = chromiumPackage.default || chromiumPackage;
   await page.selectOption('#component','capacitor');
   assert.equal(await page.locator('#fam').inputValue(),'chip');
   assert.equal(await page.locator('#cType').inputValue(),'CAPC');
-  await page.selectOption('#smp','chip0603');
+  await selectSample('chip0603');
   assert.equal(await page.locator('#mCount').textContent(),'2');
   await page.selectOption('#component','transistor');
-  assert.equal(await page.locator('#smp').inputValue(),'sot23');
+  assert.equal(await page.locator('#package').inputValue(),'sot23');
   assert.equal(await page.locator('#mCount').textContent(),'3');
   assert((await page.locator('#insName').textContent()).startsWith('SOT'));
   await page.locator('#mkA').evaluate(e=>e.click());
@@ -58,8 +64,8 @@ const engine = chromiumPackage.default || chromiumPackage;
   console.log('User-selected shape, reload and SOT-23-5/6 geometry: PASS');
   await page.selectOption('#component','resistor');await page.selectOption('#package','axial');if(await page.locator('#leaveReference').isVisible())await page.locator('#leaveReference').click();
   await page.selectOption('#tExample','cfr25');assert.equal(await page.locator('#mCount').textContent(),'2');
-  await page.selectOption('#smp','soic');assert.equal(await page.locator('#mCount').textContent(),'16');
-  assert.equal(await page.locator('#tModel').inputValue(),'axial-h');
+  await selectSample('soic');assert.equal(await page.locator('#mCount').textContent(),'16');
+  assert.equal(await page.locator('#kind').inputValue(),'smd');
   await page.reload();assert.equal(await page.locator('#mCount').textContent(),'16');
   await page.selectOption('#component','transistor');await page.selectOption('#package','sot23-5');
   if(await page.locator('#previewPackage').isVisible())await page.locator('#previewPackage').click();assert.equal(await page.locator('#mCount').textContent(),'5');
@@ -69,7 +75,7 @@ const engine = chromiumPackage.default || chromiumPackage;
   await page.selectOption('#package','sot23-5');assert.equal(await page.locator('#W').inputValue(),'0.47');
   assert.equal(await page.locator('#mCount').textContent(),'5');
   console.log('THT to SMD isolation, persisted stale THT model and per-package input recovery: PASS');
-  await page.selectOption('#smp','ti-db5');
+  await selectSample('ti-db5');
   assert.equal(await page.locator('#mfrL').inputValue(),'1.1');assert.equal(await page.locator('#mfrW').inputValue(),'0.6');
   await page.locator('#mfrL').fill('1.2');await page.reload();
   assert.equal(await page.locator('#padBasis').inputValue(),'manufacturer');assert.equal(await page.locator('#mfrL').inputValue(),'1.2');
@@ -81,11 +87,11 @@ const engine = chromiumPackage.default || chromiumPackage;
   assert.equal(await page.locator('#smp').inputValue(),'ti-db5');
   assert((await page.locator('#dimG').textContent()).includes('C-C X 2.60 mm'));
   await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-horizontal-centers.png'});
-  await page.locator('#footprintSearch').fill('CFR-25');await page.locator('#footprintSearchResults button').first().click();
+  await page.selectOption('#component','resistor');await page.locator('#footprintSearch').fill('CFR-25');await page.locator('#footprintSearchResults button').first().click();
   assert.equal(await page.locator('#tExample').inputValue(),'cfr25');assert.equal(await page.locator('#mCount').textContent(),'2');
   await page.locator('#footprintSearch').fill('no-match-xyz');assert.equal(await page.locator('#footprintSearchResults button').count(),0);
   await page.locator('#footprintSearch').press('Escape');assert.equal(await page.locator('#footprintSearch').inputValue(),'');
-  console.log('Global footprint search and horizontal center-to-center dimension: PASS');
+  console.log('Component-scoped footprint search and horizontal center-to-center dimension: PASS');
 
 
 
@@ -100,26 +106,26 @@ const engine = chromiumPackage.default || chromiumPackage;
   assert((await page.locator('#pads').inputValue()).length>0);
   await page.selectOption('#component','led');assert.equal(await page.locator('#cType').inputValue(),'LEDC');
   console.log('Catalogue filtering, blocked output and persisted package: PASS');
-  await page.selectOption('#smp','lib-sot223');
+  await selectSample('lib-sot223');
   assert(await page.locator('#referenceComment').textContent().then(t=>t.includes('SOT-223-3_TabPin2')&&t.includes('دیتاشیت')));
   await page.locator('#referenceTable input[data-row="0"][data-key="w"]').fill('1.7');
   assert((await page.locator('#pads').inputValue()).includes('1.7000'));
   await page.reload();assert.equal(await page.locator('#referenceTable input[data-row="0"][data-key="w"]').inputValue(),'1.7');
   await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-ref-sot223.png'});
-  await page.selectOption('#smp','lib-sot89');assert.equal(await page.locator('#svg polygon').count(),1);
-  await page.selectOption('#smp','lib-connector-smd');assert.equal(await page.locator('#mCount').textContent(),'13');
+  await selectSample('lib-sot89');assert.equal(await page.locator('#svg polygon').count(),1);
+  await selectSample('lib-connector-smd');assert.equal(await page.locator('#mCount').textContent(),'13');
   await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-ref-usb.png'});
   console.log('Library references, numeric editing, polygon, slot and persisted geometry: PASS');
 
   // Old 1206 state must survive a reload without becoming blank.
-  await page.selectOption('#smp','chip');
+  await selectSample('chip');
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('fp7352'));o.Lmin='5.8';localStorage.setItem('fp7352',JSON.stringify(o))});
   await page.reload();assert.equal(await page.locator('#mCount').textContent(),'2');
   await page.locator('#Lmax').fill('0');
   assert(await page.locator('#stageEmpty').isVisible());
   assert((await page.locator('#emptyReason').textContent()).includes('Lmax'));
   await page.locator('#restoreDrawing').click();assert.equal(await page.locator('#mCount').textContent(),'16');
-  await page.selectOption('#smp','dip');
+  await selectSample('dip');
   await page.selectOption('#tS','1');await page.locator('#tW').fill('0.5');await page.selectOption('#tPr','0');
   let pin=(await page.locator('#pads').inputValue()).split('\n')[1].split(',');
   assert.equal(+pin[3],1.36);assert.equal(+pin[4],.86);

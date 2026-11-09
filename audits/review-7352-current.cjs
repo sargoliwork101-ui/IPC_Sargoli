@@ -6,7 +6,12 @@ const fs=require('node:fs'),path=require('node:path'),{JSDOM}=require('jsdom');
 const html=fs.readFileSync(path.join(__dirname,'../IPC-7352/tool.html'),'utf8');
 const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://ipc-audit.test/tool.html'}),w=dom.window,d=w.document;
 function set(id,v){const e=d.getElementById(id);if(e.type==='checkbox')e.checked=!!v;else e.value=v;e.dispatchEvent(new w.Event('input',{bubbles:true}));e.dispatchEvent(new w.Event('change',{bubbles:true}));}
-function sample(id){d.getElementById('tHT').value='P';d.getElementById('tTol').value='0.08';d.getElementById('tPr').value='1';d.getElementById('smp').value=id;d.getElementById('smp').onchange();set('man',false);set('lv','B')}
+function sample(id){
+ const pk=/^chip/.test(id)?'chip':id==='bga100'?'bga':id;
+ const comp=pk==='chip'?'resistor':'ic';
+ if(d.getElementById('component').value!==comp)set('component',comp);
+ set('package',pk);
+d.getElementById('tHT').value='P';d.getElementById('tTol').value='0.08';d.getElementById('tPr').value='1';d.getElementById('smp').value=id;d.getElementById('smp').onchange();set('man',false);set('lv','B')}
 function row(name){return [...d.querySelectorAll('#res tr')].find(tr=>tr.cells[0].textContent===name)?.cells[1].textContent}
 function csv(){return d.getElementById('pads').value.trim().split('\n').slice(1).map(s=>s.split(','))}
 const findings=[];

@@ -28,9 +28,23 @@ function load(file) {
   return { d: dom.window.document, w: dom.window };
 }
 
+// Tests requesting a sample explicitly navigate the same component/package hierarchy as users.
+function prepareSample(d,value){
+ if(!value)return;
+ const pk=value.startsWith('lib-')?value.slice(4):({'ti-db5':'sot23-5','ti-db6':'sot23-6','ti-pw16':'tssop','bga100':'bga'}[value]||(/^chip/.test(value)?'chip':/^soic/.test(value)?'soic':value));
+ const change=e=>e.dispatchEvent(new d.defaultView.Event('change',{bubbles:true}));
+ if(!Array.from(d.getElementById('package').options).some(o=>o.value===pk)){
+  for(const c of Array.from(d.getElementById('component').options)){
+   d.getElementById('component').value=c.value;change(d.getElementById('component'));
+   if(Array.from(d.getElementById('package').options).some(o=>o.value===pk))break;
+  }
+ }
+ d.getElementById('package').value=pk;change(d.getElementById('package'));
+}
 function setV(d, id, v) {
   const e = d.getElementById(id);
   if (!e) throw new Error('#' + id + ' پیدا نشد');
+  if(id==='smp')prepareSample(d,v);
   if (e.type === 'checkbox') e.checked = !!v; else e.value = v;
   const W = d.defaultView;
   e.dispatchEvent(new W.Event('input', { bubbles: true }));
@@ -386,7 +400,7 @@ console.log('\n۱۱) گردش واقعی نمونه‌ها، ذخیره و تف�
  const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://ipc.test/tool.html',pretendToBeVisual:true});
  const w=dom.window,d=w.document;
  function input(id,value){const e=d.getElementById(id);e.value=value;e.dispatchEvent(new w.Event('input',{bubbles:true}))}
- function sample(value){d.getElementById('smp').value=value;d.getElementById('smp').onchange()}
+ function sample(value){prepareSample(d,value);d.getElementById('smp').value=value;d.getElementById('smp').onchange()}
  for(const preset of ['soic','soic8','soic14','tssop','chip','qfp','dip','bga100']){
   sample(preset);
   ok(d.getElementById('pads').value.split('\n').length>2,preset+': نمونه خروجی معتبر دارد');
@@ -401,7 +415,7 @@ console.log('\n۱۱) گردش واقعی نمونه‌ها، ذخیره و تف�
  d.querySelector('[data-t="t2"]').click();
  ok(d.querySelector('.workspace').dataset.mode==='t2'&&w.getComputedStyle(d.querySelector('.sidebar .group')).display==='none','نام‌گذاری مستقل و بدون تنظیمات فوت‌پرینت است');
  ok(new Set([...d.querySelectorAll('[id]')].map(e=>e.id)).size===d.querySelectorAll('[id]').length,'شناسهٔ تکراری در سند وجود ندارد');
- const presets=[...d.getElementById('smp').options].map(o=>o.value).filter(v=>v&&!v.startsWith('lib-'));
+ const presets=['soic','soic8','soic14','tssop','ti-pw16','ti-db5','ti-db6','bga100','qfp','chip','chip0805','chip0603','sot23','dip'];
  let allTransitions=true,chipCorrect=true;
  for(const from of presets)for(const to of presets){
   sample(from);sample(to);
@@ -437,7 +451,7 @@ console.log('\n۱۲) جهت برچسب عددی و حاشیهٔ کادر');
 console.log('\n۱۳) قیدهای ورودی و پیام کنار خانه');
 {
  const {d,w}=load(TOOL);
- function sample(v){d.getElementById('smp').value=v;d.getElementById('smp').onchange()}
+ function sample(v){prepareSample(d,v);d.getElementById('smp').value=v;d.getElementById('smp').onchange()}
  for(const [preset,id,value] of [['soic','P',0],['soic','Lmin',99],['soic','n',2.5],['chip','n',2],['chip','sides','4'],['bga100','bL',-1],['bga100','bR',101],['dip','tB',-1]]){
   sample(preset);setV(d,id,value);
   ok(d.getElementById(id).getAttribute('aria-invalid')==='true'&&!!d.getElementById(id+'-error')&&!d.getElementById('pads').value,preset+'/'+id+': پیام کنار خانه و جلوگیری از خروجی نامعتبر');
@@ -487,7 +501,7 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
    if(/ابعاد دیتاشیت لازم/.test(label)&&!d.getElementById('smp').value&&!d.getElementById('libraryMode').checked)configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
   }
  }
- ok(packages.size===66&&combos===131,'۶۶ تعریف پکیج و ۱۳۱ ترکیب مرتبط قابل انتخاب است');
+ ok(packages.size===66&&combos===134,'۶۶ تعریف پکیج و ۱۳۴ ترکیب مرتبط قابل انتخاب است');
  ok(blockedSafe,'بسته‌های پشتیبانی‌نشده یا مسدود، نقشه/خروجی قطعهٔ قبلی را نشان نمی‌دهند');
  ok(configSafe,'بستهٔ بدون نمونه، ابعاد قبلی را به جای دیتاشیت استفاده نمی‌کند');
  change('component','led');
@@ -505,7 +519,7 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
 console.log('\n۱۶) مرجع مستقل سوراخ و پد طبق IPC-7352');
 {
  const {d,w}=load(TOOL);
- function sample(){d.getElementById('smp').value='dip';d.getElementById('smp').onchange()}
+ function sample(){prepareSample(d,'dip');d.getElementById('smp').value='dip';d.getElementById('smp').onchange()}
  function pair(){const p=padsOf(d)[0];return p?[p[3],p[4]]:[]}
  for(const shape of [0,1,2])for(const process of [0,1]){
   sample();setV(d,'tS',shape);setV(d,'tW',.5);setV(d,'tW2',.3);setV(d,'tPr',process);
@@ -540,7 +554,7 @@ console.log('\n۱۶) مرجع مستقل سوراخ و پد طبق IPC-7352');
 console.log('\n۱۷) شیار: نام‌گذاری صریح استاندارد و ابعاد ورودی سازنده');
 {
  const {d,w}=load(TOOL);
- d.getElementById('smp').value='dip';d.getElementById('smp').onchange();
+ prepareSample(d,'dip');d.getElementById('smp').value='dip';d.getElementById('smp').onchange();
  setV(d,'tK',1);setV(d,'tR',0);setV(d,'tS',2);setV(d,'tW',2);setV(d,'tW2',.3);
  setV(d,'tHoleShape','slot');
  ok(!d.getElementById('pads').value&&d.getElementById('tSlotL').getAttribute('aria-invalid')==='true','شیار بدون ابعاد سازنده، سایزبندی حدسی یا خروجی ندارد');
@@ -712,15 +726,35 @@ console.log('\n۲۳) جستجو و فاصلهٔ افقی مراکز');
  ok(d.getElementById('pads').value===before,'تایپ جستجو هندسه را تغییر نمی‌دهد');
  setV(d,'footprintSearch','SN74LVC1G04');d.querySelector('#footprintSearchResults button').click();
  ok(d.getElementById('smp').value==='ti-db5'&&padsOf(d).length===5,'کلیک نتیجهٔ شماره‌قطعه، نمونهٔ واقعی را باز می‌کند');
- setV(d,'footprintSearch','CFR-25');d.querySelector('#footprintSearchResults button').click();
+ setV(d,'component','resistor');setV(d,'footprintSearch','CFR-25');d.querySelector('#footprintSearchResults button').click();
  ok(d.getElementById('tExample').value==='cfr25'&&padsOf(d).length===2,'جستجوی نمونهٔ THT سازنده هم کار می‌کند');
  setV(d,'footprintSearch','مقاومت');ok(!!d.querySelector('#footprintSearchResults button'),'جستجوی فارسی در گروه‌های قطعه');
  setV(d,'footprintSearch','not-a-real-footprint-xyz');ok(!d.querySelector('#footprintSearchResults button')&&/پیدا نشد/.test(d.getElementById('footprintSearchResults').textContent),'جستجوی بی‌نتیجه پیام روشن دارد');
- setV(d,'footprintSearch','SOT223');d.querySelector('#footprintSearchResults button').click();
+ setV(d,'component','transistor');setV(d,'footprintSearch','SOT223');d.querySelector('#footprintSearchResults button').click();
  ok(d.getElementById('package').value==='sot223'&&d.getElementById('libraryMode').checked&&!!d.getElementById('pads').value,'نتیجهٔ SOT223 اکنون نمونهٔ مرجع خودش را نشان می‌دهد، نه نقشهٔ قبلی');
  w.close();
 }
 
+
+console.log('\nفیلتر سخت نوع قطعه و پکیج');
+{
+ const {d,w}=load(TOOL);
+ for(const component of ['resistor','capacitor','ic','connector','transistor']){
+  setV(d,'component',component);
+  const packageIds=Array.from(d.getElementById('package').options).map(o=>o.value);
+  ok(!packageIds.includes(component==='ic'?'chip':'bga'),component+': پکیج نامرتبط در فهرست وجود ندارد');
+  for(const pk of packageIds){
+   setV(d,'package',pk);
+   const values=Array.from(d.getElementById('smp').options).filter(o=>o.value).map(o=>o.value);
+   ok(values.every(v=>{const expected=v.startsWith('lib-')?v.slice(4):({'ti-db5':'sot23-5','ti-db6':'sot23-6','ti-pw16':'tssop','bga100':'bga'}[v]||(/^chip/.test(v)?'chip':/^soic/.test(v)?'soic':v));return expected===pk}),component+'/'+pk+': فقط نمونهٔ همان پکیج در DOM است');
+  }
+ }
+ setV(d,'component','resistor');setV(d,'footprintSearch','BGA');
+ ok(!d.querySelector('#footprintSearchResults button'),'جستجوی مقاومت، BGA نشان نمی‌دهد');
+ setV(d,'footprintSearch','CFR25');ok(!!d.querySelector('#footprintSearchResults button'),'نمونهٔ مقاومت پایه‌دار در گروه مقاومت پیدا می‌شود');
+ setV(d,'component','capacitor');ok(!d.querySelector('#footprintSearchResults button'),'نتایج قبلی بعد از تغییر نوع قطعه پاک/بازفیلتر می‌شوند');
+ w.close();
+}
 
 console.log('\n۲۴) مرجع‌های واقعی KiCad و پیام مدل');
 {
