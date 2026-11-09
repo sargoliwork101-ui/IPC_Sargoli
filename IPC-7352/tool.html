@@ -7,6 +7,13 @@
 <title>ابزار طراحی فوت‌پرینت (IPC-7352)</title>
 <link rel="stylesheet" href="fonts/vazirmatn.css">
 <style>
+[hidden]{display:none!important}
+.workspace[data-mode="t2"],.workspace[data-mode="t3"]{grid-template-columns: minmax(0,1fr)}
+.workspace:not([data-mode="t1"]) .sidebar .group,.workspace:not([data-mode="t1"]) .inspector{display:none}
+.workspace:not([data-mode="t1"]) .sidebar{position:static;max-height:none;border:0}
+.workspace:not([data-mode="t1"]) .stage{max-width:1100px;width:100%;margin:auto}
+@media(min-width:1000px){.workspace:not([data-mode="t1"]) .sidebar{grid-column:1/-1}}
+
 /* ============================================================
    Footprint Studio — dark studio theme for the IPC-7352 tool
    ============================================================ */
@@ -225,7 +232,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
     <a class="btn primary" href="course.html">دورهٔ کامل استاندارد</a>
   </div>
 </header>
-<div class="workspace">
+<div class="workspace" data-mode="t1">
 
 <!-- ================= ستون تنظیمات ================= -->
 <aside class="sidebar" id="sb">
@@ -241,7 +248,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 <div><label>نوع قطعه</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
-<div><label>نمونه‌ی آماده</label><select id="smp"><option value="">انتخاب کن...</option><option value="soic">SOIC-16</option><option value="qfp">LQFP-48 (چهارطرفه)</option><option value="chip">چیپ 1206</option><option value="dip">DIP-14</option></select></div>
+<div><label>نمونه‌ی آماده</label><select id="smp"><option value="">انتخاب کن...</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48 (چهارطرفه)</option><option value="chip">چیپ 1206</option><option value="dip">DIP-14</option></select></div>
     </div>
   </div>
   <div class="group">
@@ -432,11 +439,11 @@ function fld(id){return rd(id)}                        // خواندن فیلد 
 var FIELDS={smd:[['Lmin','Lmin','E/HE حداقل',5.8,1],['Lmax','Lmax','E/HE حداکثر',6.2,1],['Tmin','Tmin','L (Foot) حداقل',0.4,1],['Tmax','Tmax','L (Foot) حداکثر',1.27,1],['Smax','Smax','فقط اگر تیک S خاموش',4.98,1],['W','W','b (عرض پایه)',0.51,1],['H','H','A (ارتفاع)',1.75,1],['Hl','Hl','فقط QFN',0.2,1],['P','P','e (گام)',1.27,1],['Amax','A','A: عرض بدنه (فقط gull-wing؛ 0 = نادیده)',0,1],['Th','Th','پد حرارتی QFN: بُعد مربع (0 = ندارد)',0,1],
  ['Th2','Th','پد حرارتی مستطیلی: بُعد دوم (0 = مربع)',0,1],
  ['BW','Wmax','عرض بدنه (برای Courtyard و نام QFN/چیپ؛ 0 = نامعلوم)',0,1],
- ['Amax','A','عرض بدنه برای قاعدهٔ پاشنه gull-wing (0 = نادیده)',0,1],
+
  ['n','n','پایه در هر طرف',8,0]],
-bga:[['bB','Ball','قطر توپ',0.5,1],['bP','P','گام (ردیف و ستون)',0.8,1],['bPX','P','گام محور X (0 = همان گام)',0,1],['bPY','P','گام محور Y (0 = همان گام)',0,1],['bC','Cols','ستون',10,0],['bR','Cols','ردیف',10,0],['bL','BL','طول بدنه',9,1],['bW','BL','عرض بدنه',9,1],['bH','H','ارتفاع',1.5,1],['bSkip','Cols','توپ‌های حذف‌شده (مثل A1,B2 — از نقشهٔ دیتاشیت)',0,0]],
+bga:[['bB','Ball','قطر توپ',0.5,1],['bP','گام مشترک','گام پیش‌فرض هر دو محور',0.8,1],['bPX','گام X (اختیاری)','0 = استفاده از گام مشترک',0,1],['bPY','گام Y (اختیاری)','0 = استفاده از گام مشترک',0,1],['bC','Cols','ستون',10,0],['bR','Cols','ردیف',10,0],['bL','BL','طول بدنه',9,1],['bW','BL','عرض بدنه',9,1],['bH','H','ارتفاع',1.5,1],['bSkip','Cols','توپ‌های حذف‌شده (مثل A1,B2 — از نقشهٔ دیتاشیت)',0,0]],
 th:[['tK','Pins','تعداد پین',14,0],['tP','P','گام',2.54,1],['tR','R','فاصله‌ی دو ردیف (0=تک‌ردیف)',7.62,1],['tW','Wt','بُعد max پایه',0.52,1],['tW2','Wt','بُعد دوم مستطیل (فقط شکل مستطیلی)',0.25,1],['tB','Bd','ضخامت برد',1.6,1]]};
-var FAM=[['gull','Gull-wing / L-lead (3-1)'],['chip','چیپ مستطیلی (3-3/3-4)'],['sof','Small outline پایه تخت: SOT/SOD (3-15)'],['jlead','J-lead: SOJ/PLCC (3-2)'],['qfn','QFN/DFN/SON (3-10)'],['pull','Pullback (3-12)'],['alc','الکترولیتی/کریستال (3-14)'],['melf','MELF (3-5)'],['conc','Concave (3-6)'],['inl','L-lead رو به داخل (3-8)'],['butt','Butt/I (3-7)'],['lug','Flat lug (3-9)']];
+var FAM=[['gull','SOIC / SOP / TSSOP / QFP · Gull-wing (3-1)'],['chip','چیپ مستطیلی (3-3/3-4)'],['sof','Small outline پایه تخت: SOT/SOD (3-15)'],['jlead','J-lead: SOJ/PLCC (3-2)'],['qfn','QFN/DFN/SON (3-10)'],['pull','Pullback (3-12)'],['alc','الکترولیتی/کریستال (3-14)'],['melf','MELF (3-5)'],['conc','Concave (3-6)'],['inl','L-lead رو به داخل (3-8)'],['butt','Butt/I (3-7)'],['lug','Flat lug (3-9)']];
 function build(){
 var h='<div><label>خانواده</label><select id="fam">'+FAM.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div><div><label>تعداد طرف</label><select id="sides"><option value="2">2 طرف</option><option value="4">4 طرف (مربعی)</option></select></div>'+
 '<div id="cTypeWrap"><label class="kv" data-v="cType">پیشوند نام (چیپ / QFN)</label><select id="cType"><option value="RESC">RESC مقاومت</option><option value="CAPC">CAPC خازن</option><option value="INDC">INDC سلف</option><option value="DIOC">DIOC دیود</option><option value="QFN">QFN</option><option value="SON">SON</option><option value="DFN">DFN</option><option value="">— بدون نام —</option></select></div>'+
@@ -478,7 +485,7 @@ K.frame=function(extX,extY){                       // extX/extY: نیم‌عرض
  window.SVG_BASE=vb.slice();
  var cam=window.CAM;
  if(!window.NODRAW&&cam&&cam.z&&Math.abs(cam.z-1)>1e-6){
-   var z=Math.min(14,Math.max(.5,cam.z)),w=vb[2]/z,h=vb[3]/z;
+   var z=Math.min(20,Math.max(.5,cam.z)),w=vb[2]/z,h=vb[3]/z;
    window.SVG_VB=[vb[0]+vb[2]/2+cam.fx*vb[2]-w/2, vb[1]+vb[3]/2+cam.fy*vb[3]-h/2, w, h];
    svg.setAttribute('viewBox',window.SVG_VB.map(function(n){return n.toFixed(1)}).join(' '));
    setVB(window.SVG_VB);
@@ -536,11 +543,12 @@ K.txt=function(x,y,t,a,cls){
  var padX=fs*0.45, padY=fs*0.32, h=fs*1.35+padY*2, w=tw+padX*2;
  var left=anchor==='start'?x:anchor==='end'?x-w:x-w/2;
  K.grow(left,y-h,left+w,y+fs*.5);
- K.dim.appendChild(el('rect',{x:left.toFixed(1),y:(y-fs*0.92-padY).toFixed(1),width:w.toFixed(1),height:h.toFixed(1),
+ var label=el('g',{'data-label-x':x,'data-label-y':y,'data-label-fs':fs});K.dim.appendChild(label);
+ label.appendChild(el('rect',{x:left.toFixed(1),y:(y-fs*0.92-padY).toFixed(1),width:w.toFixed(1),height:h.toFixed(1),
    rx:(h/2).toFixed(1),fill:'#0b121c','fill-opacity':.92,stroke:'#2a4157','stroke-width':.6}));
  var e=el('text',{x:x.toFixed(1),y:y.toFixed(1),'text-anchor':anchor,'font-size':fs.toFixed(2),
    fill:'#e6f1fb','font-weight':'600','dominant-baseline':'auto','class':cls||'dimt'});
- e.textContent=str;(K.dim||K.svg).appendChild(e);return e};
+ e.textContent=str;label.appendChild(e);return e};
 K.hDim=function(x1,x2,y,label){     // اندازهٔ افقی با خط رابط و برچسب بالای خط
  if(!(Math.abs(x2-x1)>1e-9))return;
  K.dim.appendChild(el('line',{x1:x1.toFixed(1),y1:(y-1.2).toFixed(1),x2:x2.toFixed(1),y2:y.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
@@ -978,6 +986,7 @@ $('warn').textContent=wr;
 }
 function run(){
 var k=$('kind').value;
+if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
 ['smd','bga','th'].forEach(function(a){$('b'+a).classList.toggle('on',a===k)});
 $('warn').textContent='';WG='';
 filterParams();
@@ -986,8 +995,14 @@ try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){$('warn').textContent='خطای 
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
 why(k);save()
 }
-function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){o[e.id]=e.type==='checkbox'?e.checked:e.value});o._u=U;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
-function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else e.value=o[e.id]}});$('unit').value=U}catch(e){}}
+function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){o[e.id]=e.type==='checkbox'?e.checked:e.value});o._schema=2;o._u=U;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
+function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';UOLD=U;
+// مهاجرت ذخیره‌های قدیمی: نمونهٔ قدیمی تمام ابعاد خانواده‌های دیگر را صفر می‌کرد.
+if(!o._schema){['bga','th'].forEach(function(k){
+ var dims=FIELDS[k].filter(function(a){return a[4]===1&&a[3]>0});
+ if(dims.every(function(a){return Number(o[a[0]])===0}))FIELDS[k].forEach(function(a){o[a[0]]=a[4]===1?a[3]/PX[U]:a[3]});
+})}
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else e.value=o[e.id]}});$('unit').value=U}catch(e){}}
 function syncUnitLabels(){var t=$('unit');}
 $('unit').onchange=function(){var nu=$('unit').value;
  // مقادیر را از واحد قبلی به واحد جدید تبدیل کن؛ مقدار داخلی تغییر نمی‌کند (ایراد ۲۱/۳۷)
@@ -996,12 +1011,19 @@ $('unit').onchange=function(){var nu=$('unit').value;
    var mm=(+raw)*PX[UOLD];
    e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
  UOLD=nu;U=nu;run()};
-document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',run)});
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3'))run()})});
 var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',autoS:0,Lmax:3.4,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
+SM.soic8=Object.assign({},SM.soic,{n:4});
+SM.soic14=Object.assign({},SM.soic,{n:7});
+SM.tssop=Object.assign({},SM.soic,{Lmin:6.2,Lmax:6.6,Tmin:.45,Tmax:.75,W:.30,H:1.2,P:.65,n:8});
+SM.bga100={kind:'bga',bB:.5,bP:.8,bPX:0,bPY:0,bC:10,bR:10,bL:9,bW:9,bH:1.5,bT:'C'};
 $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  // نمونه‌ها بر حسب mm تعریف شده‌اند؛ فیلدهای دیگر هم به همان واحد بازنویسی می‌شوند (ایراد ۲۱/۳۷)
+ document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value!=='')e.value=+(Number(e.value)*PX[UOLD]).toFixed(6)});
  U='mm';UOLD='mm';$('unit').value='mm';
- document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){e.value=''});
+ // نمونه فقط خانوادهٔ خودش را بازنشانی می‌کند؛ سایر خانواده‌ها دست‌نخورده می‌مانند.
+ FIELDS[s.kind].forEach(function(a){var e=$(a[0]);if(e)e.value=a[3]});
+ window.CAM=null;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
  run()};
@@ -1013,6 +1035,7 @@ document.addEventListener('change',function(e){
 });
 $('cp').onclick=function(){var t=$('pads'),done=function(){$('cpm').textContent=' کپی شد'};try{navigator.clipboard.writeText(t.value).then(done,function(){t.select();document.execCommand('copy');done()})}catch(e){t.select();try{document.execCommand('copy');done()}catch(x){}}};
 function showTab(id){
+ document.querySelector('.workspace').dataset.mode=id;
  document.querySelectorAll('[data-t]').forEach(function(x){x.classList.toggle('on',x.dataset.t===id)});
  document.querySelectorAll('main>section').forEach(function(s){s.classList.toggle('on',s.id===id)});
  if($('sb'))$('sb').scrollTop=0;
@@ -1022,10 +1045,10 @@ document.querySelectorAll('[data-t]').forEach(function(b){b.addEventListener('cl
 // SVG_BASE = قاب خودکار (fit)؛ SVG_VB = قاب فعلی؛ TOT = بزرگ‌ترین بُعد قطعه (mm)
 window.SVG_BASE=null;window.SVG_VB=null;window.TOT=1;window.SCU=1;
 function vbNow(){var b=window.SVG_VB||window.SVG_BASE;return b?b.slice():[-350,-220,700,440]}
-function fitView(){window.CAM={z:1,fx:.5,fy:.5};
+function fitView(){window.CAM={z:1,fx:0,fy:0};
  window.SVG_VB=(window.SVG_BASE||[-350,-220,700,440]).slice();
  var sv=$('svg');if(!sv)return;sv.setAttribute('viewBox',window.SVG_VB.map(function(n){return n.toFixed(2)}).join(' '));
- syncLabelScale();
+ syncLabelScale();updZoomInfo();
  var f=$('fitBtn');if(f){f.classList.add('active');setTimeout(function(){f.classList.remove('active')},450)}}
 function setVB(v){window.SVG_VB=v.slice();
  var b=window.SVG_BASE;
@@ -1035,15 +1058,23 @@ function setVB(v){window.SVG_VB=v.slice();
 // نام قطعه با جابه‌جایی/زوم تغییر نمی‌کند؛ در نمای نزدیک، برچسب پدها قابل خواندن می‌شود
 function syncLabelScale(){
  var sv=$('svg');if(!sv)return;var b=window.SVG_BASE||vbNow(),v=vbNow();
- var r=b[2]/v[2];                                   // نسبت زوم
- var w=Math.max(9,Math.min(30,26-Math.min(16,Math.log(r)*7)));
- sv.setAttribute('stroke-width','1');
- var g=sv.querySelector('#dimG');if(g&&g.style)g.style.setProperty('font-size',(w).toFixed(1)+'px');
- // برچسب اندازهٔ پد همیشه دیده می‌شود (اندازهٔ پد را همین نوشته می‌گوید)
- var pb=sv.querySelector('#padG');if(pb&&pb.style)pb.style.setProperty('opacity','1');
- // در زوم‌های خیلی بالا، برچسب‌های کلی (که بزرگ می‌شوند) کنار می‌روند تا دید پدها باز بماند
- var dg=sv.querySelector('#dimG');if(dg&&dg.style)dg.style.setProperty('opacity',r>3.2?'0':'1');
+ var rect=sv.getBoundingClientRect();
+ var screenScale=Math.min((rect.width||800)/v[2],(rect.height||600)/v[3]);
+ // متن و کادر با هم تغییر اندازه می‌دهند؛ نسبتشان هیچ‌وقت شکسته نمی‌شود.
+ sv.querySelectorAll('[data-label-fs]').forEach(function(g){
+   var fs=+g.dataset.labelFs,x=+g.dataset.labelX,y=+g.dataset.labelY;
+   var k=Math.min(1,17/Math.max(.001,fs*screenScale));
+   g.setAttribute('transform','translate('+x+' '+y+') scale('+k+') translate('+(-x)+' '+(-y)+')');
+ });
+ sv.querySelectorAll('#padG text').forEach(function(t){
+   if(!t.dataset.baseFs)t.dataset.baseFs=t.getAttribute('font-size');
+   var base=+t.dataset.baseFs;t.setAttribute('font-size',Math.min(base,16/Math.max(.001,screenScale)).toFixed(2));
+ });
+ var dg=sv.querySelector('#dimG');if(dg)dg.style.opacity='1';
+
 }
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(function(){syncLabelScale()}).observe($('svg'));
+window.addEventListener('resize',syncLabelScale);
 function updZoomInfo(){var e=$('zoomInfo');if(!e)return;var b=window.SVG_BASE;if(!b)return;
  e.textContent='×'+(b[2]/vbNow()[2]).toFixed(2).replace(/\.?0+$/,'')}
 function zoomAt(f,cx,cy){var b=window.SVG_BASE;if(!b)return;var v=vbNow();

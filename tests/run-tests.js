@@ -379,6 +379,35 @@ console.log('\n۱۰ب) هر سه خانواده در کادر دیده‌شده 
   }
 }
 
+
+console.log('\n۱۱) گردش واقعی نمونه‌ها، ذخیره و تفکیک بخش‌ها');
+{
+ const html=fs.readFileSync(TOOL,'utf8');
+ const dom=new JSDOM(html,{runScripts:'dangerously',url:'https://ipc.test/tool.html',pretendToBeVisual:true});
+ const w=dom.window,d=w.document;
+ function input(id,value){const e=d.getElementById(id);e.value=value;e.dispatchEvent(new w.Event('input',{bubbles:true}))}
+ function sample(value){d.getElementById('smp').value=value;d.getElementById('smp').onchange()}
+ for(const preset of ['soic','soic8','soic14','tssop','dip','bga100']){
+  sample(preset);
+  ok(d.getElementById('pads').value.split('\n').length>2,preset+': نمونه خروجی معتبر دارد');
+  for(const kind of ['bga','th','smd']){
+   input('kind',kind);
+   ok(d.getElementById('svg').querySelectorAll('circle,rect').length>5&&d.getElementById('stageEmpty').hidden,preset+' → '+kind+': نقشه خالی نیست',d.getElementById('warn').textContent);
+  }
+ }
+ w.document.getElementById('zoomIn').click();
+ input('kind','bga');
+ ok(d.getElementById('zoomInfo').textContent==='×1','تغییر خانواده نمای قبلی را بازنشانی می‌کند');
+ d.querySelector('[data-t="t2"]').click();
+ ok(d.querySelector('.workspace').dataset.mode==='t2'&&w.getComputedStyle(d.querySelector('.sidebar .group')).display==='none','نام‌گذاری مستقل و بدون تنظیمات فوت‌پرینت است');
+ ok(new Set([...d.querySelectorAll('[id]')].map(e=>e.id)).size===d.querySelectorAll('[id]').length,'شناسهٔ تکراری در سند وجود ندارد');
+ const old=JSON.parse(w.localStorage.getItem('fp7352'));
+ delete old._schema;for(const id of ['bB','bP','bL','bW','bH','tP','tR','tW','tW2','tB'])old[id]='0';
+ const recovered=new JSDOM(html,{runScripts:'dangerously',url:'https://ipc.test/tool.html',beforeParse(win){win.localStorage.setItem('fp7352',JSON.stringify(old))}});
+ ok(+recovered.window.document.getElementById('bB').value>0&&+recovered.window.document.getElementById('tP').value>0,'ذخیره‌های صفرشدهٔ نسخهٔ قدیمی ترمیم می‌شوند');
+ recovered.window.close();dom.window.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }
