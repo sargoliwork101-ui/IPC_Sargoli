@@ -1228,7 +1228,7 @@ if(!o._schema){['bga','th'].forEach(function(k){
  if(dims.every(function(a){return Number(o[a[0]])===0}))FIELDS[k].forEach(function(a){o[a[0]]=a[4]===1?a[3]/PX[U]:a[3]});
 })}
 if(o.component&&PACKAGE_TYPES[o.component]){$('component').value=o.component;refreshPackages(o.package)}
-document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else if(e.tagName!=='SELECT'||Array.from(e.options).some(function(opt){return opt.value===String(o[e.id])}))e.value=o[e.id]}});$('unit').value=U;
+document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox'){if(typeof o[e.id]==='boolean')e.checked=o[e.id]}else if(e.tagName!=='SELECT'||Array.from(e.options).some(function(opt){return opt.value===String(o[e.id])}))e.value=o[e.id]}});$('unit').value=U;
 if(o._mm&&typeof o._mm==='object')Object.keys(o._mm).forEach(function(id){var e=$(id),cached=o._mm[id];if(e&&e.dataset.d==='1'&&cached&&Number.isFinite(cached.mm)&&cached.unit===U&&cached.display===e.value&&Math.abs(cached.mm-Number(e.value)*PX[U])<=Math.max(1e-12,Math.abs(cached.mm)*1e-10))DIMENSION_MM_CACHE.set(e,{mm:cached.mm,display:e.value,unit:U})});
 if(o.nameBodyL==null&&o.nameBodyW==null&&/^chip/.test(o.smp||'')&&SM[o.smp]){['nameBodyL','nameBodyW'].forEach(function(id){$(id).value=SM[o.smp][id]/PX[U]})}
 // تعمیر دقیق نمونهٔ 1206 ذخیره‌شده با Lmin مربوط به SOIC در نسخهٔ قدیمی.
@@ -2314,6 +2314,9 @@ function nm(){var t=$('nT').value,P=+$('nP').value,L=+$('nL').value,W=+$('nW').v
  else if((t==='2'||t==='3')&&!(W>0))err='برای ساختار Body، عرض بدنه هم لازم است.';
  else if(!(H>0))err='ارتفاع (H) لازم است.';
  else if(t!=='3'&&(!(N>0)||!Number.isInteger(+N)))err='تعداد پین باید عدد صحیح مثبت باشد.';
+ if(!err&&!/^[A-Z]+$/.test(pf))err='پیشوند باید فقط حروف بزرگ لاتین و غیرخالی باشد.';
+ var encoded=[H*100,L*(t==='3'?10:100)];if(t!=='3')encoded.push(P*100,Number(N));if(t!=='1')encoded.push(W*(t==='3'?10:100));if(t==='2'&&Th>0)encoded.push(Th*100);
+ if(!err&&encoded.some(function(v){return !Number.isSafeInteger(Math.round(v))||Math.round(v)<=0}))err='مقدار در دقت نام‌گذاری صفر می‌شود یا از محدودهٔ عدد صحیح دقیق خارج است؛ نام تقریبی ساخته نمی‌شود.';
  if(err){$('nOut').textContent='نامعتبر: '+err;$('nOut').dataset.err='1';return ''}
  $('nOut').dataset.err='';N=String(Number(N));
  if(t==='1')o=pf+T(P)+'P'+T(L)+'X'+T(H)+'-'+N+D;
@@ -2331,6 +2334,7 @@ function ps(){var sh=$('pS').value,v1=+$('p1').value,v2=+$('p2').value,vh=+$('pH
  else if((sh==='c'||sh==='s')&&v2>0)err='برای دایره/مربع اندازهٔ دوم مجاز نیست.';
  if(!err&&sh==='v'&&!(vh>0))err='via به قطر سوراخ مثبت نیاز دارد.';
  if(!err&&vh>0){var padHeight=v2>0?v2:v1;if(vh2>0?(vh>v1||vh2>padHeight):vh>Math.min(v1,padHeight))err='ابعاد سوراخ از ابعاد پد بزرگ‌تر است.';}
+ if(!err&&['p1','p2','pH','pH2','pZ','pX','pM','pP'].some(function(id){var v=Number($(id).value);return v>0&&(!Number.isSafeInteger(q(v))||q(v)<=0)}))err='بُعد مثبت در دقت نام‌گذاری صفر می‌شود یا از محدودهٔ عدد صحیح دقیق خارج است.';
  if(err){$('pOut').textContent='نامعتبر: '+err;$('pOut').dataset.err='1';return ''}
  $('pOut').dataset.err='';
  var o=sh+q(v1);if(v2>0)o+='_'+q(v2);
@@ -2338,7 +2342,7 @@ function ps(){var sh=$('pS').value,v1=+$('p1').value,v2=+$('p2').value,vh=+$('pH
  [['pZ','z'],['pX','x'],['pM','m'],['pP','p']].forEach(function(a){if(+$(a[0]).value>0)o+=a[1]+q(+$(a[0]).value)});
  if($('pM0')&&$('pM0').value==='1'&&!(+$('pM').value>0))o+='m0';
  $('pOut').textContent=o;return o}
-document.querySelectorAll('#t2 .box .grid input,#t2 .box .grid select').forEach(function(e){e.addEventListener('input',function(){nm();ps()})});
+document.querySelectorAll('#t2 .box .grid input,#t2 .box .grid select').forEach(function(e){e.addEventListener('input',function(){nm();ps();save()})});
 var PM={c:'پد دایره‌ای (قطر)',s:'مربع',r:'مستطیل (طول_عرض)',b:'بیضوی',d:'شکل D',v:'via',h:'سوراخ',hn:'سوراخ غیرآبکاری',z:'لایه‌ی داخلی',x:'سمت مقابل',m:'ماسک لحیم',p:'خمیر لحیم',a:'لایه‌ی مونتاژ',y:'anti-pad',t:'thermal relief (ID_OD_پره)',k:'keep-out',w:'سوراخ نصب'};
 function dec(){var s=$('dIn').value.trim(),h='',m;
 if(!s){$('dOut').innerHTML='';return}                            // پاک‌کردن ورودی = پاک‌کردن خروجی (ایراد ۹۷)
@@ -2403,7 +2407,7 @@ if(m[11])h+='<div>چگالی: <b>'+sfx[m[11]]+'</b></div>';
 if(m[12])h+='<div>پین‌های مخفی/حذف‌شده: <b>'+m[12].slice(1)+'</b></div>';
 $('dOut').innerHTML=h}
 
-$('dIn').addEventListener('input',dec);
+$('dIn').addEventListener('input',function(){dec();save()});
 var REF=[['Gull-wing / L-lead','3-1','.55/.35/.15','.45/.35/.25','.05/.03/0','.50/.25/.10'],['J-lead (Heel→Z، Toe→G)','3-2','.55/.35/.15','.10/0/0','.05/.03/.01','.50/.25/.10'],['چیپ W≥0.5','3-3','.55 / min(25%h,.5) / .15','0','.05/0/0','.50/.25/.10'],['چیپ W<0.5','3-4','100% / 50% / 25% h','0','0','.20/.15/.10'],['MELF','3-5','min(Ø,1)/.40/.20','.20/.10/.02','.55/.35/.15','.50/.25/.10'],['Concave / castellated','3-6','max(50%h,.65)/max(25%h,.45)/.45','.25/.15/.05','.05/0/0','.50/.25/.10'],['Butt / I-lead','3-7','Periphery 1.00/.80/.60','—','—','1.50/.80/.20'],['L-lead رو به داخل','3-8','max(25%h,.8)/max(25%h,.5)/.20','.25/.15/.07','.01/0/0','.50/.25/.10'],['Flat lug','3-9','Periphery .05/.03/.01','—','—','.50/.25/.10'],['QFN/DFN/SON سطح عمودی','3-10','120%/110%/100% ارتفاع پایه','0','0','.50/.25/.10'],['BGA','3-11','فروپاشنده −15/20/25٪؛ سخت +15/10/5٪','—','—','2.00/1.00/0.50'],['Pullback','3-12','Periphery .05/0/0','—','—','.50/.25/.10'],['Corner concave','3-13','بیرونی .45/.35/.35','درونی .10/0/0','—','.50/.25/.10'],['الکترولیتی/کریستال h<10','3-14','.70/.50/.30','0','.50/.40/.30','1.00/.50/.25'],['الکترولیتی/کریستال h≥10','3-14','1.00/.70/.40','0','.60/.50/.40','1.00/.50/.25'],['Small outline پایه تخت','3-15','.30/.20/.10','0','.05/0/0','.20/.15/.10']];
 function rt(){var q=$('q').value.trim().toLowerCase();$('rt').innerHTML=REF.filter(function(r){return !q||r.join(' ').toLowerCase().indexOf(q)>-1}).map(function(r){return '<tr>'+r.map(function(c){return '<td>'+c+'</td>'}).join('')+'</tr>'}).join('')}
 $('q').addEventListener('input',rt);

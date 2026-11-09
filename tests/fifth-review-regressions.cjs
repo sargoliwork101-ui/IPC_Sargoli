@@ -1,0 +1,11 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),{JSDOM,VirtualConsole}=require('jsdom');
+const html=fs.readFileSync(process.env.TOOL_FILE||'IPC-7352/tool.html','utf8');
+function load(storage){return new JSDOM(html,{runScripts:'dangerously',url:'https://fifth.test/tool.html',pretendToBeVisual:true,virtualConsole:new VirtualConsole(),beforeParse(w){if(storage)w.localStorage.setItem('fp7352',storage)}})}
+let dom=load(),w=dom.window,d=w.document;
+function set(id,value){d.getElementById(id).value=value;d.getElementById(id).dispatchEvent(new w.Event('input',{bubbles:true}))}
+set('nPf','CUSTOM');set('p1','1.83');set('dIn','c183h90');let saved=w.localStorage.getItem('fp7352');assert.equal(JSON.parse(saved).nPf,'CUSTOM');assert.equal(JSON.parse(saved).p1,'1.83');assert.equal(JSON.parse(saved).dIn,'c183h90');const fresh=load(saved);assert.equal(fresh.window.document.getElementById('nPf').value,'CUSTOM');assert.equal(fresh.window.document.getElementById('dIn').value,'c183h90');fresh.window.close();console.log('Naming and decoder edits persist immediately without unrelated footprint edits: PASS');
+for(const prefix of ['','sop','SOP-','S OP']){set('nPf',prefix);assert.equal(d.getElementById('nOut').dataset.err,'1')};set('nPf','SOP');assert.equal(d.getElementById('nOut').dataset.err,'');
+for(const [id,value] of [['nH','.001'],['nL','1e30'],['nN','9007199254740992']]){const old=d.getElementById(id).value;set(id,value);assert.equal(d.getElementById('nOut').dataset.err,'1');set(id,old)}
+for(const [id,value] of [['p1','.001'],['pH','.001'],['pM','.001'],['p1','1e30']]){const old=d.getElementById(id).value;set(id,value);assert.equal(d.getElementById('pOut').dataset.err,'1');set(id,old)}
+assert.equal(d.getElementById('pOut').dataset.err,'');console.log('Invalid prefixes and zero/unsafe encoded dimensions cannot produce misleading names: PASS');
+w.close();dom=load(JSON.stringify({_schema:3,_u:'mm',man:'false',libraryMode:'false',autoS:'false'}));d=dom.window.document;assert.equal(d.getElementById('man').checked,false);assert.equal(d.getElementById('libraryMode').checked,false);assert.equal(d.getElementById('autoS').checked,true);dom.window.close();console.log('Saved string booleans cannot silently enable manual/library modes: PASS');
