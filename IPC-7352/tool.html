@@ -247,7 +247,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 <div><label>نوع قطعه</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
-<div><label>نمونه‌ی آماده</label><select id="smp"><option value="">انتخاب کن...</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48 (چهارطرفه)</option><option value="chip">چیپ 1206</option><option value="dip">DIP-14</option></select></div>
+<div><label>نمونهٔ آماده<small>انتخاب نمونه، نوع، خانواده و ابعاد را تنظیم می‌کند؛ ویرایش دستی = سفارشی</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48 (چهارطرفه)</option><option value="chip">چیپ 1206</option><option value="dip">DIP-14</option></select></div>
     </div>
   </div>
   <div class="group">
@@ -444,7 +444,7 @@ bga:[['bB','Ball','قطر توپ',0.5,1],['bP','گام مشترک','گام پی�
 th:[['tK','Pins','تعداد پین',14,0],['tP','P','گام',2.54,1],['tR','R','فاصله‌ی دو ردیف (0=تک‌ردیف)',7.62,1],['tW','Wt','بُعد max پایه',0.52,1],['tW2','Wt','بُعد دوم مستطیل (فقط شکل مستطیلی)',0.25,1],['tB','Bd','ضخامت برد',1.6,1]]};
 var FAM=[['gull','SOIC / SOP / TSSOP / QFP · Gull-wing (3-1)'],['chip','چیپ مستطیلی (3-3/3-4)'],['sof','Small outline پایه تخت: SOT/SOD (3-15)'],['jlead','J-lead: SOJ/PLCC (3-2)'],['qfn','QFN/DFN/SON (3-10)'],['pull','Pullback (3-12)'],['alc','الکترولیتی/کریستال (3-14)'],['melf','MELF (3-5)'],['conc','Concave (3-6)'],['inl','L-lead رو به داخل (3-8)'],['butt','Butt/I (3-7)'],['lug','Flat lug (3-9)']];
 function build(){
-var h='<div><label>خانواده</label><select id="fam">'+FAM.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div><div><label>تعداد طرف</label><select id="sides"><option value="2">2 طرف</option><option value="4">4 طرف (مربعی)</option></select></div>'+
+var h='<div><label>خانوادهٔ محاسباتی<small>شکل پایه و قواعد محاسبه؛ نه نام یک قطعهٔ مشخص</small></label><select id="fam">'+FAM.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div><div><label>تعداد طرف</label><select id="sides"><option value="2">2 طرف</option><option value="4">4 طرف (مربعی)</option></select></div>'+
 '<div id="cTypeWrap"><label class="kv" data-v="cType">پیشوند نام (چیپ / QFN)</label><select id="cType"><option value="RESC">RESC مقاومت</option><option value="CAPC">CAPC خازن</option><option value="INDC">INDC سلف</option><option value="DIOC">DIOC دیود</option><option value="QFN">QFN</option><option value="SON">SON</option><option value="DFN">DFN</option><option value="">— بدون نام —</option></select></div>'+
 '<div><label>S از L و T</label><input type="checkbox" id="autoS" checked> با RMS</div>';
 FIELDS.smd.forEach(function(a){h+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});$('bsmd').innerHTML=h;
@@ -1019,7 +1019,7 @@ $('unit').onchange=function(){var nu=$('unit').value;
    var mm=(+raw)*PX[UOLD];
    e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
  UOLD=nu;U=nu;run()};
-document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3'))run()})});
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3')){if(e.closest('#bsmd,#bbga,#bth')||e.id==='kind')$('smp').value='';run()}})});
 var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',cType:'RESC',autoS:0,Lmin:3.0,Lmax:3.4,Tmin:0,Tmax:0,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
 SM.soic8=Object.assign({},SM.soic,{n:4});
 SM.soic14=Object.assign({},SM.soic,{n:7});

@@ -20,6 +20,15 @@ const engine = chromiumPackage.default || chromiumPackage;
    await page.screenshot({path:'/tmp/ipc-'+sample+'.png'});
    console.log(sample,'visible:',result.count,'pads');
   }
+  await page.selectOption('#smp','chip');
+  assert.equal(await page.locator('#fam').inputValue(),'chip');
+  await page.selectOption('#fam','gull');
+  assert.equal(await page.locator('#smp').inputValue(),'');
+  await page.selectOption('#smp','soic');
+  assert.equal(await page.locator('#fam').inputValue(),'gull');
+  await page.locator('#Lmax').fill('6.3');
+  assert.equal(await page.locator('#smp').inputValue(),'');
+  console.log('Preset/family relationship and custom editing: PASS');
   // Old 1206 state must survive a reload without becoming blank.
   await page.selectOption('#smp','chip');
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('fp7352'));o.Lmin='5.8';localStorage.setItem('fp7352',JSON.stringify(o))});
