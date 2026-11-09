@@ -147,14 +147,14 @@
     "function smax": 484,
     "function rule": 485,
     "function smd": 753,
-    "function bga": 909,
-    "function thSlot": 980,
-    "function th()": 1020,
-    "function validateFootprint": 1147,
-    "function renderReference": 1885,
-    "function nm": 2304,
-    "function ps": 2319,
-    "function dec": 2338,
-    "function altium": 2406
+    "function bga": 910,
+    "function thSlot": 981,
+    "function th()": 1021,
+    "function validateFootprint": 1148,
+    "function renderReference": 1886,
+    "function nm": 2309,
+    "function ps": 2324,
+    "function dec": 2343,
+    "function altium": 2411
   }
 }

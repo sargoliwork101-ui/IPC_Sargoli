@@ -665,7 +665,7 @@ else h='<li><b>قطر سوراخ:</b> بند 4.4.1 ('+pg(19)+'): از بُعد m
 h+=EX(k);$('why').innerHTML='<b>چرا این عددها؟ دلیل و ارجاع به استاندارد</b><ul>'+h+'</ul><p class="note">ص = شماره‌ی چاپ‌شده در گوشه‌ی صفحه‌ی استاندارد. متن استاندارد بند به بند: <a href="course.html">دوره‌ی کامل استاندارد (متن بند‌به‌بند و ارجاع)</a></p>'}
 function clearOut(msg){
 VALID=false;R=[];M={};MP=[];
-$('res').innerHTML='<tr><td colspan="3">'+(msg||'خروجی پاک شد؛ ورودی معتبر وارد کن.')+'</td></tr>';
+$('res').textContent='';var errorRow=document.createElement('tr'),errorCell=document.createElement('td');errorCell.colSpan=3;errorCell.textContent=msg||'خروجی پاک شد؛ ورودی معتبر وارد کن.';errorRow.appendChild(errorCell);$('res').appendChild(errorRow);
 $('pads').value='';$('alt').value='';$('cpAm').textContent='';$('cpm').textContent='';
 var sv=$('svg');if(sv)sv.innerHTML='';
 if(typeof K!=='undefined'&&K.bb)K.bb={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9};   // جعبهٔ محتوا هم پاک شود
@@ -788,6 +788,7 @@ var d3=Pt<0.4?3:2,Z=+(Lm+2*r[0]).toFixed(d3),G=+Math.max(S-2*r[1],0).toFixed(d3)
  pl=(Z-G)/2,ce=(Z+G)/4,pads=[],no=1;
 if(F==='chip'&&W<.5){G=Math.max(S-2*r[1],0);pl=(Z-G)/2;ce=(Z+G)/4}
 if($('padBasis').value==='manufacturer'){pl=rd('mfrL');X=rd('mfrW');ce=rd('mfrSpan')/2;Z=2*ce+pl;G=2*ce-pl}
+if(![Z,G,X,pl,ce].every(Number.isFinite)||!(Z>0&&G>=0&&X>0&&pl>0))return bad('ابعاد محاسبه‌شدهٔ پد باید متناهی و مثبت باشند؛ ضرایب دستی و دقت گردکردن را بررسی کن.');
 if($('layout').value==='sot23'){
  pads=[{n:1,x:-ce,y:Pt/2,w:pl,h:X},{n:2,x:-ce,y:-Pt/2,w:pl,h:X},{n:3,x:ce,y:0,w:pl,h:X}];
 }else if($('layout').value==='sot23-5'){
@@ -2258,6 +2259,7 @@ markWide();
 // بخش‌های ستون کناری: باز/بسته شدن با ذخیرهٔ وضعیت
 (function(){
  var KEY='fp7352_groups',st={};try{st=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+ if(!st||typeof st!=='object'||Array.isArray(st))st={};
  document.querySelectorAll('.sidebar .group').forEach(function(g,i){
    var t=g.querySelector('.section-title');if(!t)return;
    var k='g'+i;if(st[k])g.classList.add('collapsed');
@@ -2292,7 +2294,10 @@ if($('helpBtn'))$('helpBtn').onclick=function(){
 };
 if($('rowReset'))$('rowReset').onclick=function(){
  if(!confirm('همهٔ ورودی‌ها به مقدار پیش‌فرض برگردند؟ (نام‌گذاری و رمزگشا دست‌نخورده می‌مانند)'))return;
- try{localStorage.removeItem('fp7352')}catch(e){}
+ var naming={_schema:3,_u:'mm',component:'ic',package:'soic',smp:'soic'};
+ document.querySelectorAll('#t2 input,#t2 select,#dIn').forEach(function(e){if(e.id)naming[e.id]=e.type==='checkbox'?e.checked:e.value});
+ packageDrafts={};activePackage='';
+ try{localStorage.removeItem('fp7352');localStorage.removeItem('fp7352PackageDrafts');localStorage.setItem('fp7352',JSON.stringify(naming))}catch(e){}
  location.reload();
 };
 if($('rowUnit')){
