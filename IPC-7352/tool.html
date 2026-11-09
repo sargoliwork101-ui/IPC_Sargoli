@@ -1,4 +1,3 @@
-// زوم با چرخ ماوس روی نقشه؛ «تناسب نما» به نمای خودکار برمی‌گردد
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -306,7 +305,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
     <div class="canvas-wrap" id="canvasWrap">
       <svg id="svg" viewBox="0 0 700 440" role="img" aria-label="نقشه‌ی پد"></svg>
       <div class="canvas-label">TOP COPPER · COURTYARD · SILKSCREEN</div>
-      <div id="stageEmpty" hidden style="position:absolute;inset:0;display:grid;place-items:center;color:#5d7189;font-size:12px;text-align:center;padding:20px">ورودی معتبر وارد کن تا نقشه ساخته شود</div>
+      <div id="stageEmpty" hidden style="position:absolute;inset:0;display:grid;place-items:center;color:#5d7189;font-size:12px;text-align:center;padding:20px"><div><p id="emptyReason">ورودی معتبر وارد کن تا نقشه ساخته شود</p><button class="btn" id="restoreDrawing">بارگذاری نمونهٔ سالم و نمایش نقشه</button></div></div>
     </div>
     <div class="metrics">
       <div class="metric"><span>اندازهٔ پد</span><strong id="mPad">—</strong></div>
@@ -622,7 +621,10 @@ if(typeof K!=='undefined'&&K.bb)K.bb={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9};   // جع�
 PITCH_TXT='';
 ['mPad','mPitch','mCount','mCourt','insPad','insG','insZ','insGap','insCount'].forEach(function(i){if($(i))$(i).textContent='—'});
 if($('insName'))$('insName').textContent='—';
-if($('stageEmpty'))$('stageEmpty').hidden=false;
+if($('stageEmpty')){
+ $('stageEmpty').hidden=false;
+ $('emptyReason').textContent=msg||'ورودی معتبر وارد کن تا نقشه ساخته شود';
+}
 }
 function invalidate(clear){if(clear)clearOut()}
 function out(rows,pads,hdr,warn){
@@ -689,7 +691,7 @@ var F=$('fam').value,sd=+$('sides').value,lv=$('lv').value,i={A:0,B:1,C:2}[lv],
  Pt=rd('P'),nRaw=+$('n').value,n=Math.round(nRaw),bw=rd('BW'),th=rd('Th'),th2=rd('Th2')||rd('Th'),
  autoS=$('autoS').checked,S=null,srcS='',k,y;
 WG='';
-function bad(m){$('warn').textContent=m;clearOut();return}
+function bad(m){$('warn').textContent=m;clearOut(m);return}
 // ---------- اعتبارسنجی ورودی (ایراد ۵) ----------
 if(!(Lm>0))return bad('Lmax باید بزرگ‌تر از صفر باشد.');
 if(Ln>0&&!(Ln<=Lm))return bad('Lmin باید کوچک‌تر یا مساوی Lmax باشد.');
@@ -830,7 +832,7 @@ var b=rd('bB'),Pt=rd('bP'),PtX=rd('bPX')||Pt,PtY=rd('bPY')||Pt,c=Math.round(+$('
  lv=$('lv').value,i={A:0,B:1,C:2}[lv],ty=$('bT').value,BL=rd('bL'),BW=rd('bW'),BH=rd('bH'),
  skip=String($('bSkip').value||'').split(/[,; ]+/).map(function(x){return x.trim().toUpperCase()}).filter(Boolean);
 WG='';MP=[];
-function bad(m){$('warn').textContent=m;clearOut();return}
+function bad(m){$('warn').textContent=m;clearOut(m);return}
 if([b,Pt,c,rw,BL,BW].some(isNaN)||!(b>0)||!(Pt>0)||!(PtX>0)||!(PtY>0))return bad('قطر توپ و گام‌ها باید مثبت باشند.');
 if(c<1||rw<1||c>100||rw>100)return bad('تعداد ستون و ردیف باید بین ۱ و ۱۰۰ باشد.');
 if(Math.abs(+$('bC').value-c)>1e-9||Math.abs(+$('bR').value-rw)>1e-9)return bad('تعداد ستون و ردیف باید عدد صحیح باشد.');
@@ -894,7 +896,7 @@ function th(){
 var k=Math.round(+$('tK').value),Pt=rd('tP'),R2=rd('tR'),Wd0=rd('tW'),W2=rd('tW2'),sh=+$('tS').value,
  pr=+$('tPr').value,HT=$('tHT').value,HO=rd('pHole'),bt=rd('tB'),tol=+$('tTol').value,p1=$('tP1').value;
 WG='';
-function bad(m){$('warn').textContent=m;clearOut();return}
+function bad(m){$('warn').textContent=m;clearOut(m);return}
 if([k,Pt,Wd0].some(isNaN)||!(k>=1&&k<=200))return bad('تعداد پین باید بین ۱ و ۲۰۰ باشد.');
 if(Math.abs(+$('tK').value-k)>1e-9)return bad('تعداد پین باید عدد صحیح باشد (ورودی '+$('tK').value+' به‌صورت خاموش تغییر داده نمی‌شود).');
 if(!(Pt>0))return bad('گام باید بزرگ‌تر از صفر باشد.');
@@ -992,7 +994,7 @@ if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
 $('warn').textContent='';WG='';
 filterParams();
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
-try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
+try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){clearOut('خطای رسم: '+e.message);$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
 why(k);save()
 }
@@ -1003,7 +1005,12 @@ if(!o._schema){['bga','th'].forEach(function(k){
  var dims=FIELDS[k].filter(function(a){return a[4]===1&&a[3]>0});
  if(dims.every(function(a){return Number(o[a[0]])===0}))FIELDS[k].forEach(function(a){o[a[0]]=a[4]===1?a[3]/PX[U]:a[3]});
 })}
-document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else e.value=o[e.id]}});$('unit').value=U}catch(e){}}
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else if(e.tagName!=='SELECT'||Array.from(e.options).some(function(opt){return opt.value===String(o[e.id])}))e.value=o[e.id]}});$('unit').value=U;
+// تعمیر دقیق نمونهٔ 1206 ذخیره‌شده با Lmin مربوط به SOIC در نسخهٔ قدیمی.
+if(o.smp==='chip'&&o.fam==='chip'&&Math.abs(rd('Lmin')-5.8)<.001&&Math.abs(rd('Lmax')-3.4)<.001){
+ $('Lmin').value=3/PX[U];$('Tmin').value=0;$('Tmax').value=0;
+}
+}catch(e){}}
 function syncUnitLabels(){var t=$('unit');}
 $('unit').onchange=function(){var nu=$('unit').value;
  // مقادیر را از واحد قبلی به واحد جدید تبدیل کن؛ مقدار داخلی تغییر نمی‌کند (ایراد ۲۱/۳۷)
@@ -1019,6 +1026,7 @@ SM.soic14=Object.assign({},SM.soic,{n:7});
 SM.tssop=Object.assign({},SM.soic,{Lmin:6.2,Lmax:6.6,Tmin:.45,Tmax:.75,W:.30,H:1.2,P:.65,n:8});
 SM.bga100={kind:'bga',bB:.5,bP:.8,bPX:0,bPY:0,bC:10,bR:10,bL:9,bW:9,bH:1.5,bT:'C'};
 $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
+ showTab('t1');
  // نمونه‌ها بر حسب mm تعریف شده‌اند؛ فیلدهای دیگر هم به همان واحد بازنویسی می‌شوند (ایراد ۲۱/۳۷)
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value!=='')e.value=+(Number(e.value)*PX[UOLD]).toFixed(6)});
  U='mm';UOLD='mm';$('unit').value='mm';
@@ -1029,6 +1037,7 @@ $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
  run()};
+$('restoreDrawing').onclick=function(){$('man').checked=false;$('smp').value='soic';$('smp').onchange()};
 document.addEventListener('change',function(e){
  if(e.target&&e.target.id==='fam'){var f=e.target.value,c=$('cType');if(!c)return;
   if(f==='chip'&&!/C$/.test(c.value)||c.value===''){c.value='RESC'}
