@@ -552,10 +552,19 @@ K.commonDimensions=function(){
  var box=K.courtyard;if(box){K.hDim(K.PX(box.x),K.PX(box.x+box.w),K.PY(box.y)+FS*2.6,'Courtyard X '+fm(box.w)+K.u());K.vDim(K.PY(box.y+box.h),K.PY(box.y),K.PX(box.x+box.w)+FS*1.4,'Courtyard Y '+fm(box.h)+K.u(),'right')}
  var xs=unique('x'),ys=unique('y'),left=Infinity,right=-Infinity,top=Infinity,bottom=-Infinity;
  pads.forEach(function(p){left=Math.min(left,K.PX(p.x-p.w/2));right=Math.max(right,K.PX(p.x+p.w/2));top=Math.min(top,K.PY(p.y+p.h/2));bottom=Math.max(bottom,K.PY(p.y-p.h/2))});
- // Put the common layer beyond all existing geometry/dimensions to avoid label collisions.
- top=Math.min(top,K.bb.y0);right=Math.max(right,K.bb.x1);
- if(xs.length>1)K.hDim(K.PX(xs[0]),K.PX(xs[xs.length-1]),top-FS*3.4,'C-C X '+fm(xs[xs.length-1]-xs[0])+K.u());
- if(ys.length>1)K.vDim(K.PY(ys[ys.length-1]),K.PY(ys[0]),right+FS*4,'C-C Y '+fm(ys[ys.length-1]-ys[0])+K.u(),'right');
+ // Keep centre spans near the drawing, outside the existing label plates.
+ // Use actual endpoint pad centres, not an unrelated bounding rectangle.
+ var dimensionTop=Math.min(top,K.bb.y0)-FS*1.2;
+ var dimensionRight=Math.max(right,K.bb.x1)+FS*1.2;
+ function extension(x1,y1,x2,y2){var line=el('line',{'data-center-extension':'true',x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#79a9ca','stroke-width':.8,'stroke-dasharray':'3 3'});group.appendChild(line);K.grow(Math.min(x1,x2),Math.min(y1,y2),Math.max(x1,x2),Math.max(y1,y2));}
+ if(xs.length>1){
+  [xs[0],xs[xs.length-1]].forEach(function(x){var p=pads.filter(function(p){return Math.abs(p.x-x)<1e-7}).sort(function(a,b){return b.y-a.y})[0];extension(K.PX(p.x),K.PY(p.y),K.PX(p.x),dimensionTop);});
+  K.hDim(K.PX(xs[0]),K.PX(xs[xs.length-1]),dimensionTop,'C-C X '+fm(xs[xs.length-1]-xs[0])+K.u());
+ }
+ if(ys.length>1){
+  [ys[0],ys[ys.length-1]].forEach(function(y){var p=pads.filter(function(p){return Math.abs(p.y-y)<1e-7}).sort(function(a,b){return b.x-a.x})[0];extension(K.PX(p.x),K.PY(p.y),dimensionRight,K.PY(p.y));});
+  K.vDim(K.PY(ys[ys.length-1]),K.PY(ys[0]),dimensionRight,'C-C Y '+fm(ys[ys.length-1]-ys[0])+K.u(),'right');
+ }
  K.dim=old;old.appendChild(group);
 };
 K.fitContent=function(){
@@ -621,7 +630,7 @@ K.padTag=function(cx,cy,w,h,txt,opt){if(txt===null||txt==='')return null;
  if(!(maxW>0&&maxH>0))return null;
  var e=el('text',{x:cx.toFixed(4),y:cy.toFixed(4),'text-anchor':'middle',direction:'ltr','unicode-bidi':'isolate',fill:opt.light?'#fff4cf':'#241a04','font-weight':'800','letter-spacing':'-0.02em'});
  e.textContent=str;(K.padLbl||K.svg).appendChild(e);
- var fit=K.fitText(e,maxW*.96,maxH*.90,maxH),fs=fit.fs;
+ var fit=K.fitText(e,maxW*.80,maxH*.80,maxH),fs=fit.fs;
  if(opt.light){e.setAttribute('stroke','#1c1503');e.setAttribute('stroke-width',(fs*.08).toFixed(6));e.setAttribute('paint-order','stroke')}
  e.setAttribute('y',(fit.box.real?cy-(fit.box.y+fit.box.height/2)+cy:cy+fs*.23).toFixed(6));
  e.setAttribute('data-fit-x',(cx-maxW/2).toFixed(6));e.setAttribute('data-fit-y',(cy-maxH/2).toFixed(6));e.setAttribute('data-fit-width',maxW.toFixed(6));e.setAttribute('data-fit-height',maxH.toFixed(6));
