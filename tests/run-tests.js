@@ -408,6 +408,22 @@ console.log('\n۱۱) گردش واقعی نمونه‌ها، ذخیره و تف�
  recovered.window.close();dom.window.close();
 }
 
+console.log('\n۱۲) جهت برچسب عددی و حاشیهٔ کادر');
+{
+ const {d,w}=load(TOOL);
+ for(const kind of ['smd','bga','th']){
+  setV(d,'kind',kind);
+  const groups=[...d.querySelectorAll('[data-label-fs]')];
+  ok(groups.length>0&&groups.every(g=>{
+   const t=g.querySelector('text'),r=g.querySelector('rect');
+   const x=+t.getAttribute('x'),left=+r.getAttribute('x'),right=left+(+r.getAttribute('width'));
+   return g.getAttribute('direction')==='ltr'&&t.getAttribute('direction')==='ltr'&&
+    w.getComputedStyle(t).direction==='ltr'&&x>left&&x<right;
+  }),kind+': جهت متن مستقل از صفحهٔ فارسی و نقطهٔ اتصال داخل حاشیهٔ کادر است');
+ }
+ w.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }
