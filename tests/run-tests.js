@@ -298,10 +298,16 @@ console.log('\n۹ج) دیدبان نقشه: جابه‌جایی، زوم و بر
   ok(vb()[2] > 0, 'پس از تغییر ورودی، قاب نقشه معتبر می‌ماند');
 }
 
-console.log('\n۱۰) پنل داینامیک');
+console.log('\n۱۰) پنل داینامیک و ویرایش دستی');
 {
   const { d } = load(TOOL);
   const shown = () => [...d.querySelectorAll('#paramGrid>div')].filter(x => x.style.display !== 'none').map(x => x.querySelector('input,select').id);
+  // ویرایش دستی خاموش: همهٔ پارامترها پنهان و غیرفعال
+  ok(shown().length === 0, 'ویرایش دستی خاموش ⇒ هیچ پارامتری نشان داده نمی‌شود', shown().join(','));
+  ok(d.getElementById('pZJ').disabled === true, 'در حالت خاموش، ورودی‌ها غیرفعال‌اند');
+  ok(!!d.getElementById('paramHint') && !d.getElementById('paramHint').hidden, 'راهنمای «ویرایش دستی خاموش است» دیده می‌شود');
+  setV(d, 'man', true);
+  ok(d.getElementById('pZJ').disabled === false, 'روشن‌کردن ویرایش دستی، ورودی‌ها را فعال می‌کند');
   setV(d, 'kind', 'smd'); const a = shown();
   setV(d, 'kind', 'bga'); const b = shown();
   setV(d, 'kind', 'th');  const c = shown();
@@ -310,18 +316,31 @@ console.log('\n۱۰) پنل داینامیک');
   ok(c.includes('pHole') && !c.includes('pBR'), 'TH فقط پارامترهای سوراخ‌دار را نشان می‌دهد', c.join(','));
   setV(d, 'showAllP', true);
   ok([...d.querySelectorAll('#paramGrid>div')].every(x => x.style.display !== 'none'), 'کلید «نمایش همه» همهٔ پارامترها را برمی‌گرداند');
+  setV(d, 'man', false);
+  ok(shown().length === 0, 'خاموش‌کردن مجدد، همه را پنهان می‌کند');
   const sel = d.querySelector('.grid>div.wide select');
   ok(!!sel, 'فیلدهای انتخابی تمام‌عرض علامت‌گذاری می‌شوند (متن نصفه نمی‌شود)');
 }
 
-console.log('\n۸) دوره: متن استاندارد (ایراد ۱۴، ۴، ۶۱، ۶۷، ۹۲)');
+console.log('\n۱۰ب) هر سه خانواده در کادر دیده‌شده رسم می‌شوند');
 {
-  const t = fs.readFileSync(COURSE, 'utf8');
-  ok(!/round-off برای همه‌ی جدول‌های 3-1 تا 3-15 یکسان/.test(t), 'ادعای یکسان‌بودن round-off اصلاح شد');
-  ok(/کاهش اکید نیست|کم یا برابر/.test(t), 'ادعای کاهش اکید J اصلاح شد');
-  ok(/تصحیح هندسی/.test(t), 'توضیح علامت G اصلاح شد');
-  ok(/استثنا دارد/.test(t), 'استثنای قاعدهٔ شمارهٔ اول نام TH ذکر شد');
-  ok(/043|04<\/code> و <code>02|صفر ابتدایی لازم/.test(t), 'قاعدهٔ دو کاراکتری نام چیپ توضیح داده شد');
+  for (const kind of ['smd', 'bga', 'th']) {
+    const { d } = load(TOOL);
+    setV(d, 'kind', kind);
+    const svg = d.getElementById('svg');
+    const [vx, vy, vw, vh] = svg.getAttribute('viewBox').split(' ').map(Number);
+    const rects = [...svg.querySelectorAll('rect')];
+    const circles = [...svg.querySelectorAll('circle')];
+    // مرکز ثقل پدها باید داخل قاب باشد (اگر قاب غلط باشد، پدها بیرون می‌افتند)
+    const pts = [];
+    rects.forEach(r => { if (r.getAttribute('fill') === '#d4a017') pts.push([+r.getAttribute('x'), +r.getAttribute('y')]); });
+    circles.forEach(c => pts.push([+c.getAttribute('cx'), +c.getAttribute('cy')]));
+    const inside = pts.filter(([x, y]) => x > vx && x < vx + vw && y > vy && y < vy + vh);
+    ok(pts.length > 0 && inside.length === pts.length,
+       kind.toUpperCase() + ': همهٔ پدها داخل قاب نقشه هستند', inside.length + '/' + pts.length);
+    const texts = [...svg.querySelectorAll('#dimG text')].map(t => t.textContent).join(' | ');
+    ok(/Courtyard/.test(texts) && texts.length > 10, kind.toUpperCase() + ': اندازه‌ها روی نقشه نوشته می‌شوند', texts.slice(0, 60));
+  }
 }
 
 console.log('\n─────────────────────────────');

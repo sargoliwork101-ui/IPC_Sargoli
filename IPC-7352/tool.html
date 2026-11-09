@@ -116,7 +116,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 .zoomval{font-size:10.5px;color:var(--muted);min-width:34px;text-align:center;font-variant-numeric:tabular-nums}
 .canvas-wrap{position:relative;flex:1;display:grid;place-items:center;padding:12px;min-height:300px;
   background-color:#0b121c;background-image:radial-gradient(#22344a 1px,transparent 1px);background-size:22px 22px}
-#svg{width:100%;height:100%;min-height:290px;max-height:calc(100vh - 210px)}
+#svg{display:block;width:100%;height:100%;min-height:320px;max-height:min(78vh,860px);aspect-ratio:4/3}
 #svg text{font-weight:600;cursor:pointer;font-family:Vazirmatn,Tahoma,sans-serif}
 #svg text.dimt{fill:#e2eefa}
 #svg text.dimt:hover{fill:#7fe3d2}
@@ -174,7 +174,7 @@ main{min-width:0}
 #t2 .box,#t3 .box{max-width:900px}
 section{display:none;margin:0;padding:12px}
 section.on{display:block}
-section#t1.on{display:flex;flex-direction:column;flex:1;min-height:0}
+section#t1.on{display:flex!important;flex-direction:column;flex:1;min-height:0}
 section:not(.on) input,section:not(.on) select{pointer-events:none}
 .blk{display:none}.blk.on{display:grid}
 
@@ -254,7 +254,8 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
     <div class="section-title">پارامترهای استاندارد (قابل تنظیم)</div>
     <p class="note" style="margin:0 0 8px">فقط پارامترهای مربوط به نوع قطعهٔ انتخاب‌شده نشان داده می‌شوند؛ اعداد با واحد فعال خوانده و نوشته می‌شوند.</p>
     <label style="display:block;margin:0 0 8px;font-size:10.5px"><input type="checkbox" id="showAllP"> نمایش همهٔ پارامترها</label>
-    <div style="margin-bottom:8px"><label style="display:block;margin:6px 0"><input type="checkbox" id="man"> ویرایش دستی (override): اگر روشن شود اعداد زیر به‌جای مقادیر استاندارد به کار می‌روند. اگر خاموش باشد، همین خانه‌ها مقدار استاندارد مورد استفاده را نشان می‌دهند.</label></div>
+    <div style="margin-bottom:8px"><label style="display:block;margin:6px 0"><input type="checkbox" id="man"> ویرایش دستی (override): اگر روشن شود، خانه‌های زیر فعال می‌شوند و مقدار شما به‌جای مقدار استاندارد به کار می‌رود.</label></div>
+    <p class="note" id="paramHint" style="margin:0 0 6px;color:#f0b968">ویرایش دستی خاموش است؛ این پارامترها پنهان و غیرفعال‌اند و مقدار استانداردِ محاسبه‌شده در جدول «نتیجه» استفاده می‌شود. برای تغییر دستی، تیک بالا را بزن.</p>
     <div class="grid" id="paramGrid">
 <div data-k="smd"><label class="kv" data-v="ZJ">ZJ: بیرون‌زدگی بیرونی (SMD)</label><input id="pZJ" type="number" step="any" data-d="1"></div>
 <div data-k="smd"><label class="kv" data-v="GJ">GJ: بیرون‌زدگی داخلی (SMD)</label><input id="pGJ" type="number" step="any" data-d="1"></div>
@@ -485,7 +486,15 @@ K.frame=function(extX,extY){                       // extX/extY: نیم‌عرض
  K.extX=extX;K.extY=extY};
 K.view=function(x0,y0,x1,y1){var vb=[x0,y0,x1-x0,y1-y0];      // قاب دستی (مسیر قدیمی)
  window.SVG_BASE=vb.slice();K.extX=(x1-x0)/2;K.extY=(y1-y0)/2;fitView()};
-K.rect=function(x,y,w,h,fill,o,ex){var r=el('rect',{x:K.PX(x),y:K.PY(y+h),width:Math.max(w*sc,.5),height:Math.max(h*sc,.5),fill:fill,'fill-opacity':o==null?1:o});for(var k in ex||{})r.setAttribute(k,ex[k]);svg.appendChild(r);return r};
+K.rect=function(x,y,w,h,fill,o,ex){var pw=K.PX(x),ph=K.PY(y+h),ww=Math.max(w*sc,.5),hh=Math.max(h*sc,.5);
+ var r=el('rect',{x:pw,y:ph,width:ww,height:hh,fill:fill,'fill-opacity':o==null?1:o});for(var k in ex||{})r.setAttribute(k,ex[k]);
+ svg.appendChild(r);K.grow(pw,ph,pw+ww,ph+hh);return r};
+// جعبهٔ واقعی محتوا؛ هر شکل و برچسبی که رسم می‌شود آن را بزرگ می‌کند
+K.bb={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9};
+K.grow=function(x0,y0,x1,y1){var b=K.bb;
+ if(x0<b.x0)b.x0=x0; if(y0<b.y0)b.y0=y0; if(x1>b.x1)b.x1=x1; if(y1>b.y1)b.y1=y1};
+K.circle=function(cx,cy,r,attrs){var c=el('circle',attrs||{});c.setAttribute('cx',cx.toFixed(1));c.setAttribute('cy',cy.toFixed(1));c.setAttribute('r',r.toFixed(1));
+ svg.appendChild(c);K.grow(cx-r,cy-r,cx+r,cy+r);return c};
 K.tip=function(node,t){if(!node)return;var ti=el('title',{});ti.textContent=t;node.appendChild(ti);return node};
 K.ln=function(a,b,c,e){svg.appendChild(el('line',{x1:a,y1:b,x2:c,y2:e,stroke:'#888','stroke-width':.8,'stroke-dasharray':'2 2'}))};
 K.tx=function(x,y,s,a){var e=el('text',{x:x,y:y,'text-anchor':a||'middle'});e.textContent=s;e.addEventListener('click',function(){var k=s.split(' ')[0];tip(k)});svg.appendChild(e)};
@@ -498,9 +507,28 @@ K.vd=function(y1,y2,x,s,ex,a){K.ln(ex,y1,x,y1);K.ln(ex,y2,x,y2);K.ar(x,y1,x,y2);
 // FS در K.frame از روی اندازهٔ قطعه تعیین می‌شود (متغیر بالا در kit تعریف شده)
 K.u=function(){return ' '+U};
 K.raise=function(){if(K.dim)K.svg.appendChild(K.dim);if(K.padLbl)K.svg.appendChild(K.padLbl)};
+// بعد از رسم، قاب را از جعبهٔ واقعی محتوا می‌سازیم (در مرورگر getBBox در دسترس است؛
+// اگر نبود، همان قاب محاسبه‌شدهٔ K.frame می‌ماند). این کار تضمین می‌کند هر خانواده
+// — SMD، BGA و سوراخ‌دار — همیشه کامل و وسط دیده شود.
+K.fitContent=function(){
+ var b=K.bb;
+ if(!(b.x1>b.x0&&b.y1>b.y0))return;                 // چیزی رسم نشده
+ b={x:b.x0,y:b.y0,width:b.x1-b.x0,height:b.y1-b.y0};
+ var pad=Math.max(b.width,b.height)*0.05+6;
+ var nb=[b.x-pad,b.y-pad,b.width+2*pad,b.height+2*pad];
+ window.SVG_BASE=nb.slice();
+ var cam=window.CAM;
+ if(cam&&cam.z&&Math.abs(cam.z-1)>1e-6){
+   var z=Math.min(14,Math.max(.5,cam.z)),w=nb[2]/z,h=nb[3]/z;
+   window.SVG_VB=[nb[0]+nb[2]/2+cam.fx*nb[2]-w/2,nb[1]+nb[3]/2+cam.fy*nb[3]-h/2,w,h];
+   setVB(window.SVG_VB);
+ }else{fitView()}
+};
 K.txt=function(x,y,t,a,cls){
  var anchor=a||'middle';
  var w=String(t).length*FS*.56+FS*.8,h=FS*1.45;
+ var l=/^start/.test(anchor)?x:w&&anchor==='end'?x-w:x-w/2;
+ K.grow(l,y-h,l+w,y+h*.4);
  var bx=anchor==='start'?x-FS*.25:anchor==='end'?x-w+FS*.25:x-w/2;
  K.dim.appendChild(el('rect',{x:bx.toFixed(1),y:(y-h+FS*.3).toFixed(1),width:w.toFixed(1),height:h.toFixed(1),rx:(h/2).toFixed(1),fill:'#0b121c','fill-opacity':.9,stroke:'#22364b','stroke-width':.6}));
  var e=el('text',{x:x.toFixed(1),y:(y+FS*.12).toFixed(1),'text-anchor':anchor,'font-size':FS.toFixed(2),fill:'#e2eefa','font-weight':'600','class':cls||'dimt'});
@@ -516,6 +544,7 @@ K.vDim=function(y1,y2,x,label,side){  // side='left' (پیش‌فرض) یا 'rig
  else K.txt(x-FS*.4,(y1+y2)/2+FS*.4,label,'end')};
 // برچسب اندازهٔ خود پد: روی خود پد نوشته می‌شود و با زوم خوانا می‌شود
 K.padTag=function(cx,cy,w,h,txt){var fs=Math.min(h*sc*.42,w*sc*.42,FS*.8);if(fs<1.5)return null;
+ K.grow(cx-w*sc/2,cy-h*sc/2,cx+w*sc/2,cy+h*sc/2);
  var e=el('text',{x:cx.toFixed(1),y:(cy+fs*.36).toFixed(1),'text-anchor':'middle','font-size':fs.toFixed(2),fill:'#1b1405','font-weight':'800'});e.textContent=txt;(K.padLbl||K.svg).appendChild(e);return e};
 K.lead=function(x1,y1,x2,y2){K.svg.appendChild(el('line',{x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}))};
 return K}
@@ -559,6 +588,7 @@ R=[];M={};MP=[];
 $('res').innerHTML='<tr><td colspan="3">'+(msg||'خروجی پاک شد؛ ورودی معتبر وارد کن.')+'</td></tr>';
 $('pads').value='';$('alt').value='';$('cpAm').textContent='';$('cpm').textContent='';
 var sv=$('svg');if(sv)sv.innerHTML='';
+if(typeof K!=='undefined'&&K.bb)K.bb={x0:1e9,y0:1e9,x1:-1e9,y1:-1e9};   // جعبهٔ محتوا هم پاک شود
 PITCH_TXT='';
 ['mPad','mPitch','mCount','mCourt','insPad','insG','insZ','insGap','insCount'].forEach(function(i){if($(i))$(i).textContent='—'});
 if($('insName'))$('insName').textContent='—';
@@ -577,11 +607,28 @@ syncInspect();
 }
 // ---- نمایش فقط پارامترهای مرتبط با نوع قطعه (ایراد «صفحه داینامیک نیست») ----
 function filterParams(){
- var k=$('kind').value,all=$('showAllP')&&$('showAllP').checked;
+ var k=$('kind').value,all=$('showAllP')&&$('showAllP').checked,
+     manual=$('man')&&$('man').checked;
+ // پارامترها فقط وقتی دیده می‌شوند که ویرایش دستی روشن باشد (وگرنه مقدارِ استانداردِ
+ // محاسبه‌شده در جدول نتیجه نمایش داده می‌شود و خانه‌ها فقط گمراه می‌کنند)
  document.querySelectorAll('#paramGrid>div').forEach(function(d){
   var ks=(d.getAttribute('data-k')||'all').split('|');
-  d.style.display=(all||ks.indexOf('all')>-1||ks.indexOf(k)>-1)?'':'none'});
+  var kindOK=(all||ks.indexOf('all')>-1||ks.indexOf(k)>-1);
+  var show=manual&&kindOK;
+  d.style.display=show?'':'none';
+  d.querySelectorAll('input,select').forEach(function(el){
+    el.disabled=!manual || !kindOK;
+    el.setAttribute('aria-disabled',String(!manual));
+  });
+ });
+ var box=$('paramGrid');
+ if(box)box.style.opacity=manual?'':'0';
+ var hint=$('paramHint');
+ if(hint)hint.hidden=!!manual;
+ var sa=$('showAllP');if(sa){sa.disabled=!manual;if(!manual)sa.checked=false}
+ var sw=sa&&sa.closest('label');if(sw)sw.style.opacity=manual?'':'0.45';
 }
+if($('man'))$('man').addEventListener('input',filterParams);
 if($('showAllP'))$('showAllP').onchange=filterParams;
 // ---- بازرس و کارت‌های متریک: فقط نمایشی، از همان ردیف‌های نتیجه ----
 function rowV(re){for(var i=0;i<R.length;i++){if(new RegExp(re).test(R[i][0]))return R[i][1]}return '—'}
@@ -685,7 +732,7 @@ pads.forEach(function(p){
     'پد '+p.n+' · '+fm(p.w)+' × '+fm(p.h)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')');
   // اندازهٔ همین پد، روی خودِ پد (با زوم بزرگ می‌شود و خوانا می‌ماند)
   K.padTag(K.PX(p.x),K.PY(p.y),p.w,p.h,p.th?'':fm(p.w)+'×'+fm(p.h));});
-K.svg.appendChild(el('circle',{cx:K.PX(-Z/2-.25),cy:K.PY((n-1)*Pt/2),r:4,fill:'#000'}));
+K.circle(K.PX(-Z/2-.25),K.PY((n-1)*Pt/2),4,{fill:'#000'});
 // ---------- اندازه‌گذاری روی تصویر (بالای قطعه و کناره‌ها، بدون تداخل) ----------
 (function(){
  var p0=pads[0]||{w:X,h:X,x:0,y:0};
@@ -731,7 +778,8 @@ wr+=asym;
 // ---------- خروجی ----------
 var srcT='جدول '+r[4]+'، سطح '+lv+(src.length?' — '+src.join('، '):'')+(F==='melf'?' — توجه: در MELF قطر بدنه به‌جای W در فرمول کناره استفاده شده است؛ محور اندازه‌گیری J از رأس گرد باید با دیتاشیت تأیید شود.':'');
 VALID=true;
-K.raise();
+K.raise();K.fitContent();
+if(K.bb.x1<K.bb.x0&&$('stageEmpty'))$('stageEmpty').hidden=false;
 out([['اندازهٔ هر پد (طول × عرض)',fm(pl)+' × '+fm(X)+' '+U,'(Z − G)/2 و X. '+srcT],
  ['Z (طول کل پدها)',fu(Z),'Z = Lmax + 2·'+fmo(r[0])+' '+U],
  ['G (فاصلهٔ داخلی)',fu(G),'G = S − 2·'+fmo(r[1])+' '+U+' ، S='+fm(S)+' ('+srcS+')'],
@@ -772,8 +820,8 @@ K.frame(cw/2*sc,ch/2*sc);
 K.rect(-cw/2,-ch/2,cw,ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'6 4','stroke-width':1.5});
 K.rect(-BL/2,-BW/2,BL,BW,'#8e9aa3',.35,{stroke:'#555'});
 padsR.forEach(function(p){
-  if(skipt[p.n]){K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd*sc/2*.35,1),fill:'none',stroke:'#bbb','stroke-dasharray':'2 2'}));return}
-  K.tip(K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd/2*sc,1),fill:'#d4a017','fill-opacity':.7,stroke:'#8a6d0b'})),
+  if(skipt[p.n]){K.circle(K.PX(p.x),K.PY(p.y),Math.max(pd*sc/2*.35,1),{fill:'none',stroke:'#bbb','stroke-dasharray':'2 2'});return}
+  K.tip(K.circle(K.PX(p.x),K.PY(p.y),Math.max(pd/2*sc,1),{fill:'#d4a017','fill-opacity':.7,stroke:'#8a6d0b'}),
     p.n+' · Ø '+fm(pd)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')');
   K.padTag(K.PX(p.x),K.PY(p.y),pd,pd,'');
   MP.push({n:p.n,x:p.x,y:p.y,w:pd,h:pd,sh:'c',hole:0,pl:true});
@@ -801,7 +849,7 @@ if(minGap!==null&&minGap<0)wr+='پدها روی هم افتاده‌اند؛ گ�
 else if(minGap!==null&&minGap<GP())wr+='کوچک‌ترین فاصلهٔ خالی بین پدها '+fm(minGap)+' '+U+' (جفت '+pair+') از آستانه کمتر است. ';
 if(PtX!==PtY)wr+='آرایه با گام متفاوت محورها ساخته شد؛ نام استاندارد تک‌گام است، نوع دوگام را با دیتاشیت تأیید کن. ';
 VALID=true;
-K.raise();
+K.raise();K.fitContent();
 out([['قطر هر پد','Ø '+fu(pd),'جدول 3-11، سطح '+lv+(ty==='C'?': کاهش از قطر توپ':': افزایش به قطر توپ')+' (گردشده به 0.01)'],
  ['گام / کمینه فاصلهٔ خالی',fm(PtX)+(PtX!==PtY?' × '+fm(PtY):'')+' / '+(minGap===null?'—':fm(minGap)),'آستانه '+fm(GP())+' '+U],
  ['تعداد پد ساخته‌شده',String(count),'از '+rw*c+' موقعیت؛ '+(rw*c-count)+' حذف‌شده'],
@@ -862,9 +910,9 @@ K.rect(-M.cw/2,-M.ch/2,M.cw,M.ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'
 pads.forEach(function(p){
   var tInfo='پد '+p.n+' · Ø '+fm(pad)+' '+U+' · سوراخ Ø'+fm(hole)+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')';
   if(p.n===1&&p1==='r')K.tip(K.rect(p.x-pad/2,p.y-pad/2,pad,pad,'#d4a017',.6,{stroke:'#8a6d0b'}),tInfo);
-  else K.tip(K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:pad/2*sc,fill:'#d4a017','fill-opacity':.6,stroke:'#8a6d0b'})),tInfo);
+  else K.tip(K.circle(K.PX(p.x),K.PY(p.y),pad/2*sc,{fill:'#d4a017','fill-opacity':.6,stroke:'#8a6d0b'}),tInfo);
   K.padTag(K.PX(p.x),K.PY(p.y),pad,pad,fm(pad));
-  K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:hole/2*sc,fill:'#1b2a26','fill-opacity':.85}));
+  K.circle(K.PX(p.x),K.PY(p.y),hole/2*sc,{fill:'#1b2a26','fill-opacity':.85});
   MP.push({n:p.n,x:p.x,y:p.y,w:pad,h:pad,sh:(p.n===1&&p1==='r')?'r':'c',hole:hole,pl:HT!=='N'});
 });
 var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
@@ -874,8 +922,8 @@ var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
  var p0=MP[0];
  K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(M.cw)+K.u());
  K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(M.ch)+K.u(),'right');
- K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*3.4,'Pad '+fm(pad)+K.u());
- K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-FS*1.5,'Hole Ø'+fm(hole)+K.u());
+ K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*2.6,'Pad '+fm(pad)+K.u());
+ K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-FS*1.25,'Hole Ø'+fm(hole)+K.u());
  if(two){
    K.hDim(K.PX(-R2/2),K.PX(R2/2),Y1+FS*5.2,'Row span '+fm(R2)+K.u());
    K.vDim(K.PY(p0.y),K.PY(MP.length>1?MP[1].y:p0.y-Pt),K.PX(-M.cw/2)-FS*1.4,'P '+fm(Pt)+K.u());
@@ -893,7 +941,7 @@ if(two&&k%2)wr+='DIP با تعداد پین فرد ساخته شد؛ مکان و
 if(HT==='N')wr+='NPTH: وجود و ابعاد مس اطراف سوراخ را با کاربرد و دیتاشیت تعیین کن؛ جدول 4-4 مخصوص PTH است. ';
 if(pr&&(bt<0.8||bt>4)&&!$('man').checked)wr+='برای ضخامت زیر 0.8 یا بالای 4 mm، جدول 4-3 حداکثر اصلاح «تا 0.2» می‌دهد؛ ابزار حداکثر را گرفته است. با فرایند و توان سازنده تطبیق بده یا با «ویرایش دستی» مقدار را تغییر بده. ';
 VALID=true;
-K.raise();
+K.raise();K.fitContent();
 out([['سوراخ نهایی',('Ø '+fu(hole))+(tolShow>0?' (±'+fmo(tolShow)+')':' (تلرانس سازنده)'),holeSrc],
  ['پد',('Ø '+fu(pad))+(p1==='r'?' (پین ۱ مربع)':''),'سوراخ + '+fmo(pa)+' '+U+' (جدول 4-4)؛ '+MP.length+' پد — حداقل پد IPC-222X و توان سازنده باید جداگانه کنترل شود'],
  ['کمینه فاصلهٔ خالی واقعی پدها',(minGap===null?'— (جفت پدی وجود ندارد)':fm(minGap)+' '+U),'آستانه '+fm(GP())+' '+U],
