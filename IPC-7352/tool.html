@@ -104,7 +104,8 @@ input:hover,select:hover,textarea:hover{border-color:#364d67}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #56c7b51f}
 #man{margin-inline-end:6px}
 .hint,.note{font-size:10.5px;color:var(--muted);line-height:1.7;margin-top:6px}
-.note{color:#8ea1b6}
+.note{color:#8ea1b6;overflow-wrap:anywhere}
+.box code{white-space:normal;overflow-wrap:anywhere}
 
 /* ---------- stage: canvas + metrics ---------- */
 .stage-inner{flex:1;display:flex;flex-direction:column;min-height:0}
@@ -133,7 +134,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
   border-top:1px solid var(--line);background:#101925}
 .metric{padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;overflow:hidden}
 .metric span{display:block;color:var(--muted);font-size:9px;letter-spacing:.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.metric strong{display:block;font-size:14.5px;margin-top:2px;font-variant-numeric:tabular-nums;
+.metric strong{display:block;min-width:0;max-width:100%;font-size:14.5px;margin-top:2px;font-variant-numeric:tabular-nums;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- inspector ---------- */
@@ -143,7 +144,7 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
 .readout-row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:var(--muted);
   font-size:11.5px;border-bottom:1px solid #131e2b}
 .readout-row:last-child{border-bottom:0}
-.readout-row b{color:var(--text);font-weight:650;font-variant-numeric:tabular-nums;direction:ltr;text-align:end}
+.readout-row b{min-width:0;max-width:70%;overflow-wrap:anywhere;color:var(--text);font-weight:650;font-variant-numeric:tabular-nums;direction:ltr;text-align:end}
 .readout-row em{font-style:normal;color:var(--accent);font-size:10.5px;font-weight:700}
 .legend{display:flex;flex-wrap:wrap;gap:5px 11px;font-size:10.5px;color:var(--muted);margin-top:8px}
 .legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-inline-end:4px;vertical-align:middle}
@@ -544,6 +545,12 @@ K.fitContent=function(){
    setVB(window.SVG_VB);
  }else{fitView()}
 };
+K.fitText=function(e,maxW,maxH,start){
+ var fs=Math.max(.01,start),box;
+ function measure(){try{var b=e.getBBox();if(b.width>0&&b.height>0)return {x:b.x,y:b.y,width:b.width,height:b.height,real:true}}catch(err){}return {x:0,y:-fs*.85,width:Math.max(1,e.textContent.length)*fs*.72,height:fs*1.25,real:false}}
+ for(var iter=0;iter<5;iter++){e.setAttribute('font-size',fs.toFixed(6));box=measure();var ratio=Math.min(1,maxW/box.width,maxH/box.height);if(ratio>=.9999)break;fs=Math.max(.001,fs*ratio*.985)}
+ e.setAttribute('font-size',fs.toFixed(6));box=measure();return {fs:fs,box:box};
+};
 K.txt=function(x,y,t,a,cls){
  var anchor=a||'middle',str=String(t);
  // اندازهٔ واقعی متن: در مرورگر با getComputedTextLength (دقیق)، در آزمون با تخمین
@@ -562,7 +569,9 @@ K.txt=function(x,y,t,a,cls){
  var textX=anchor==='start'?left+padX:anchor==='end'?left+w-padX:x;
  var e=el('text',{x:textX.toFixed(1),y:y.toFixed(1),direction:'ltr','unicode-bidi':'isolate','text-anchor':anchor,'font-size':fs.toFixed(2),
    fill:'#e6f1fb','font-weight':'600','dominant-baseline':'auto','class':cls||'dimt'});
- e.textContent=str;label.appendChild(e);return e};
+ e.textContent=str;label.appendChild(e);
+ var fit=K.fitText(e,w-2*padX,h-2*padY,fs);if(fit.box.real)e.setAttribute('y',(+e.getAttribute('y')+(y-fs*.92-padY+h/2)-(fit.box.y+fit.box.height/2)).toFixed(4));
+ e.setAttribute('data-fit-width',(w-2*padX).toFixed(4));e.setAttribute('data-fit-height',(h-2*padY).toFixed(4));return e};
 K.hDim=function(x1,x2,y,label){     // اندازهٔ افقی با خط رابط و برچسب بالای خط
  if(!(Math.abs(x2-x1)>1e-9))return;
  K.dim.appendChild(el('line',{x1:x1.toFixed(1),y1:(y-1.2).toFixed(1),x2:x2.toFixed(1),y2:y.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
@@ -576,19 +585,19 @@ K.vDim=function(y1,y2,x,label,side){  // side='left' (پیش‌فرض) یا 'rig
 // با رنگ سفید کنار نقشه تکرار نمی‌شود.
 K.tagged=false;
 K.padTag=function(cx,cy,w,h,txt,opt){if(txt===null||txt==='')return null;
- opt=opt||{};
- // اندازهٔ نوشته طوری انتخاب می‌شود که هم در ارتفاع و هم در عرض پد جا شود
- var str=String(txt),chars=str.length||1,
-     // ۰٫۹۲ تا متن دو طرف کمی حاشیه داشته باشد (عرض نویسهٔ فارسی/× حدود ۰٫۶em است)
-     fs=Math.min(h*sc*0.46, (w*sc*0.86)/(chars*0.60), FS*0.8);
- if(fs<1.2)return null;K.tagged=true;
- var half=chars*fs*0.31;
- K.grow(cx-half,cy-h*sc/2,cx+half,cy+h*sc/2);
- // روی پد THT سوراخ تیره زیر متن است؛ برای خوانایی، متن روشن با دورخط تیره
- var e=el('text',{x:cx.toFixed(1),y:(cy+fs*0.36).toFixed(1),'text-anchor':'middle','font-size':fs.toFixed(2),
-   fill:opt.light?'#fff4cf':'#241a04','font-weight':'800','letter-spacing':'-0.02em'});
- if(opt.light){e.setAttribute('stroke','#1c1503');e.setAttribute('stroke-width',(fs*0.11).toFixed(2));e.setAttribute('paint-order','stroke');}
- e.textContent=str;(K.padLbl||K.svg).appendChild(e);return e};
+ opt=opt||{};var str=String(txt),angle=((opt.rotation||0)%180+180)%180,pw=w*sc,ph=h*sc;
+ // A conservative central rectangle fits even a circular/oblong pad, not just its bounding box.
+ if(Math.abs(angle-90)<1e-7){var tmp=pw;pw=ph;ph=tmp}
+ else if(angle>1e-7&&Math.abs(angle-180)>1e-7){pw=ph=Math.min(pw,ph)*.70}
+ var maxW=pw*.80,maxH=ph*.50;
+ if(!(maxW>0&&maxH>0))return null;
+ var e=el('text',{x:cx.toFixed(4),y:cy.toFixed(4),'text-anchor':'middle',direction:'ltr','unicode-bidi':'isolate',fill:opt.light?'#fff4cf':'#241a04','font-weight':'800','letter-spacing':'-0.02em'});
+ e.textContent=str;(K.padLbl||K.svg).appendChild(e);
+ var fit=K.fitText(e,maxW*.96,maxH*.90,maxH),fs=fit.fs;
+ if(opt.light){e.setAttribute('stroke','#1c1503');e.setAttribute('stroke-width',(fs*.08).toFixed(6));e.setAttribute('paint-order','stroke')}
+ e.setAttribute('y',(fit.box.real?cy-(fit.box.y+fit.box.height/2)+cy:cy+fs*.23).toFixed(6));
+ e.setAttribute('data-fit-x',(cx-maxW/2).toFixed(6));e.setAttribute('data-fit-y',(cy-maxH/2).toFixed(6));e.setAttribute('data-fit-width',maxW.toFixed(6));e.setAttribute('data-fit-height',maxH.toFixed(6));
+ K.grow(cx-maxW/2,cy-maxH/2,cx+maxW/2,cy+maxH/2);K.tagged=true;return e};
 K.lead=function(x1,y1,x2,y2){K.svg.appendChild(el('line',{x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}))};
 return K}
 var FS=11,R=[],P=[],W='',M={},MP=[],PITCH_TXT='';   // FS: اندازهٔ قلم برچسب‌ها، نسبت به اندازهٔ قطعه
@@ -681,7 +690,16 @@ if($('man'))$('man').addEventListener('input',filterParams);
 if($('showAllP'))$('showAllP').onchange=filterParams;
 // ---- بازرس و کارت‌های متریک: فقط نمایشی، از همان ردیف‌های نتیجه ----
 function rowV(re){for(var i=0;i<R.length;i++){if(new RegExp(re).test(R[i][0]))return R[i][1]}return '—'}
-function syncInspect(){
+var htmlFitPending=false;
+function fitMetricText(){htmlFitPending=false;document.querySelectorAll('.metric strong').forEach(function(e){
+ var width=e.clientWidth;if(!(width>0))return;var fs=14.5;e.style.whiteSpace='nowrap';e.style.textOverflow='clip';e.style.fontSize=fs+'px';
+ while(e.scrollWidth>width+.5&&fs>10){fs-=.25;e.style.fontSize=fs+'px'}
+ if(e.scrollWidth>width+.5){e.style.whiteSpace='normal';e.style.overflowWrap='anywhere'}
+})}
+function queueMetricFit(){if(htmlFitPending)return;htmlFitPending=true;(window.requestAnimationFrame||function(fn){setTimeout(fn,0)})(fitMetricText)}
+window.addEventListener('resize',queueMetricFit);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(queueMetricFit);
+function syncInspect(){queueMetricFit();
  if($('stageEmpty'))$('stageEmpty').hidden=true;
  var any=MP.filter(function(p){return !p.skip}).length;
  var padsTxt=R.length?rowV('اندازهٔ هر پد|قطر هر پد'):'—';
@@ -1812,7 +1830,7 @@ function renderReference(){
  K.tip(node,'پد '+p.n+' · '+fm(p.w)+'×'+fm(p.h)+' '+U+' · مرکز '+fm(p.x)+','+fm(p.y));
  if(p.sh==='poly'){var points=p.polygon.map(function(v){var q=point(p,v[0],v[1]);return K.PX(q[0])+','+K.PY(q[1])}).join(' ');K.svg.appendChild(el('polygon',{points:points,fill:'#d4a017','fill-opacity':.65,stroke:'#8a6d0b'}))}
  if(p.holeType==='slot')K.rect(p.x-p.holeL/2,p.y-p.holeW/2,p.holeL,p.holeW,'#071019',1,{rx:Math.min(p.holeL,p.holeW)/2*sc,transform:attrs.transform});else if(p.hole)K.circle(K.PX(p.x),K.PY(p.y),p.hole/2*sc,{fill:'#071019'});
- var crowded=pads.some(function(q){return q!==original&&Math.abs(q.x-p.x)<(q.w+p.w)/2&&Math.abs(q.y-p.y)<(q.h+p.h)/2});if(!crowded)K.padTag(K.PX(p.x),K.PY(p.y),p.w,p.h,String(p.n)+' · '+fm(p.w)+'×'+fm(p.h),{light:true});return p});
+ var crowded=pads.some(function(q){return q!==original&&Math.abs(q.x-p.x)<(q.w+p.w)/2&&Math.abs(q.y-p.y)<(q.h+p.h)/2});if(!crowded)K.padTag(K.PX(p.x),K.PY(p.y),p.w,p.h,String(p.n)+' · '+fm(p.w)+'×'+fm(p.h),{light:true,rotation:p.rotation});return p});
  K.hDim(K.PX(-cw/2),K.PX(cw/2),K.PY(-ch/2)+FS*2.6,'Envelope '+fm(cw)+K.u());
  var xs=Array.from(new Set(pads.map(function(p){return p.x}))).sort(function(a,b){return a-b});if(xs.length>1)K.hDim(K.PX(xs[0]),K.PX(xs[xs.length-1]),K.PY(ch/2)-FS*3.4,'C-C X '+fm(xs[xs.length-1]-xs[0])+K.u());
  M.cw=cw;M.ch=ch;M.name=ref.name;M.reference=true;VALID=true;K.raise();K.fitContent();

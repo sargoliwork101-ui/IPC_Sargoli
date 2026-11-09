@@ -1,0 +1,148 @@
+{
+  "baseline": "IPC-7352 May 2023; user-supplied PDF",
+  "observations": [
+    {
+      "id": "A1",
+      "topic": "Table 3-4 toe-only rounding",
+      "actual_width_mm": 0.32,
+      "reference_before_independent_fabrication_rounding_mm": 0.321,
+      "reference": "Table 3-4 note 1, printed p10/PDF20"
+    },
+    {
+      "id": "A2",
+      "topic": "diagonal circular-pad clearance",
+      "centres": [
+        [
+          "A1",
+          -0.4,
+          0.4
+        ],
+        [
+          "B2",
+          0.4,
+          -0.4
+        ]
+      ],
+      "actual": "0.80 / 0.40",
+      "expected_mm": 0.7313708498984762,
+      "reference": "Euclidean geometry; clearance warning is an application addition, not an IPC equation"
+    },
+    {
+      "id": "A3a",
+      "topic": "chip name from maximum instead of separate body size",
+      "actual": "RESC3418X100N",
+      "nominal_1206_body_mm": [
+        3.2,
+        1.6
+      ],
+      "expected_size_token": "3216",
+      "reference": "Table 3-16, RESC+Body Length+Body Width…; printed p15/PDF25"
+    },
+    {
+      "id": "A3b",
+      "topic": "independent QFN body length is ignored in name",
+      "body_mm": [
+        6,
+        4
+      ],
+      "actual": "QFN127P400X400X175-16N",
+      "reference": "Table 3-16, body length X body width; printed p16/PDF26"
+    },
+    {
+      "id": "A3c",
+      "topic": "checked suspicion: BGA fixed density suffix is allowed by the explicit exception",
+      "density": "A",
+      "actual": "BGA100C80P10X10_900X900X150D50N",
+      "expected_density_suffix": "N",
+      "result": "NOT A DEFECT: 3.4.3 explicitly excludes BGA from the M/N/L density variation",
+      "reference": "3.4.3 note, printed p16/PDF26"
+    },
+    {
+      "id": "A3d",
+      "topic": "dual pitch still generates a single-pitch name",
+      "actual": "BGA100C80P10X10_900X900X150D50N",
+      "pitch_mm": [
+        0.8,
+        0.6
+      ],
+      "reference": "Table 3-16 BGA w/Dual Pitch printed p14/PDF24"
+    },
+    {
+      "id": "A4",
+      "topic": "thermal pad SVG/Altium shape mismatch",
+      "svg_has_corner_radius": false,
+      "last_Altium_pad": "  AddPad('17', 0.0000, 0.0000, 2.0000, 1.0000, 0.0000, 1, True);",
+      "reference": "Application export consistency; IPC-7352 5.3 thermal pad context, printed p29/PDF39"
+    },
+    {
+      "id": "A5",
+      "topic": "press-fit accepts generic PTH tolerance without manufacturer tolerance",
+      "actual": "Ø 1.00 mm (±0.08)",
+      "reference": "4.5, printed p21/PDF31, hole sizes AND tolerances provided by component manufacturer"
+    },
+    {
+      "id": "A6",
+      "topic": "MELF effective contact width not distinct from diameter, reachable via custom",
+      "actual": "2.70 mm",
+      "zero_foot_width_case_mm": 0.7,
+      "reference": "Table 3-5 note 1, printed p10/PDF20; do not zero the body diameter for toe calculations"
+    },
+    {
+      "id": "A7",
+      "topic": "invalid identifiers on tall arrays",
+      "bad_identifiers": [
+        "Aundefined1",
+        "Aundefined1",
+        "Aundefined1",
+        "Aundefined1"
+      ],
+      "reference": "Software string-index bug; no claim that the source PDF defines a universal row alphabet"
+    },
+    {
+      "id": "L1",
+      "topic": "NPTH copper pad still calculated from PTH table",
+      "actual_hole": "Ø 0.90 mm (±0.10)",
+      "actual_pad": "Ø 1.40 mm (پین ۱ مربع)",
+      "reference": "4.6 NPTH vs 4.4.2/table 4-4 PTH; extra copper needs an explicit design choice"
+    },
+    {
+      "id": "OK1",
+      "topic": "previous square-pin diagonal correction still works",
+      "actual": "Ø 0.86 mm (±0.08)",
+      "expected_mm": 0.86
+    },
+    {
+      "id": "OK2",
+      "topic": "disabled hole override still ineffective",
+      "actual": "Ø 0.93 mm (±0.08)",
+      "must_not_equal_mm": 1.2
+    },
+    {
+      "id": "A8",
+      "topic": "square TH pin-1 padstack uses rectangular r instead of square s",
+      "actual": "r143h93",
+      "reference": "5.1 and 5.2.1, printed pp25-26/PDF35-36: square s150h90, rectangle r200_100"
+    },
+    {
+      "id": "A9",
+      "topic": "negative hole dimension is silently omitted by independent padstack builder",
+      "actual": "c150",
+      "expected": "input validation error, not c150",
+      "reference": "Software validation issue; section 5 encodes the intended padstack structure"
+    }
+  ],
+  "code_lines": {
+    "function smax": 473,
+    "function rule": 474,
+    "function smd": 723,
+    "function bga": 877,
+    "function thSlot": 943,
+    "function th()": 983,
+    "function validateFootprint": 1108,
+    "function renderReference": 1802,
+    "function nm": 2142,
+    "function ps": 2156,
+    "function dec": 2172,
+    "function altium": 2240
+  }
+}
