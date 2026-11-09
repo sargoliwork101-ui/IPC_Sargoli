@@ -469,6 +469,39 @@ console.log('\n۱۴) انتخاب مرحله‌ای و SOT-23-3');
  w.close();
 }
 
+console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادعای پشتیبانی کاذب');
+{
+ const {d,w}=load(TOOL);
+ function change(id,v){const e=d.getElementById(id);e.value=v;e.dispatchEvent(new w.Event('change',{bubbles:true}))}
+ const types=[...d.getElementById('component').options].map(o=>o.value);
+ ok(types.length===18,'۱۸ گروه قطعه در دسترس است');
+ const packages=new Set();let combos=0,blockedSafe=true,configSafe=true;
+ for(const type of types){
+  change('component',type);
+  const options=[...d.getElementById('package').options].map(o=>[o.value,o.textContent]);
+  for(const [id,label] of options){
+   packages.add(id);combos++;change('package',id);
+   if(/هنوز پشتیبانی نمی‌شود|نیازمند اصلاح محاسبه/.test(label)){
+    blockedSafe=blockedSafe&&!d.getElementById('pads').value&&!d.getElementById('stageEmpty').hidden;
+   }
+   if(/ابعاد دیتاشیت لازم/.test(label))configSafe=configSafe&&!d.getElementById('pads').value&&d.getElementById('Lmax').value==='';
+  }
+ }
+ ok(packages.size===66&&combos===131,'۶۶ تعریف پکیج و ۱۳۱ ترکیب مرتبط قابل انتخاب است');
+ ok(blockedSafe,'بسته‌های پشتیبانی‌نشده یا مسدود، نقشه/خروجی قطعهٔ قبلی را نشان نمی‌دهند');
+ ok(configSafe,'بستهٔ بدون نمونه، ابعاد قبلی را به جای دیتاشیت استفاده نمی‌کند');
+ change('component','led');
+ ok(d.getElementById('cType').value==='LEDC','LED چیپ پیشوند مناسب می‌گیرد');
+ change('component','ferrite');
+ ok(d.getElementById('cType').value==='BEADC','فریت چیپ پیشوند مناسب می‌گیرد');
+ change('component','resistor');change('package','melf');
+ setV(d,'W',1);
+ ok(!d.getElementById('pads').value&&/ممیزی/.test(d.getElementById('emptyReason').textContent),'MELF با ویرایش عددی از قفل ممیزی عبور نمی‌کند');
+ d.getElementById('mkA').click();
+ ok(!/  AddPad\('/.test(d.getElementById('alt').value),'پکیج مسدود خروجی Altium معتبر نمی‌سازد');
+ w.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }

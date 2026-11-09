@@ -42,6 +42,17 @@ const engine = chromiumPackage.default || chromiumPackage;
   await page.locator('#mkA').evaluate(e=>e.click());
   const alt=await page.locator('#alt').inputValue();assert(alt.includes('3'));
   console.log('Cascading selection and SOT-23: PASS');
+  await page.selectOption('#component','ic');await page.selectOption('#package','qfn');
+  assert.equal(await page.locator('#Lmax').inputValue(),'');
+  assert(await page.locator('#stageEmpty').isVisible());
+  await page.selectOption('#package','lga');
+  assert.equal(await page.locator('#pads').inputValue(),'');
+  assert((await page.locator('#packageStatus').textContent()).includes('پیاده‌سازی نشده'));
+  await page.reload();
+  assert.equal(await page.locator('#package').inputValue(),'lga');
+  assert.equal(await page.locator('#pads').inputValue(),'');
+  await page.selectOption('#component','led');assert.equal(await page.locator('#cType').inputValue(),'LEDC');
+  console.log('Catalogue filtering, blocked output and persisted package: PASS');
   // Old 1206 state must survive a reload without becoming blank.
   await page.selectOption('#smp','chip');
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('fp7352'));o.Lmin='5.8';localStorage.setItem('fp7352',JSON.stringify(o))});

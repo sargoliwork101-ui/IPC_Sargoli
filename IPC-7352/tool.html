@@ -249,9 +249,9 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 <div><label>روش نصب / مدل هندسی (پیشرفته)</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
-<div><label>۱. نوع قطعه</label><select id="component"><option value="resistor">مقاومت</option><option value="capacitor">خازن</option><option value="inductor">سلف</option><option value="transistor">ترانزیستور</option><option value="ic" selected>آی‌سی</option><option value="custom">طراحی سفارشی / سایر قطعات</option></select></div>
+<div><label>۱. نوع قطعه</label><select id="component"><option value="resistor">مقاومت</option><option value="capacitor">خازن</option><option value="inductor">سلف</option><option value="ferrite">فریت‌بید</option><option value="diode">دیود</option><option value="led">LED</option><option value="transistor">ترانزیستور / قطعهٔ قدرت</option><option value="ic" selected>آی‌سی</option><option value="crystal">کریستال</option><option value="oscillator">اسیلاتور</option><option value="fuse">فیوز</option><option value="thermistor">ترمیستور</option><option value="varistor">واریستور</option><option value="connector">کانکتور / هدر / سوکت</option><option value="jumper">جامپر</option><option value="switch">کلید / رله</option><option value="transformer">ترانس / قطعات مغناطیسی خاص</option><option value="custom">طراحی سفارشی / سایر قطعات</option></select></div>
 <div><label>۲. نوع پکیج</label><select id="package"></select></div>
-<div class="note wide" id="methodReadout" aria-live="polite"></div>
+<div class="note wide" id="packageStatus" role="status" aria-live="polite"></div><div class="note wide" id="methodReadout" aria-live="polite"></div>
 <div><label>۳. اندازه / نمونهٔ آماده<small>ابعاد نمونه‌ها نقطهٔ شروع‌اند؛ دیتاشیت سازنده مرجع نهایی است.</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48</option><option value="chip">1206 اینچی / 3216 متریک</option><option value="chip0805">0805 اینچی / 2012 متریک</option><option value="chip0603">0603 اینچی / 1608 متریک</option><option value="sot23">SOT-23-3 · نمونهٔ هندسی</option><option value="dip">DIP-14</option></select></div>
     </div>
   </div>
@@ -451,7 +451,7 @@ th:[['tK','Pins','تعداد پین',14,0],['tP','P','گام',2.54,1],['tR','R',
 var FAM=[['gull','SOIC / SOP / TSSOP / QFP · Gull-wing (3-1)'],['chip','چیپ مستطیلی (3-3/3-4)'],['sof','Small outline پایه تخت: SOT/SOD (3-15)'],['jlead','J-lead: SOJ/PLCC (3-2)'],['qfn','QFN/DFN/SON (3-10)'],['pull','Pullback (3-12)'],['alc','الکترولیتی/کریستال (3-14)'],['melf','MELF (3-5)'],['conc','Concave (3-6)'],['inl','L-lead رو به داخل (3-8)'],['butt','Butt/I (3-7)'],['lug','Flat lug (3-9)']];
 function build(){
 var h='<div><label>خانوادهٔ محاسباتی<small>شکل پایه و قواعد محاسبه؛ نه نام یک قطعهٔ مشخص</small></label><select id="fam">'+FAM.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div><div><label>تعداد طرف</label><select id="sides"><option value="2">2 طرف</option><option value="4">4 طرف (مربعی)</option></select></div>'+
-'<div id="cTypeWrap"><label class="kv" data-v="cType">پیشوند نام (چیپ / QFN)</label><select id="cType"><option value="RESC">RESC مقاومت</option><option value="CAPC">CAPC خازن</option><option value="INDC">INDC سلف</option><option value="DIOC">DIOC دیود</option><option value="QFN">QFN</option><option value="SON">SON</option><option value="DFN">DFN</option><option value="">— بدون نام —</option></select></div>'+
+'<div id="cTypeWrap"><label class="kv" data-v="cType">پیشوند نام (چیپ / QFN)</label><select id="cType"><option value="RESC">RESC مقاومت</option><option value="CAPC">CAPC خازن</option><option value="INDC">INDC سلف</option><option value="BEADC">BEADC فریت</option><option value="LEDC">LEDC LED</option><option value="FUSC">FUSC فیوز</option><option value="THRMC">THRMC ترمیستور</option><option value="VARC">VARC واریستور</option><option value="DIOC">DIOC دیود</option><option value="QFN">QFN</option><option value="SON">SON</option><option value="DFN">DFN</option><option value="">— بدون نام —</option></select></div>'+
 '<div><label>آرایش پایه‌ها</label><select id="layout"><option value="symmetric">متقارن</option><option value="sot23">SOT-23-3: دو چپ، یک راست (نمای بالا)</option></select></div><div><label>S از L و T</label><input type="checkbox" id="autoS" checked> با RMS</div>';
 FIELDS.smd.forEach(function(a){h+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});$('bsmd').innerHTML=h;
 ['bga','th'].forEach(function(k){var s='';FIELDS[k].forEach(function(a){s+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});
@@ -1044,6 +1044,7 @@ if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
 $('warn').textContent='';WG='';
 filterParams();updateMethod();
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
+var blocked=packageBlockReason();if(blocked){clearOut(blocked);$('warn').textContent=blocked;why(k);save();return}
 var issues=validateFootprint(k);if(issues.length){var message=issues.map(function(e){return e.id+': '+e.msg}).join(' • ');clearOut(message);$('warn').textContent=message;why(k);save();return}
 try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){clearOut('خطای رسم: '+e.message);$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
@@ -1056,6 +1057,7 @@ if(!o._schema){['bga','th'].forEach(function(k){
  var dims=FIELDS[k].filter(function(a){return a[4]===1&&a[3]>0});
  if(dims.every(function(a){return Number(o[a[0]])===0}))FIELDS[k].forEach(function(a){o[a[0]]=a[4]===1?a[3]/PX[U]:a[3]});
 })}
+if(o.component&&PACKAGE_TYPES[o.component]){$('component').value=o.component;refreshPackages(o.package)}
 document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else if(e.tagName!=='SELECT'||Array.from(e.options).some(function(opt){return opt.value===String(o[e.id])}))e.value=o[e.id]}});$('unit').value=U;
 // تعمیر دقیق نمونهٔ 1206 ذخیره‌شده با Lmin مربوط به SOIC در نسخهٔ قدیمی.
 if(o.smp==='chip'&&o.fam==='chip'&&Math.abs(rd('Lmin')-5.8)<.001&&Math.abs(rd('Lmax')-3.4)<.001){
@@ -1091,37 +1093,611 @@ $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
  syncHierarchyFromSample($('smp').value);
- if($('fam').value==='chip')$('cType').value={resistor:'RESC',capacitor:'CAPC',inductor:'INDC'}[$('component').value]||'RESC';
+ if($('fam').value==='chip')$('cType').value=CHIP_PREFIX[$('component').value]||'RESC';
  run()};
-var PACKAGE_MAP={resistor:[['chip','چیپ SMD']],capacitor:[['chip','چیپ SMD غیرقطبی']],inductor:[['chip','چیپ SMD']],transistor:[['sot23','SOT-23-3 · Gull-wing']],ic:[['soic','SOIC / SOP'],['tssop','TSSOP'],['qfp','QFP مربعی'],['bga','BGA'],['dip','DIP']],custom:[['custom','پکیج سفارشی / تنظیمات پیشرفته']]};
+var PACKAGE_CATALOG={
+ "chip": {
+  "label": "چیپ مستطیلی SMD",
+  "state": "sample",
+  "ref": "3-3 / 3-4"
+ },
+ "soic": {
+  "label": "SOIC / SOP",
+  "state": "sample",
+  "ref": "3-1 / 3-16"
+ },
+ "tssop": {
+  "label": "TSSOP",
+  "state": "sample",
+  "ref": "3-1 / 3-16"
+ },
+ "qfp": {
+  "label": "QFP مربعی",
+  "state": "sample",
+  "ref": "3-1 / 3-16"
+ },
+ "bga": {
+  "label": "BGA",
+  "state": "sample",
+  "ref": "3-11 / 3-16"
+ },
+ "dip": {
+  "label": "DIP",
+  "state": "sample",
+  "ref": "4.4 / 4-6"
+ },
+ "sot23": {
+  "label": "SOT-23-3 · Gull-wing",
+  "state": "sample",
+  "ref": "3-1 / 3-16"
+ },
+ "qfn": {
+  "label": "QFN مربعی با سطح عمودی لحیم‌پذیر",
+  "state": "configure",
+  "ref": "3-10",
+  "config": {
+   "kind": "smd",
+   "fam": "qfn",
+   "sides": "4"
+  }
+ },
+ "son": {
+  "label": "SON / DFN دوطرفه با سطح عمودی",
+  "state": "configure",
+  "ref": "3-10",
+  "config": {
+   "kind": "smd",
+   "fam": "qfn",
+   "sides": "2"
+  }
+ },
+ "soj": {
+  "label": "SOJ · J-lead",
+  "state": "configure",
+  "ref": "3-2",
+  "config": {
+   "kind": "smd",
+   "fam": "jlead",
+   "sides": "2"
+  }
+ },
+ "plcc": {
+  "label": "PLCC مربعی · J-lead",
+  "state": "configure",
+  "ref": "3-2",
+  "config": {
+   "kind": "smd",
+   "fam": "jlead",
+   "sides": "4"
+  }
+ },
+ "flat": {
+  "label": "پایهٔ تخت Small Outline؛ شکل ترمینال باید تأیید شود",
+  "state": "configure",
+  "ref": "3-15",
+  "config": {
+   "kind": "smd",
+   "fam": "sof",
+   "sides": "2"
+  }
+ },
+ "conc": {
+  "label": "Side Concave / Castellated دوطرفه",
+  "state": "configure",
+  "ref": "3-6",
+  "config": {
+   "kind": "smd",
+   "fam": "conc",
+   "sides": "2"
+  }
+ },
+ "pull": {
+  "label": "SON با Pullback دوطرفه",
+  "state": "configure",
+  "ref": "3-12",
+  "config": {
+   "kind": "smd",
+   "fam": "pull",
+   "sides": "2"
+  }
+ },
+ "electrolytic": {
+  "label": "الکترولیتی آلومینیومی SMD / کریستال دوپایه",
+  "state": "configure",
+  "ref": "3-14",
+  "config": {
+   "kind": "smd",
+   "fam": "alc",
+   "sides": "2"
+  }
+ },
+ "inward": {
+  "label": "پایهٔ L رو به داخل",
+  "state": "configure",
+  "ref": "3-8",
+  "config": {
+   "kind": "smd",
+   "fam": "inl",
+   "sides": "2"
+  }
+ },
+ "butt": {
+  "label": "Butt / I-lead دوطرفه",
+  "state": "configure",
+  "ref": "3-7",
+  "config": {
+   "kind": "smd",
+   "fam": "butt",
+   "sides": "2"
+  }
+ },
+ "lug": {
+  "label": "Flat Lug دوطرفه",
+  "state": "configure",
+  "ref": "3-9",
+  "config": {
+   "kind": "smd",
+   "fam": "lug",
+   "sides": "2"
+  }
+ },
+ "melf": {
+  "label": "MELF / Mini-MELF",
+  "state": "blocked",
+  "ref": "3-5؛ تعریف عرض مؤثر تماس نیازمند اصلاح است"
+ },
+ "axial": {
+  "label": "پایه‌دار محوری افقی / عمودی",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "radial": {
+  "label": "پایه‌دار شعاعی گرد / مستطیلی / دیسکی",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "array-conc": {
+  "label": "آرایهٔ چیپ مقعر",
+  "state": "unavailable",
+  "ref": "3-16 / C.3"
+ },
+ "array-convex": {
+  "label": "آرایهٔ چیپ محدب E / S",
+  "state": "unavailable",
+  "ref": "3-16 / C.4"
+ },
+ "array-flat": {
+  "label": "آرایهٔ چیپ تخت",
+  "state": "unavailable",
+  "ref": "3-16 / C.5"
+ },
+ "molded": {
+  "label": "Molded SMD",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "dfn-discrete": {
+  "label": "DFN قطعهٔ گسسته / قطب‌دار",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "corner": {
+  "label": "Corner Concave",
+  "state": "unavailable",
+  "ref": "3-13"
+ },
+ "sot23-5": {
+  "label": "SOT-23-5 / SOT-25",
+  "state": "unavailable",
+  "ref": "3-1؛ آرایش مستقل لازم است"
+ },
+ "sot23-6": {
+  "label": "SOT-23-6 / SOT-26",
+  "state": "unavailable",
+  "ref": "3-1؛ آرایش مستقل لازم است"
+ },
+ "sot223": {
+  "label": "SOT-223؛ پد تب و پایه‌های نامساوی",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "sot89": {
+  "label": "SOT-89؛ پدهای نامساوی",
+  "state": "unavailable",
+  "ref": "3.4.4"
+ },
+ "sot143": {
+  "label": "SOT-143 / SOT-343 / Reverse",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "sod": {
+  "label": "SOD / SOD-123 / SOD-323 / SOD-523",
+  "state": "unavailable",
+  "ref": "3-16؛ وابسته به شکل پایه"
+ },
+ "sodfl": {
+  "label": "SODFL؛ پایهٔ تخت دیود",
+  "state": "unavailable",
+  "ref": "3-15 / 3-16"
+ },
+ "sotfl": {
+  "label": "SOTFL؛ پایهٔ تخت ترانزیستور",
+  "state": "unavailable",
+  "ref": "3-15 / 3-16"
+ },
+ "dpak": {
+  "label": "TO / DPAK / D2PAK / Power Tab",
+  "state": "unavailable",
+  "ref": "3-16 / 5.3"
+ },
+ "to-th": {
+  "label": "TO پایه‌دار، استوانه‌ای / فلنج‌دار",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "qfp-rect": {
+  "label": "QFP / CQFP مستطیلی؛ دو span مستقل",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "qfn-rect": {
+  "label": "QFN / DFN مستطیلی یا پدهای نامساوی",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "pqfn": {
+  "label": "PQFN؛ Pullback چهارطرفه",
+  "state": "unavailable",
+  "ref": "3-12 / 3-16"
+ },
+ "lcc": {
+  "label": "LCC / LCCS / Ceramic Leadless",
+  "state": "unavailable",
+  "ref": "3-16 / C.6"
+ },
+ "bga-dual": {
+  "label": "BGA دوگام؛ نام‌گذاری مستقل لازم است",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "bgas": {
+  "label": "BGAS؛ توپ‌های staggered",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "cga": {
+  "label": "CGA / PCGA؛ ستون / pillar",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "lga": {
+  "label": "LGA دایره‌ای / مربعی",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "cdip": {
+  "label": "CDIP / DIPC / سوکت DIP",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "sip": {
+  "label": "SIP / SIP با پایه‌های staggered",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "hdr": {
+  "label": "هدر عمودی / زاویه‌دار؛ تک‌ردیف و چندردیف",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "socket": {
+  "label": "سوکت / سوکت PLCC",
+  "state": "unavailable",
+  "ref": "3-16 / 4-6"
+ },
+ "pressfit": {
+  "label": "کانکتور Press-fit؛ سوراخ طبق دیتاشیت سازنده",
+  "state": "unavailable",
+  "ref": "4.5 / 3.4.4"
+ },
+ "npth": {
+  "label": "پین تراز NPTH؛ مکان و بدنه طبق دیتاشیت",
+  "state": "unavailable",
+  "ref": "4.6 / 3.4.4"
+ },
+ "connector-smd": {
+  "label": "کانکتور SMD؛ تب و پایه‌های نامساوی",
+  "state": "unavailable",
+  "ref": "3.4.4"
+ },
+ "unique": {
+  "label": "بستهٔ اختصاصی / سایر پکیج‌ها",
+  "state": "unavailable",
+  "ref": "3.4.4 / 4.7.1"
+ },
+ "xtal-dfn": {
+  "label": "کریستال DFN",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "osc-j": {
+  "label": "اسیلاتور J-lead",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "osc-l": {
+  "label": "اسیلاتور L-bend",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "osc-flat": {
+  "label": "اسیلاتور Side Flat / DFN",
+  "state": "unavailable",
+  "ref": "3-16"
+ },
+ "jump-th": {
+  "label": "جامپر سیمی",
+  "state": "unavailable",
+  "ref": "4-6"
+ },
+ "custom": {
+  "label": "هندسهٔ سفارشی / تنظیمات پیشرفته",
+  "state": "custom",
+  "ref": "انتخاب دستی مدل؛ بدون فرض انطباق بسته"
+ },
+ "chip-polar": {
+  "label": "چیپ قطب‌دار CAPPC",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ },
+ "molded-polar": {
+  "label": "Molded قطب‌دار CAPPM",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ },
+ "precision-molded": {
+  "label": "سلف Precision Molded / INDPM",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ },
+ "diode-nonpolar": {
+  "label": "دیود چیپ غیرقطبی DIONC",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ },
+ "cfp": {
+  "label": "CFP؛ Ceramic Flat Package",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ },
+ "sol": {
+  "label": "SOL؛ Small Outline L-lead",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ },
+ "dfn-polar": {
+  "label": "DFN قطب‌دار CAPPDFN",
+  "state": "unavailable",
+  "ref": "3-16؛ مدل/نام‌گذاری اختصاصی لازم است"
+ }
+};
+var PACKAGE_TYPES={
+ "resistor": [
+  "chip",
+  "melf",
+  "molded",
+  "conc",
+  "dfn-discrete",
+  "array-conc",
+  "array-convex",
+  "array-flat",
+  "axial",
+  "radial",
+  "unique"
+ ],
+ "capacitor": [
+  "chip",
+  "molded",
+  "electrolytic",
+  "dfn-discrete",
+  "conc",
+  "array-conc",
+  "array-flat",
+  "axial",
+  "radial",
+  "chip-polar",
+  "molded-polar",
+  "dfn-polar",
+  "unique"
+ ],
+ "inductor": [
+  "chip",
+  "molded",
+  "dfn-discrete",
+  "conc",
+  "array-conc",
+  "array-flat",
+  "axial",
+  "radial",
+  "precision-molded",
+  "unique"
+ ],
+ "ferrite": [
+  "chip",
+  "axial",
+  "unique"
+ ],
+ "diode": [
+  "chip",
+  "sod",
+  "sodfl",
+  "melf",
+  "molded",
+  "dfn-discrete",
+  "conc",
+  "sot23",
+  "dpak",
+  "axial",
+  "radial",
+  "diode-nonpolar",
+  "unique"
+ ],
+ "led": [
+  "chip",
+  "molded",
+  "dfn-discrete",
+  "conc",
+  "radial",
+  "unique"
+ ],
+ "fuse": [
+  "chip",
+  "molded",
+  "dfn-discrete",
+  "conc",
+  "axial",
+  "radial",
+  "unique"
+ ],
+ "thermistor": [
+  "chip",
+  "radial",
+  "axial",
+  "unique"
+ ],
+ "varistor": [
+  "chip",
+  "radial",
+  "unique"
+ ],
+ "crystal": [
+  "electrolytic",
+  "xtal-dfn",
+  "conc",
+  "radial",
+  "unique"
+ ],
+ "oscillator": [
+  "osc-flat",
+  "osc-j",
+  "osc-l",
+  "conc",
+  "corner",
+  "unique"
+ ],
+ "transistor": [
+  "sot23",
+  "sot23-5",
+  "sot23-6",
+  "sot89",
+  "sot143",
+  "sot223",
+  "sotfl",
+  "dpak",
+  "dfn-discrete",
+  "to-th",
+  "unique"
+ ],
+ "ic": [
+  "soic",
+  "tssop",
+  "qfp",
+  "qfn",
+  "son",
+  "soj",
+  "plcc",
+  "flat",
+  "pull",
+  "pqfn",
+  "qfp-rect",
+  "qfn-rect",
+  "lcc",
+  "bga",
+  "bga-dual",
+  "bgas",
+  "cga",
+  "lga",
+  "dip",
+  "cdip",
+  "sip",
+  "cfp",
+  "sol",
+  "unique"
+ ],
+ "connector": [
+  "hdr",
+  "socket",
+  "connector-smd",
+  "pressfit",
+  "npth",
+  "unique"
+ ],
+ "jumper": [
+  "jump-th",
+  "chip",
+  "unique"
+ ],
+ "switch": [
+  "unique"
+ ],
+ "transformer": [
+  "unique"
+ ],
+ "custom": [
+  "custom",
+  "inward",
+  "butt",
+  "lug"
+ ]
+};
+var CHIP_PREFIX={resistor:"RESC",capacitor:"CAPC",inductor:"INDC",ferrite:"BEADC",diode:"DIOC",led:"LEDC",fuse:"FUSC",thermistor:"THRMC",varistor:"VARC",jumper:"RESC"};
 function presetPackage(id){return /^chip/.test(id)?'chip':/^soic/.test(id)?'soic':id==='bga100'?'bga':id}
 function refreshPackages(selected){
- $('package').innerHTML=PACKAGE_MAP[$('component').value].map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('');
- if(selected)$('package').value=selected;
+ $('package').innerHTML=PACKAGE_TYPES[$('component').value].map(function(id){var p=PACKAGE_CATALOG[id],status={sample:'نمونه دارد',configure:'ابعاد دیتاشیت لازم',unavailable:'هنوز پشتیبانی نمی‌شود',blocked:'نیازمند اصلاح محاسبه',custom:'پیشرفته'}[p.state];return '<option value="'+id+'">'+p.label+' — '+status+'</option>'}).join('');
+ if(selected&&PACKAGE_TYPES[$('component').value].indexOf(selected)>=0)$('package').value=selected;
  filterSamples();
 }
 function filterSamples(){var pk=$('package').value;
  Array.from($('smp').options).forEach(function(o){o.hidden=!!o.value&&presetPackage(o.value)!==pk});
 }
 function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp=$('component').value;
- if(pk==='chip'){if(['resistor','capacitor','inductor'].indexOf(comp)<0)comp='resistor'}
- else comp=pk==='sot23'?'transistor':'ic';
+ if(!PACKAGE_TYPES[comp]||PACKAGE_TYPES[comp].indexOf(pk)<0)comp=pk==='chip'?'resistor':pk==='sot23'?'transistor':'ic';
  $('component').value=comp;refreshPackages(pk);
 }
 function choosePackage(){filterSamples();var first=Array.from($('smp').options).find(function(o){return o.value&&!o.hidden});
  if(first){$('smp').value=first.value;$('smp').onchange()}
- else{$('smp').value='';$('advancedGeometry').open=true;run()}
+ else{
+ $('smp').value='';var spec=PACKAGE_CATALOG[$('package').value];
+ if(spec.state==='configure'){
+  window.CAM=null;$('kind').value=spec.config.kind;$('fam').value=spec.config.fam;$('sides').value=spec.config.sides;$('layout').value='symmetric';$('autoS').checked=false;
+  FIELDS.smd.forEach(function(a){$(a[0]).value=0});
+  ['Lmax','W','H','P','n','Smax'].forEach(function(id){$(id).value=''});
+  if(spec.config.fam==='qfn')$('Hl').value='';
+  $('cType').value=spec.config.fam==='qfn'?($('package').value==='son'?'SON':'QFN'):'';
+  $('man').checked=false;
+ }
+ if(spec.state==='custom')$('advancedGeometry').open=true;
+ run();
+}
 }
 $('component').onchange=function(){refreshPackages();choosePackage()};
 $('package').onchange=choosePackage;
 // خانواده و مدل هندسی برای کار عادی خودکارند؛ دسترسی دستی برای کاربر حرفه‌ای حفظ می‌شود.
 var advanced=document.createElement('details');advanced.id='advancedGeometry';advanced.className='box';
-advanced.innerHTML='<summary>تنظیمات پیشرفتهٔ هندسه و خانواده</summary><p class="note">تغییر این گزینه‌ها طراحی را سفارشی می‌کند. بسته‌های خارج از فهرست نمونهٔ تأییدشده ندارند.</p><div class="grid"></div>';
+advanced.innerHTML='<summary>تنظیمات پیشرفتهٔ هندسه و خانواده</summary><p class="note">تغییر این گزینه‌ها طراحی را سفارشی می‌کند. نمونه‌ها تأیید ساخت نیستند؛ حالت سفارشی نیز از محدودیت‌ها و خطاهای گزارش ممیزی مستثنا نیست.</p><div class="grid"></div>';
 $('bsmd').parentNode.appendChild(advanced);
 ['kind','fam','sides','layout','cType'].forEach(function(id){advanced.querySelector('.grid').appendChild($(id).parentNode)});
 refreshPackages('soic');
-function updateMethod(){var k=$('kind').value;
+function packageBlockReason(){var spec=PACKAGE_CATALOG[$('package').value];
+ if(!spec)return 'پکیج معتبر انتخاب کن.';
+ return spec.state==='unavailable'?'این پکیج در فهرست هست، ولی مدل هندسه/نام‌گذاری آن هنوز پیاده‌سازی نشده است؛ فوت‌پرینتِ قطعهٔ قبلی به‌جایش نمایش داده نمی‌شود.':spec.state==='blocked'?'محاسبهٔ این پکیج در ممیزی نیازمند اصلاح تشخیص داده شده است؛ فعلاً خروجی تولید نمی‌شود.':'';
+}
+function updateMethod(){var k=$('kind').value,spec=PACKAGE_CATALOG[$('package').value];
+ $('packageStatus').textContent=spec?(spec.label+' · مبنای اصلی: IPC-7352:2023 · مرجع '+spec.ref+' · '+(packageBlockReason()||(spec.state==='configure'?'نمونهٔ آماده ندارد؛ خانه‌های خالی را از دیتاشیت پر کن.':spec.state==='sample'?'ابعاد نمونه عمومی‌اند؛ با دیتاشیت تطبیق بده.':'انتخاب مدل به عهدهٔ کاربر است.'))):'';
+
  $('methodReadout').textContent='روش محاسبه: '+(k==='smd'?$('fam').selectedOptions[0].textContent:k==='bga'?'BGA · جدول 3-11':'سوراخ‌دار · بخش 4')+($('smp').value?'':' · ابعاد سفارشی');
+ if(k==='th'&&!packageBlockReason())$('packageStatus').textContent+=' هشدار ممیزی: محاسبهٔ سوراخ پایهٔ مربع/مستطیل و خاموش‌شدن override هنوز نیازمند اصلاح‌اند؛ خروجی برای ساخت تأیید نشده است.';
  ['fam','sides','layout','cType'].forEach(function(id){$(id).parentNode.hidden=k!=='smd'});
 }
 $('restoreDrawing').onclick=function(){$('man').checked=false;$('smp').value='soic';$('smp').onchange()};
@@ -1444,7 +2020,7 @@ load();
 if($('smp').value)syncHierarchyFromSample($('smp').value);
 // اجرای اول: اگر کاربر قبلاً چیزی ذخیره نکرده، نمونهٔ SOIC-16 بارگذاری می‌شود تا استودیو خالی نباشد
 try{if(!localStorage.getItem('fp7352')){var _s=$('smp');_s.value='soic';_s.onchange&&_s.onchange()}}catch(e){}
-$('kind').dispatchEvent(new Event('input'));run();nm();ps();dec();rt();
+run();nm();ps();dec();rt();
 })();
 </script>
 <script type="text/javascript">
