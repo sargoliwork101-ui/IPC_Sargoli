@@ -227,6 +227,41 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
   ok(/mm|mil/.test(svgTexts()), 'برچسب اندازه‌ها واحد فعال را نشان می‌دهد', svgTexts().slice(0, 60));
 }
 
+console.log('\n۹ب) اعداد روی نقشه با هندسهٔ واقعی پدها می‌خوانند');
+{
+  const { d } = load(TOOL);
+  const svg = d.getElementById('svg');
+  const texts = () => [...svg.querySelectorAll('text')].map(t => t.getBoundingClientRect ? t.textContent : t.textContent);
+  const vb = () => svg.getAttribute('viewBox').split(' ').map(Number);
+  // پدهای SOIC-16 نمونه: 1.31 x 0.57، Z=6.90، P=1.27
+  const res = {}; [...d.querySelectorAll('#res tr')].slice(1).forEach(r => res[r.children[0].textContent.trim()] = r.children[1].textContent.trim());
+  const z = parseFloat((res['Z (طول کل پدها)'] || '').replace(' mm', ''));
+  const labels = texts().join(' | ');
+  ok(Math.abs(z - 6.90) < 0.005, 'Z در جدول = 6.90 mm', res['Z (طول کل پدها)']);
+  ok(new RegExp('Z ' + z.toFixed(2) + ' mm').test(labels),
+     'همان عدد Z روی نقشه نوشته می‌شود', labels);
+  // پدها باید با نسبت درست رسم شوند: نسبت ارتفاع پد به گام = 0.57/1.27
+  const pRect = [...svg.querySelectorAll('rect')].filter(r => r.getAttribute('fill') === '#d4a017');
+  const uy = [...new Set(pRect.map(r => (+r.getAttribute('y')).toFixed(1)))].map(Number).sort((a, b) => a - b);
+  const hPx = +pRect[0].getAttribute('height');
+  const ratio = hPx / (uy[1] - uy[0]);
+  ok(Math.abs(ratio - 0.57 / 1.27) < 0.02, 'نسبت ابعاد پد به گام در نقشه درست است (مقیاس تحریف نشده)', ratio.toFixed(3));
+  // ضخامت خط نقشه نباید بیشتر از فاصلهٔ دو پد شود (بررسی اینکه پدها روی هم نیفتاده‌اند)
+  const rects = [...svg.querySelectorAll('rect[d*="M"]'), ...svg.querySelectorAll('rect')].filter(r => r.getAttribute('fill') === '#d4a017');
+  ok(rects.length >= 16, 'همهٔ پدها رسم شده‌اند', String(rects.length));
+  // هیچ متنی بیرون از قاب دیده نشود
+  const [vx, vy, vw, vh] = vb();
+  const out = [...svg.querySelectorAll('text')].filter(t => { const x = +t.getAttribute('x'), y = +t.getAttribute('y'); return x < vx || x > vx + vw || y < vy || y > vy + vh; });
+  ok(out.length === 0, 'هیچ برچسبی بیرون از قاب نقشه نمی‌افتد', out.map(t => t.textContent).join(','));
+  // برچسب‌ها روی هم نیفتند (فاصلهٔ عمودی حداقل ۱۰ واحد)
+  const pos = [...svg.querySelectorAll('text')].map(t => [+t.getAttribute('x'), +t.getAttribute('y'), t.textContent]);
+  let clash = 0;
+  for (let i = 0; i < pos.length; i++) for (let j = i + 1; j < pos.length; j++) {
+    if (Math.abs(pos[i][0] - pos[j][0]) < 40 && Math.abs(pos[i][1] - pos[j][1]) < 10) clash++;
+  }
+  ok(clash === 0, 'برچسب‌های اندازه‌گذاری روی هم نمی‌افتند', String(clash) + ' تداخل');
+}
+
 console.log('\n۱۰) پنل داینامیک');
 {
   const { d } = load(TOOL);
