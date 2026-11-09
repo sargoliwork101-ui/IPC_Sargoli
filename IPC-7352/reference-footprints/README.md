@@ -2,7 +2,7 @@
 
 Source: KiCad library contributors, `KiCad/kicad-footprints` on GitHub, pinned commit `7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd`.
 
-These are actual library footprints, **not** a claim of manufacturer approval, newest-release coverage, universal suitability, or IPC-7352 conformity. Package names may be standardized library models rather than commercial orderable part numbers. In broad categories (molded, custom, unique, radial, etc.), the displayed reference is only the specifically named mechanical example; its electrical component type may differ from the currently selected component group.
+These are actual library footprints, **not** a claim of manufacturer approval, newest-release coverage, universal suitability, or IPC-7352 conformity. Package names may be standardized library models rather than commercial orderable part numbers. Electrical applicability is filtered separately from the mechanical family. Named resistor, capacitor, diode, inductor, crystal and oscillator library examples are only offered in their matching component groups (or the explicitly selected advanced/custom catalogue). Generic mechanical package references can be shared where applicable. A shared body outline is not permission to show a capacitor model under resistors.
 
 ## Attribution and changes
 

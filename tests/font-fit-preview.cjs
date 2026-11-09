@@ -8,6 +8,10 @@ try{const page=await browser.newPage({viewport:{width:1440,height:1000}});await 
  const comp=d.getElementById('component'),pkg=d.getElementById('package'),change=e=>e.dispatchEvent(new Event('change',{bubbles:true}));
  if(!Array.from(pkg.options).some(o=>o.value===pk)){comp.value=pk==='chip'?'resistor':/^(sot|dpak|to-th)/.test(pk)?'transistor':/^(connector|hdr|socket|npth|pressfit)/.test(pk)?'connector':'ic';change(comp)}
  pkg.value=pk;change(pkg);
+ if(!Array.from(d.getElementById('smp').options).some(o=>o.value===v)){
+  for(const c of Array.from(comp.options).filter(c=>c.value!=='custom')){comp.value=c.value;change(comp);if(!Array.from(pkg.options).some(o=>o.value===pk))continue;pkg.value=pk;change(pkg);if(Array.from(d.getElementById('smp').options).some(o=>o.value===v))break}
+ }
+
  },value);await page.selectOption('#smp',value)};
  const check=async(label)=>{const errors=await page.evaluate(()=>{
   const errors=[];for(const e of document.querySelectorAll('#padG text')){const b=e.getBBox(),x=+e.dataset.fitX,y=+e.dataset.fitY,w=+e.dataset.fitWidth,h=+e.dataset.fitHeight,stroke=parseFloat(e.getAttribute('stroke-width')||0)/2;

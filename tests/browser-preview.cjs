@@ -13,6 +13,10 @@ const engine = chromiumPackage.default || chromiumPackage;
  const comp=d.getElementById('component'),pkg=d.getElementById('package'),change=e=>e.dispatchEvent(new Event('change',{bubbles:true}));
  if(!Array.from(pkg.options).some(o=>o.value===pk)){comp.value=pk==='chip'?'resistor':/^(sot|dpak|to-th)/.test(pk)?'transistor':/^(connector|hdr|socket|npth|pressfit)/.test(pk)?'connector':'ic';change(comp)}
  pkg.value=pk;change(pkg);
+ if(!Array.from(d.getElementById('smp').options).some(o=>o.value===v)){
+  for(const c of Array.from(comp.options).filter(c=>c.value!=='custom')){comp.value=c.value;change(comp);if(!Array.from(pkg.options).some(o=>o.value===pk))continue;pkg.value=pk;change(pkg);if(Array.from(d.getElementById('smp').options).some(o=>o.value===v))break}
+ }
+
  },value);await page.selectOption('#smp',value)};
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://localhost:8080/tool.html');

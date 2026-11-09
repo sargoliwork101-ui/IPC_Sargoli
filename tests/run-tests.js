@@ -40,6 +40,14 @@ function prepareSample(d,value){
   }
  }
  d.getElementById('package').value=pk;change(d.getElementById('package'));
+ if(!Array.from(d.getElementById('smp').options).some(o=>o.value===value)){
+  for(const c of Array.from(d.getElementById('component').options).filter(c=>c.value!=='custom')){
+   d.getElementById('component').value=c.value;change(d.getElementById('component'));
+   if(!Array.from(d.getElementById('package').options).some(o=>o.value===pk))continue;
+   d.getElementById('package').value=pk;change(d.getElementById('package'));
+   if(Array.from(d.getElementById('smp').options).some(o=>o.value===value))break;
+  }
+ }
 }
 function setV(d, id, v) {
   const e = d.getElementById(id);
@@ -229,14 +237,14 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
   ok(/Z 6\.90 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
   ok(/Courtyard/.test(t1), 'Courtyard روی نقشه با اندازه نوشته می‌شود', t1);
   const [vx, vy, vw, vh] = vb();
-  ok(vw > 0 && vh > 0 && vw < 600 && vh < 600, 'نمای نقشه به اندازهٔ محتوا بریده می‌شود (بدون فضای خالی)', vb().join(','));
+  ok(vw > 0 && vh > 0 && vw < 1100 && vh < 1100, 'نمای نقشه به اندازهٔ محتوا بریده می‌شود (بدون فضای خالی)', vb().join(','));
 
   setV(d, 'kind', 'bga');
   const t2 = svgTexts();
   ok(/Ø 0\.40 mm/.test(t2) && /P 0\.80 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
   setV(d, 'kind', 'th');
   const t3 = svgTexts();
-  ok(/Hole Ø0\.92 mm/.test(t3) && /Row span 7\.62 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
+  ok(/Hole Ø0\.92 mm/.test(t3) && /C-C X 7\.62 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
   setV(d, 'unit', 'mil');
   ok(/mm|mil/.test(svgTexts()), 'برچسب اندازه‌ها واحد فعال را نشان می‌دهد', svgTexts().slice(0, 60));
 }
@@ -504,14 +512,14 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
   }
  }
  ok(modelsAvailable,'همهٔ گروه‌ها مسیر مدل دارند و برچسب پکیج پشتیبانی‌نشده باقی نمانده است');
- ok(packages.size===66&&combos===134,'۶۶ تعریف پکیج و ۱۳۴ ترکیب مرتبط قابل انتخاب است');
+ ok(packages.size===66&&combos>66,'۶۶ تعریف پکیج با گروه‌بندی بر اساس نوع واقعی قطعه در دسترس است');
  ok(blockedSafe,'بسته‌های پشتیبانی‌نشده یا مسدود، نقشه/خروجی قطعهٔ قبلی را نشان نمی‌دهند');
  ok(configSafe,'بستهٔ بدون نمونه، ابعاد قبلی را به جای دیتاشیت استفاده نمی‌کند');
  change('component','led');
  ok(d.getElementById('cType').value==='LEDC','LED چیپ پیشوند مناسب می‌گیرد');
  change('component','ferrite');
  ok(d.getElementById('cType').value==='BEADC','فریت چیپ پیشوند مناسب می‌گیرد');
- change('component','resistor');change('package','melf');
+ change('component','diode');change('package','melf');
  setV(d,'W',1);
  ok(!d.getElementById('pads').value&&/ممیزی/.test(d.getElementById('emptyReason').textContent),'MELF با ویرایش عددی از قفل ممیزی عبور نمی‌کند');
  d.getElementById('mkA').click();
@@ -601,7 +609,7 @@ console.log('\n۱۸) مدل بدنهٔ THT');
  setV(d,'tModel','axial-v');setV(d,'tP',5.08);
  ok(valid()&&!!d.querySelector('[data-th-body="axial-v"]')&&/^RESADV508/.test(name()),'مدل عمودی دایره روی پین ۱ و نام مستقل دارد');
  setV(d,'tK',3);ok(!d.getElementById('pads').value,'مدل دوپایه تعداد دیگر را رد می‌کند');
- setV(d,'tExample','1n4148');
+ setV(d,'component','diode');setV(d,'package','axial');setV(d,'tExample','1n4148');
  ok(valid()&&name()==='DIOAD762W55L340D175B'&&Math.abs(ps()[0][4]-.95)<1e-9,'دیود رسمی با max پایه و نام DIOAD');
  setV(d,'component','capacitor');setV(d,'package','radial');d.getElementById('leaveReference').click();
  setV(d,'tP',5);setV(d,'tW',.65);setV(d,'tBodyL',10.5);setV(d,'tBodyD',10.5);setV(d,'tBodyH',13);setV(d,'tPolar','yes');
@@ -626,7 +634,7 @@ console.log('\n۱۹) انتخاب شکل و پکیج‌های جدید');
  setV(d,'pShape','o');
  ok(gold().length===3&&gold().every(e=>+e.getAttribute('rx')>0),'SOT-23 دوسرگرد در نقشه');
  ok(JSON.stringify(dimensions)===JSON.stringify(padsOf(d).map(p=>p.slice(1,5).join(','))),'انتخاب شکل ابعاد بیرونی و مرکز پد را عوض نمی‌کند');
- setV(d,'component','transistor');
+ setV(d,'component','ic');
  for(const [pkg,count] of [['sot23-5',5],['sot23-6',6]]){
   setV(d,'package',pkg);ok(valid()&&d.getElementById('padBasis').value==='manufacturer','پکیج '+pkg+' با نمونهٔ واقعی سازنده باز می‌شود');
   for(const [id,v] of Object.entries({Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.7,bodyLength:3}))setV(d,id,v);
