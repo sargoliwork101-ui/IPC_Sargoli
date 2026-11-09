@@ -51,6 +51,37 @@ math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math
 <div class="tabs"><div><button class="btn on" data-t="t1">محاسبه‌ی پد</button><button class="btn" data-t="t2">نام‌گذاری و رمزگشایی</button><button class="btn" data-t="t3">جدول مرجع و جستجو</button></div></div>
 <main>
 <section id="t1" class="on">
+<div class="box" id="focus-footprint">
+<h2>فوت‌پرینت SOT-23 و مقاومت 0603</h2>
+<p class="note">ابعاد اولیه فقط نمونه‌اند، نه دیتاشیت قطعهٔ شما. همه را با دیتاشیت همان شماره‌قطعه جایگزین کنید. 0603 در اینجا <b>کد اینچی</b> است (حدود ۱٫۶ × ۰٫۸ میلی‌متر)، نه 0603 متریک.</p>
+<div class="grid">
+<div><label for="fpKind">نوع قطعه</label><select id="fpKind"><option value="sot">SOT-23 سه‌پایه</option><option value="res">مقاومت 0603 اینچی (1608 متریک)</option></select></div>
+<div><label for="fpLevel">سطح چگالی</label><select id="fpLevel"><option>A</option><option selected>B</option><option>C</option></select></div>
+<div id="fpStyleBox"><label for="fpStyle">شکل پایه SOT-23</label><select id="fpStyle"><option value="gull">Gull-wing — جدول 3-1</option><option value="flat">پایه تخت — جدول 3-15</option></select></div>
+<div><label for="fpLmin">Lmin: حداقل فاصلهٔ نوک تا نوک پایه‌ها (mm)</label><input id="fpLmin" type="number" step="any"></div>
+<div><label for="fpLmax">Lmax: حداکثر فاصلهٔ نوک تا نوک پایه‌ها (mm)</label><input id="fpLmax" type="number" step="any"></div>
+<div><label for="fpTmin">Tmin: حداقل طول تماس پایه (mm)</label><input id="fpTmin" type="number" step="any"></div>
+<div><label for="fpTmax">Tmax: حداکثر طول تماس پایه (mm)</label><input id="fpTmax" type="number" step="any"></div>
+<div><label for="fpW">Wmax: حداکثر عرض تماس پایه (mm)</label><input id="fpW" type="number" step="any"></div>
+<div><label for="fpH">ارتفاع اسمی قطعه (mm)</label><input id="fpH" type="number" step="any"></div>
+<div><label for="fpBodyX">حداکثر بُعد بدنه در محور X (mm)</label><input id="fpBodyX" type="number" step="any"></div>
+<div><label for="fpBodyY">حداکثر بُعد بدنه در محور Y (mm)</label><input id="fpBodyY" type="number" step="any"></div>
+<div id="fpPitchBox"><label for="fpPitch">گام پین‌های ۱ و ۲ در SOT-23 (mm)</label><input id="fpPitch" type="number" step="any"></div>
+<div><label for="fpS">Smax دیتاشیت (mm؛ خالی = تخمین آماری RMS، نه بدترین حالت)</label><input id="fpS" type="number" step="any" placeholder="اختیاری"></div>
+<div><label for="fpGap">حداقل فاصلهٔ مس، طبق سازنده (mm)</label><input id="fpGap" type="number" step="any" value="0.15"></div>
+</div>
+<p class="note">مرکز قطعه مبدأ است؛ X به راست و Y به بالا. در SOT-23 پین ۱ پایین چپ، ۲ پایین راست و ۳ بالا است؛ در 0603 پد ۱ چپ و ۲ راست است. شماره‌گذاری و چرخش را حتماً با نمای دیتاشیت مقایسه کنید. با تغییر نوع، ابعاد نمونه بارگذاری می‌شوند. مقدار Smax تخمینیِ RMS تضمین بدترین حالت نیست؛ اگر دیتاشیت Smax می‌دهد آن را وارد کنید.</p>
+<div class="warn" id="fpError" role="alert"></div>
+<div id="fpOutput" hidden>
+<div class="tw"><table id="fpResults"></table></div>
+<svg id="fpSvg" viewBox="0 0 600 340" width="100%" role="img" aria-label="نقشهٔ پدها و محدودهٔ courtyard"></svg>
+<p class="note">شکل مس پیشنهادی oblong است. فهرست صرفاً مختصات و اندازهٔ مس را می‌دهد؛ ماسک، خمیر، سیلک، الزامات ساخت و صحت شماره‌ها باید جداگانه در ECAD و با سازنده بررسی شوند.</p>
+<label for="fpCsv">فهرست پدها (mm؛ قابل کپی)</label><textarea id="fpCsv" readonly></textarea>
+<button class="btn" id="fpCopy" type="button">کپی فهرست</button><span id="fpCopyStatus" class="note" role="status"></span>
+</div></div>
+<details><summary>محاسبه‌گر عمومی سایر خانواده‌ها (در حال بازبینی)</summary>
+<p class="warn">این بخش عمومی هنوز ایرادهای ثبت‌شده در Problem.md را دارد؛ برای SOT-23 و 0603 از بخش اختصاصی بالا استفاده کنید.</p>
+
 <div class="box"><div class="grid">
 <div><label>نوع قطعه</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option></select></div>
@@ -86,6 +117,7 @@ math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math
 <div class="box"><b>فهرست پدها (برای وارد کردن در ابزار ECAD)</b>
 <textarea id="pads" readonly></textarea>
 <button class="btn" id="cp">کپی فهرست</button><span class="note" id="cpm"></span></div>
+</details>
 </section>
 
 <section id="t2">
@@ -132,7 +164,7 @@ math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math
 </section>
 </main>
 <div id="tip" hidden><b id="tipT"></b><div id="tipP"></div><button class="btn" id="tX">بستن</button></div>
-<script type="242303142939deeabd615c1f-text/javascript">
+<script type="text/javascript">
 (function(){
 var $=function(i){return document.getElementById(i)},NS='http://www.w3.org/2000/svg',U='mm';
 function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e}
@@ -265,7 +297,7 @@ $('q').addEventListener('input',rt);
 load();$('kind').dispatchEvent(new Event('input'));run();nm();ps();dec();rt();
 })();
 </script>
-<script type="242303142939deeabd615c1f-text/javascript">
+<script type="text/javascript">
 (function(){
 if(!window.NodeFilter||!window.MutationObserver)return;
 var PD="۰۱۲۳۴۵۶۷۸۹",SD="₀₁₂₃₄₅₆₇₈₉";
@@ -305,5 +337,5 @@ try{mathify(document.body)}catch(e){}
 new MutationObserver(function(ms){ms.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1||n.nodeType===3){try{mathify(n)}catch(e){}}})});}).observe(document.body,{childList:true,subtree:true});
 })();
 </script>
-<script src="/cdn-cgi/scripts/7d0fa10a/cloudflare-static/rocket-loader.min.js" data-cf-settings="242303142939deeabd615c1f-|49" defer></script></body>
+<script src="focus.js"></script></body>
 </html>
