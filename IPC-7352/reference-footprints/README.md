@@ -16,7 +16,7 @@ From the repository root: `python audits/import-reference-footprints.py`. This r
 
 ## Coverage
 
-47 library references plus 3 existing direct TI templates cover **50 of the 66 package groups**. The remaining 16 groups have formula/configuration paths (6) or explicit user-dimension geometry builders (10), not sourced ready-made references. This does **not** mean 50 IPC formula solvers. All reference examples have an explicit model name, provenance and a warning requiring the user to adapt values to their own part datasheet.
+49 library references and 3 direct TI templates cover **50 distinct package groups out of 66** (SOT-23-5 and SOT-23-6 have both KiCad and TI examples). The remaining 16 groups have formula/configuration paths (6) or explicit user-dimension geometry builders (10), not sourced ready-made references. This does **not** mean 50 IPC formula solvers. All reference examples have an explicit model name, provenance and a warning requiring the user to adapt values to their own part datasheet.
 
 | Group | Specific reference | Original file |
 |---|---|---|
@@ -94,3 +94,5 @@ These groups retain explicit unsupported/configuration status as applicable. No 
 `sotfl`: [SOT-383FL](https://github.com/KiCad/kicad-footprints/blob/7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd/Package_TO_SOT_SMD.pretty/SOT-383FL.kicad_mod), original unmodified, same license and pinned version. This specific eight-pad flat-lead model does not represent all SOTFL devices.
 
 The ten direct geometry builders intentionally start without made-up dimensions. Users must supply their exact manufacturer land pattern. These are application code, not derived library examples or IPC formula solvers.
+
+SOT-23-5 and SOT-23-6 now also have unmodified KiCad references at the same pinned commit: `Package_TO_SOT_SMD.pretty/SOT-23-5.kicad_mod` and `Package_TO_SOT_SMD.pretty/SOT-23-6.kicad_mod`. They allow immediate display in the transistor group without presenting the TI logic-IC examples as transistors.

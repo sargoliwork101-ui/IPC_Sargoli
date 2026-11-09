@@ -11,8 +11,8 @@ for(const key of ['chip','array-conc','array-convex','axial']){
 }
 assert.deepEqual(await page.locator('#tExample option').evaluateAll(es=>es.filter(e=>e.value).map(e=>e.value)),['cfr25']);
 await page.selectOption('#package','chip');assert.deepEqual(await page.locator('#cType option').evaluateAll(es=>es.map(e=>e.value)),['RESC']);
-await page.locator('#footprintSearch').fill('خازن');assert.equal(await page.locator('#footprintSearchResults button').count(),0);
-console.log('Resistor packages, named examples, prefixes and search exclude capacitor/diode models: PASS');
+await page.locator('#footprintSearch').fill('خازن');assert((await page.locator('#footprintSearchResults button').count())>0);await page.locator('#footprintSearch').fill('');
+console.log('Resistor packages, named examples, prefixes exclude foreign models; search is global: PASS');
 const cases=[['ic','soic','soic'],['resistor','chip','chip0603'],['ic','bga','bga100'],['ic','dip','dip'],['resistor','axial','lib-axial'],['capacitor','radial','lib-radial'],['transistor','sot89','lib-sot89'],['connector','connector-smd','lib-connector-smd']];
 for(const [component,key,sample] of cases){
  await page.selectOption('#component',component);await page.selectOption('#package',key);await page.selectOption('#smp',sample);

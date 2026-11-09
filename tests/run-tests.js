@@ -761,16 +761,16 @@ console.log('\nفیلتر سخت نوع قطعه و پکیج');
   }
  }
  setV(d,'component','resistor');setV(d,'footprintSearch','BGA');
- ok(!d.querySelector('#footprintSearchResults button'),'جستجوی مقاومت، BGA نشان نمی‌دهد');
+ ok(!!d.querySelector('#footprintSearchResults button'),'جستجوی سراسری حتی از گروه مقاومت BGA را پیدا می‌کند');
  setV(d,'footprintSearch','CFR25');ok(!!d.querySelector('#footprintSearchResults button'),'نمونهٔ مقاومت پایه‌دار در گروه مقاومت پیدا می‌شود');
- setV(d,'component','capacitor');ok(!d.querySelector('#footprintSearchResults button'),'نتایج قبلی بعد از تغییر نوع قطعه پاک/بازفیلتر می‌شوند');
+ setV(d,'component','capacitor');ok(!!d.querySelector('#footprintSearchResults button'),'نتایج جستجوی سراسری به گروه فعلی محدود نمی‌شوند');
  w.close();
 }
 
 console.log('\n۲۴) مرجع‌های واقعی KiCad و پیام مدل');
 {
  const {d,w}=load(TOOL);const refs=JSON.parse(d.getElementById('referenceFootprintData').textContent);
- ok(Object.keys(refs).length===47,'۴۷ الگوی واقعی با دادهٔ آفلاین موجود است');
+ ok(Object.keys(refs).length===49,'۴۹ الگوی واقعی با دادهٔ آفلاین موجود است');
  for(const [key,ref] of Object.entries(refs)){
   setV(d,'smp','lib-'+key);
   const raw=fs.readFileSync(path.join(ROOT,'reference-footprints',key+'.kicad_mod'),'utf8');
