@@ -434,6 +434,21 @@ console.log('\n۱۲) جهت برچسب عددی و حاشیهٔ کادر');
  w.close();
 }
 
+console.log('\n۱۳) قیدهای ورودی و پیام کنار خانه');
+{
+ const {d,w}=load(TOOL);
+ function sample(v){d.getElementById('smp').value=v;d.getElementById('smp').onchange()}
+ for(const [preset,id,value] of [['soic','P',0],['soic','Lmin',99],['soic','n',2.5],['chip','n',2],['chip','sides','4'],['bga100','bL',-1],['bga100','bR',101],['dip','tB',-1]]){
+  sample(preset);setV(d,id,value);
+  ok(d.getElementById(id).getAttribute('aria-invalid')==='true'&&!!d.getElementById(id+'-error')&&!d.getElementById('pads').value,preset+'/'+id+': پیام کنار خانه و جلوگیری از خروجی نامعتبر');
+ }
+ sample('soic');setV(d,'P','');
+ ok(d.getElementById('P').getAttribute('aria-invalid')==='true','خانهٔ عددی خالی با صفر یا مقدار معتبر اشتباه نمی‌شود');
+ setV(d,'P',1.27);
+ ok(!d.getElementById('P-error')&&d.getElementById('pads').value.length>0,'پس از اصلاح مقدار، خطا پاک و خروجی ساخته می‌شود');
+ w.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }

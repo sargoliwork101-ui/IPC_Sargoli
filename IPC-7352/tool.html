@@ -7,6 +7,8 @@
 <link rel="stylesheet" href="fonts/vazirmatn.css">
 <style>
 [hidden]{display:none!important}
+input[aria-invalid="true"],select[aria-invalid="true"]{border-color:var(--danger);box-shadow:0 0 0 2px #f0787826}
+.field-error{display:block;color:var(--danger);font-size:11px;line-height:1.7;margin-top:4px}
 .workspace[data-mode="t2"],.workspace[data-mode="t3"]{grid-template-columns: minmax(0,1fr)}
 .workspace:not([data-mode="t1"]) .sidebar .group,.workspace:not([data-mode="t1"]) .inspector{display:none}
 .workspace:not([data-mode="t1"]) .sidebar{position:static;max-height:none;border:0}
@@ -613,7 +615,7 @@ else if(k==='bga')h='<li><b>قطر پد و Courtyard:</b> جدول 3-11 ('+pg(12
 else h='<li><b>قطر سوراخ:</b> بند 4.4.1 ('+pg(19)+'): از بُعد max پایه حساب می‌شود. مقدار اضافه: جدول 4-1 (محدود) و 4-2 (نامحدود) در '+pg(20)+'؛ تلرانس ±0.08 همانجا.</li><li><b>اصلاح ضخامت برد:</b> جدول 4-3 ('+pg(21)+') فقط برای لحیم نامحدود.</li><li><b>اندازه‌ی پد:</b> بند 4.4.2 و جدول 4-4 ('+pg(21)+').</li><li><b>پین 1 مربع:</b> بند 4.2.3 از نشان دادن قطبیت می‌گوید ('+pg(19)+') و شکل C-14 ('+pg(42)+') پین ۱ را متفاوت نشان می‌دهد.</li><li><b>نام DIP:</b> جدول 4-6 ('+pg(23)+').</li><li>آستانه‌ی هشدار فاصله از استاندارد نیست.</li>';
 h+=EX(k);$('why').innerHTML='<b>چرا این عددها؟ دلیل و ارجاع به استاندارد</b><ul>'+h+'</ul><p class="note">ص = شماره‌ی چاپ‌شده در گوشه‌ی صفحه‌ی استاندارد. متن استاندارد بند به بند: <a href="course.html">دوره‌ی کامل استاندارد (متن بند‌به‌بند و ارجاع)</a></p>'}
 function clearOut(msg){
-R=[];M={};MP=[];
+VALID=false;R=[];M={};MP=[];
 $('res').innerHTML='<tr><td colspan="3">'+(msg||'خروجی پاک شد؛ ورودی معتبر وارد کن.')+'</td></tr>';
 $('pads').value='';$('alt').value='';$('cpAm').textContent='';$('cpm').textContent='';
 var sv=$('svg');if(sv)sv.innerHTML='';
@@ -987,6 +989,43 @@ out([['سوراخ نهایی',('Ø '+fu(hole))+(tolShow>0?' (±'+fmo(tolShow)+')
  'Pin,X('+U+'),Y('+U+'),PadDia,HoleDia,Shape,Plating',wr);
 $('warn').textContent=wr;
 }
+// قیدهای عمومی/هندسی؛ بدون سقف سلیقه‌ای برای ابعاد واقعی قطعه.
+function validateFootprint(k){
+ document.querySelectorAll('.field-error').forEach(function(e){e.remove()});
+ document.querySelectorAll('[aria-invalid="true"]').forEach(function(e){e.removeAttribute('aria-invalid');e.removeAttribute('aria-describedby');if(e.setCustomValidity)e.setCustomValidity('')});
+ var errors=[];
+ function error(id,msg){var e=$(id);if(!e||errors.some(function(a){return a.id===id}))return;
+  errors.push({id:id,msg:msg});e.setAttribute('aria-invalid','true');e.setCustomValidity(msg);
+  var hint=document.createElement('span');hint.className='field-error';hint.id=id+'-error';hint.textContent=msg;
+  e.setAttribute('aria-describedby',hint.id);e.after(hint);
+ }
+ var required={smd:['Lmax','W','H','P','n'],bga:['bB','bP','bC','bR','bL','bW','bH'],th:['tK','tP','tW','tB']}[k];
+ var inputs=[].slice.call($('b'+k).querySelectorAll('input[type="number"]'));
+ if($('man').checked)inputs=inputs.concat([].slice.call($('paramGrid').querySelectorAll('input[type="number"]:not(:disabled)')));
+ inputs.forEach(function(e){var raw=e.value,v=Number(raw);
+  if(raw.trim()===''||!Number.isFinite(v)){error(e.id,'یک عدد معتبر و متناهی وارد کن.');return}
+  if(required.indexOf(e.id)>=0&&v<=0)error(e.id,'این مقدار باید بزرگ‌تر از صفر باشد.');
+  else if(v<0&&['pZJ','pGJ','pSJ','pHadj','pBR'].indexOf(e.id)<0)error(e.id,'مقدار منفی برای این پارامتر مجاز نیست.');
+ });
+ var counts={n:100,bC:100,bR:100,tK:200};
+ Object.keys(counts).forEach(function(id){if(inputs.indexOf($(id))>=0){var v=+$(id).value;if(!Number.isInteger(v)||v<1||v>counts[id])error(id,'عدد صحیح بین ۱ و '+counts[id]+' لازم است.')}});
+ if(k==='smd'){
+  if(rd('Lmin')>rd('Lmax'))error('Lmin','طول حداقل نباید از طول حداکثر بیشتر باشد.');
+  if(rd('Tmin')>rd('Tmax'))error('Tmin','طول حداقل پایه نباید از طول حداکثر آن بیشتر باشد.');
+  if(!$('autoS').checked&&(!(rd('Smax')>0)||rd('Smax')>=rd('Lmax')))error('Smax','فاصلهٔ داخلی باید مثبت و کوچک‌تر از طول کل Lmax باشد.');
+  if($('fam').value==='chip'){
+   if($('sides').value!=='2')error('sides','چیپ مستطیلی فقط دو طرف اتصال دارد.');
+   if(+$('n').value!==1)error('n','چیپ مستطیلی یک پد در هر طرف دارد.');
+  }
+  if($('fam').value==='qfn'&&!(rd('Hl')>0))error('Hl','ارتفاع سطح لحیم‌پذیر QFN باید مثبت باشد.');
+ }
+ if(k==='th'&&$('tS').value==='2'&&!(rd('tW2')>0))error('tW2','برای پایهٔ مستطیلی بُعد دوم باید مثبت باشد.');
+ if($('man').checked){
+  var dec=+$('pDec').value;if(!Number.isInteger(dec)||dec<2||dec>4)error('pDec','تعداد اعشار باید عدد صحیح بین ۲ و ۴ باشد.');
+  if(k==='bga'&&$('bT').value==='C'&&+$('pBR').value>=100)error('pBR','کاهش قطر نمی‌تواند ۱۰۰ درصد یا بیشتر باشد.');
+ }
+ return errors;
+}
 function run(){
 var k=$('kind').value;
 if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
@@ -994,6 +1033,7 @@ if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
 $('warn').textContent='';WG='';
 filterParams();
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
+var issues=validateFootprint(k);if(issues.length){var message=issues.map(function(e){return e.id+': '+e.msg}).join(' • ');clearOut(message);$('warn').textContent=message;why(k);save();return}
 try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){clearOut('خطای رسم: '+e.message);$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
 why(k);save()
