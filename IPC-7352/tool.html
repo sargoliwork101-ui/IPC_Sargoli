@@ -6,64 +6,237 @@
 <title>ابزار طراحی فوت‌پرینت (IPC-7352)</title>
 <link rel="stylesheet" href="fonts/vazirmatn.css">
 <style>
-:root{--bg:#f3f6f4;--fg:#1b2a26;--mut:#5b6b66;--card:#fff;--ln:#cfdad5;--ac:#0b6e4f;--ac2:#b8860b;--code:#e6efe9;--in:#fff8d6;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101a17;--fg:#e3ede8;--mut:#9bb0a8;--card:#17241f;--ln:#2b3d36;--ac:#4fd1a1;--ac2:#e5b94a;--code:#1f3029;--in:#3a3413}}
-*{box-sizing:border-box;font-family:Vazirmatn,Tahoma,sans-serif}
-body{margin:0;background:var(--bg);color:var(--fg);line-height:1.9}
-header{max-width:1000px;margin:auto;padding:28px 18px 10px}
-h1{margin:0;font-size:1.7rem;font-weight:800}header p{color:var(--mut);margin:4px 0}
-a{color:var(--ac)}
-.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-block:1px solid var(--ln);padding:8px 18px;max-width:100%;overflow-x:auto;white-space:nowrap}
-.tabs>div{max-width:1000px;margin:auto}
-button,select,input,textarea{font:inherit;color:var(--fg)}
-.btn{padding:5px 14px;margin:2px;border:1px solid var(--ac);background:var(--card);border-radius:8px;cursor:pointer}
-.btn.on,.btn:hover,.btn:focus-visible{background:var(--ac);color:var(--bg);outline:none}
-main{max-width:1000px;margin:auto;padding:0 18px 60px}
-section{display:none;margin-top:20px}section.on{display:block}
-.box{background:var(--card);border:1px solid var(--ln);border-radius:10px;padding:14px 16px;margin:12px 0}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-label{font-size:.85rem;color:var(--mut);display:block}label small{display:block;font-size:.72rem;color:var(--mut)}
-.kv{cursor:pointer;border-bottom:1px dotted var(--ac2)}
-input,select,textarea{width:100%;padding:6px;border:2px solid var(--ac2);border-radius:6px;background:var(--in);direction:ltr}
-select{direction:rtl}
-input[type=checkbox]{width:auto}
-table{border-collapse:collapse;width:100%;font-size:.9rem}th,td{border:1px solid var(--ln);padding:5px 9px;text-align:start}th{background:var(--code)}
-td.v{font-weight:800;direction:ltr;text-align:center;background:var(--code)}
-.tw{overflow-x:auto}
-.warn{color:#c0392b;font-weight:600;min-height:1.8em}
-textarea{height:150px;font-family:Consolas,monospace!important;font-size:.8rem;background:var(--card);border-color:var(--ln)}
-svg text{font-size:11px;fill:var(--fg);font-weight:700;cursor:pointer}
-code{background:var(--code);padding:1px 6px;border-radius:5px;direction:ltr;unicode-bidi:isolate}
-#tip{position:fixed;inset-inline:0;bottom:0;z-index:20;background:var(--card);border-top:3px solid var(--ac);padding:12px 18px calc(12px + env(safe-area-inset-bottom,0px));max-height:40vh;overflow:auto}
-#tip[hidden]{display:none}
-.blk{display:none}.blk.on{display:contents}
-.note{color:var(--mut);font-size:.85rem}
+/* ============================================================
+   Footprint Studio — dark studio theme for the IPC-7352 tool
+   ============================================================ */
+:root{
+  --bg:#0b1018;--panel:#111a26;--panel2:#151f2d;--line:#263548;--line2:#19242f;
+  --text:#e8eef7;--muted:#8b9bb0;--accent:#56c7b5;--blue:#6da8ff;--amber:#f0b968;
+  --danger:#f07878;--shadow:0 18px 50px #0005;--top:64px;--in:250px;--out:300px;
+}
+*{box-sizing:border-box}
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(var(--top) + 12px)}
+body{margin:0;background:var(--bg);color:var(--text);line-height:1.75;
+  font:400 14px/1.75 Vazirmatn,Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
+button,select,input,textarea{font:inherit;color:var(--text)}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+code{background:#0c1420;border:1px solid var(--line);color:#b9e8de;padding:1px 6px;border-radius:5px;
+  direction:ltr;unicode-bidi:isolate;font-family:Consolas,Menlo,monospace;font-size:.86em}
 math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math",serif;font-size:1.15em}
+
+/* ---------- top bar ---------- */
+.topbar{position:sticky;top:0;z-index:40;min-height:var(--top);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;padding:0 18px;background:rgba(14,21,32,.94);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.logo{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;color:#07131a;
+  font-size:11px;font-weight:900;letter-spacing:.3px;background:linear-gradient(135deg,#56c7b5,#3976b8);
+  box-shadow:0 6px 18px #56c7b533}
+.brand b{display:block;font-size:13.5px;font-weight:800;line-height:1.4}
+.brand small{display:block;color:var(--muted);font-size:9.5px;font-weight:600;letter-spacing:1.4px;line-height:1.4;direction:ltr}
+.top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.status{color:var(--muted);font-size:11.5px;display:inline-flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px #56c7b522}
+
+/* ---------- buttons ---------- */
+.btn{border:1px solid var(--line);background:var(--panel2);color:var(--text);padding:7px 12px;
+  border-radius:9px;font-weight:600;font-size:12.5px;cursor:pointer;transition:background .15s,border-color .15s;
+  display:inline-flex;align-items:center;gap:6px;white-space:nowrap;text-decoration:none}
+.btn:hover{border-color:#4c6f8c;background:#1a2736;text-decoration:none}
+.btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn.primary{background:var(--accent);color:#061714;border-color:var(--accent)}
+.btn.primary:hover{background:#6fd9c8;border-color:#6fd9c8}
+.btn.on{background:#122724;border-color:#315d5a;color:var(--accent)}
+
+/* ---------- workspace: 3 columns ---------- */
+.workspace{display:grid;grid-template-columns:var(--in) minmax(400px,1fr) var(--out);align-items:start}
+.sidebar,.inspector{background:var(--panel);padding:14px;position:sticky;top:var(--top);
+  max-height:calc(100vh - var(--top));overflow:auto;scrollbar-width:thin;align-self:start}
+.sidebar{border-inline-end:1px solid var(--line)}
+.inspector{border-inline-start:1px solid var(--line)}
+.sidebar::-webkit-scrollbar,.inspector::-webkit-scrollbar{width:8px}
+.sidebar::-webkit-scrollbar-thumb,.inspector::-webkit-scrollbar-thumb{background:#263548;border-radius:8px}
+.stage{min-width:0;background:#0b121c;display:flex;flex-direction:column;min-height:calc(100vh - var(--top))}
+.stick{display:block}
+
+.section-title{font-size:10px;color:var(--muted);font-weight:750;letter-spacing:1.3px;
+  margin:2px 0 11px;display:flex;align-items:center;gap:8px}
+.section-title::after{content:"";flex:1;height:1px;background:var(--line2)}
+.group{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line2)}
+.group:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+
+/* ---------- fields ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 9px}
+.grid.one{grid-template-columns:1fr}
+.grid.three{grid-template-columns:repeat(3,1fr)}
+label{font-size:11px;color:var(--muted);display:block;font-weight:600;line-height:1.5}
+.grid label,.field label{display:flex;justify-content:space-between;gap:6px;margin-bottom:5px;color:#b7c4d4}
+label small{display:block;font-size:9.5px;font-weight:500;color:#6f8299;margin-top:1px}
+.kv{cursor:pointer;border-bottom:1px dashed #48607a;padding-bottom:1px}
+.kv:hover{color:var(--accent);border-color:var(--accent)}
+input,select,textarea{width:100%;background:#0c1420;border:1px solid var(--line);border-radius:8px;
+  padding:7px 9px;color:var(--text);outline:none;font-size:12.5px;transition:border-color .15s,box-shadow .15s}
+input[type=number]{direction:ltr;text-align:start;font-variant-numeric:tabular-nums}
+input[type=checkbox]{width:auto;accent-color:var(--accent)}
+select{direction:rtl}
+input:hover,select:hover,textarea:hover{border-color:#364d67}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px #56c7b51f}
+#man{margin-inline-end:6px}
+.hint,.note{font-size:10.5px;color:var(--muted);line-height:1.7;margin-top:6px}
+.note{color:#8ea1b6}
+
+/* ---------- stage: canvas + metrics ---------- */
+.stage-inner{flex:1;display:flex;flex-direction:column;min-height:0}
+.canvas-toolbar{flex:none;min-height:44px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;padding:6px 14px;border-bottom:1px solid var(--line);color:var(--muted);font-size:11.5px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;background:#19332f;
+  color:var(--accent);font-size:9.5px;font-weight:750;letter-spacing:.6px}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.tool{padding:5px 9px;border-radius:7px;border:1px solid var(--line);background:transparent;
+  color:var(--muted);font-size:11.5px;cursor:pointer;transition:.15s}
+.tool:hover{color:var(--text);border-color:#39506a}
+.tool.active{color:var(--accent);border-color:#315d5a;background:#122724}
+.canvas-wrap{position:relative;flex:1;display:grid;place-items:center;padding:12px;min-height:300px;
+  background-color:#0b121c;background-image:radial-gradient(#22344a 1px,transparent 1px);background-size:22px 22px}
+#svg{width:100%;height:100%;min-height:290px;max-height:calc(100vh - 210px)}
+#svg text{font-size:11px;fill:#9fb3c9;font-weight:700;cursor:pointer}
+#svg text:hover{fill:var(--accent)}
+.canvas-label{position:absolute;inset-inline-start:14px;bottom:10px;color:#6d8098;font-size:10px;letter-spacing:.4px;pointer-events:none}
+.metrics{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:11px 13px;
+  border-top:1px solid var(--line);background:#101925}
+.metric{padding:8px 10px;background:var(--panel2);border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.metric span{display:block;color:var(--muted);font-size:9px;letter-spacing:.7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metric strong{display:block;font-size:14.5px;margin-top:2px;font-variant-numeric:tabular-nums;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- inspector ---------- */
+.head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.head b{font-size:13px;font-weight:800;direction:ltr;text-align:end;overflow-wrap:anywhere;line-height:1.5}
+.readout{background:#0c1420;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-top:8px}
+.readout-row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;color:var(--muted);
+  font-size:11.5px;border-bottom:1px solid #131e2b}
+.readout-row:last-child{border-bottom:0}
+.readout-row b{color:var(--text);font-weight:650;font-variant-numeric:tabular-nums;direction:ltr;text-align:end}
+.readout-row em{font-style:normal;color:var(--accent);font-size:10.5px;font-weight:700}
+.legend{display:flex;flex-wrap:wrap;gap:5px 11px;font-size:10.5px;color:var(--muted);margin-top:8px}
+.legend i{width:9px;height:9px;border-radius:3px;display:inline-block;margin-inline-end:4px;vertical-align:middle}
+.export-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.export-grid .btn{justify-content:center;font-size:11.5px;padding:7px 4px}
+.note.warnbox{color:#ffd9a8;background:#2a2113;border:1px solid #55401d;border-radius:9px;padding:8px 10px;margin-top:10px}
+
+/* ---------- messages / tables / boxes ---------- */
+.warn{color:#ffb4b4;background:#2a1518;border:1px solid #5a2b2f;border-radius:10px;padding:9px 11px;
+  font-size:11.5px;font-weight:600;margin:8px 0;line-height:1.75}
+.warn:empty{display:none}
+.box{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin:9px 0}
+.box>b{display:block;font-size:11.5px;color:var(--text);margin-bottom:7px}
+.box>p.note{margin-top:0}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:11.5px;background:#0c1420}
+th,td{padding:6px 9px;border-bottom:1px solid var(--line2);text-align:start;vertical-align:top}
+th{background:#131e2b;color:var(--muted);font-size:9.5px;font-weight:750;letter-spacing:.7px;white-space:nowrap}
+tr:last-child td{border-bottom:0}
+tbody tr:hover td{background:#101c29}
+td.v{font-weight:750;direction:ltr;text-align:end;color:#bff0e4;font-variant-numeric:tabular-nums;white-space:nowrap}
+td:last-child{color:#8fa3b9;font-size:10.5px}
+#why ul{margin:6px 0 0;padding-inline-start:16px}
+#why li{margin:3px 0;font-size:11.5px;color:#b7c4d4}
+#why{font-size:11.5px;color:#b7c4d4}
+textarea{font-family:Consolas,Menlo,monospace!important;font-size:11px;direction:ltr;text-align:left;
+  background:#0c1420;border-color:var(--line);line-height:1.6;height:150px}
+#pads{height:120px}#alt{height:200px}
+textarea:focus{border-color:var(--accent)}
+#dOut{margin-top:8px;font-size:12px;line-height:1.9}
+#dOut>div{padding:3px 0;border-bottom:1px solid var(--line2)}
+#dOut>div:last-child{border-bottom:0}
+
+/* ---------- sections ---------- */
+main{min-width:0}
+#t2 .box,#t3 .box{max-width:900px}
+section{display:none;margin:0;padding:12px}
+section.on{display:block}
+section#t1.on{display:flex;flex-direction:column;flex:1;min-height:0}
+section:not(.on) input,section:not(.on) select{pointer-events:none}
+.blk{display:none}.blk.on{display:grid}
+
+/* ---------- tooltip ---------- */
+#tip{position:fixed;inset-inline:0;bottom:0;z-index:60;background:#0e1723;border-top:1px solid var(--line);
+  box-shadow:0 -18px 50px #0007;padding:13px 18px calc(13px + env(safe-area-inset-bottom,0px));
+  max-height:40vh;overflow:auto}
+#tip[hidden]{display:none}
+#tipT{color:var(--accent);font-weight:800;font-size:13px;display:block;margin-bottom:2px}
+#tX{margin-top:4px}
+#tipP{color:#c3d2e2;font-size:12.5px;margin:5px 0 9px;line-height:1.85}
+
+/* ---------- responsive ---------- */
+@media(max-width:1240px){
+  .workspace{grid-template-columns:var(--in) minmax(360px,1fr)}
+  .inspector{grid-column:1/-1;border-inline-start:0;border-top:1px solid var(--line);
+    position:static;max-height:none;overflow:visible}
+  .inspector .stick{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  .inspector .stick>.section-title{grid-column:1/-1}
+  .inspector .stick>.head,.inspector .stick>.legend,.inspector .stick>.export-grid,
+  .inspector .stick>.note.warnbox{grid-column:1/-1}
+}
+@media(max-width:820px){
+  .workspace{display:flex;flex-direction:column}
+  .sidebar,.inspector{position:static;max-height:none;overflow:visible;border:0;border-bottom:1px solid var(--line)}
+  .stage{min-height:0}
+  .inspector .stick{display:block}
+  .stage{min-height:520px}
+  .metrics{grid-template-columns:1fr 1fr}
+  .topbar{padding:8px 12px;flex-wrap:wrap;gap:8px}
+  .status{display:none}
+  #svg{max-height:none}
+  section{padding:10px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
 <body>
-<header>
-<h1>ابزار طراحی فوت‌پرینت</h1>
-<p>محاسبه‌ی ابعاد و مختصات پدها بر پایه‌ی IPC-7352 (May 2023). دلیل هر عدد و جدول مربوطه در <a id="edu" href="guide.html">صفحه‌ی آموزشی و مرجع</a> آمده است.</p>
-<p class="note">خانه‌های زردرنگ ورودی‌اند. روی نام هر پارامتر (خط‌چین نارنجی) بزن تا معنی و نام آن در دیتاشیت را ببینی. نتیجه فقط نقطه‌ی شروع است؛ با دیتاشیت قطعه و سازنده‌ی برد تأیید کن.</p>
-<p class="note">📘 <a href="course.html">دوره‌ی کامل استاندارد (بند به بند)</a></p>
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">IPC</div>
+    <div><b>ابزار طراحی فوت‌پرینت</b><small>IPC-7352 · LAND PATTERN WORKSPACE</small></div>
+  </div>
+  <div class="top-actions">
+    <span class="status"><i class="dot"></i><span>آفلاین · ذخیرهٔ خودکار در این مرورگر</span></span>
+    <button class="btn" id="helpBtn">راهنما</button>
+    <a class="btn" href="guide.html">صفحهٔ آموزشی</a>
+    <a class="btn primary" href="course.html">دورهٔ کامل استاندارد</a>
+  </div>
 </header>
-<div class="tabs"><div><button class="btn on" data-t="t1">محاسبه‌ی پد</button><button class="btn" data-t="t2">نام‌گذاری و رمزگشایی</button><button class="btn" data-t="t3">جدول مرجع و جستجو</button></div></div>
-<main>
-<section id="t1" class="on">
-<div class="box"><div class="grid">
+<div class="workspace">
+
+<!-- ================= ستون تنظیمات ================= -->
+<aside class="sidebar" id="sb">
+ <div class="stick">
+  <div class="panel-tabs" role="tablist" style="display:flex;gap:6px;margin-bottom:14px">
+    <button class="btn on" data-t="t1" style="flex:1;justify-content:center">پد</button>
+    <button class="btn" data-t="t2" style="flex:1;justify-content:center">نام</button>
+    <button class="btn" data-t="t3" style="flex:1;justify-content:center">مرجع</button>
+  </div>
+  <div class="group">
+    <div class="section-title">تنظیمات قطعه</div>
+    <div class="grid">
 <div><label>نوع قطعه</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
 <div><label>نمونه‌ی آماده</label><select id="smp"><option value="">انتخاب کن...</option><option value="soic">SOIC-16</option><option value="qfp">LQFP-48 (چهارطرفه)</option><option value="chip">چیپ 1206</option><option value="dip">DIP-14</option></select></div>
-</div>
+    </div>
+  </div>
+  <div class="group">
+    <div class="section-title">ابعاد بسته</div>
 <div class="grid blk on" id="bsmd" style="margin-top:10px"></div>
 <div class="grid blk" id="bbga" style="margin-top:10px"></div>
 <div class="grid blk" id="bth" style="margin-top:10px"></div>
-</div>
-<div class="box"><b>پارامترهای استاندارد (همه قابل تنظیم)</b> — همهٔ ابعاد و اعداد این بخش با واحد انتخاب‌شده در بالای صفحه خوانده و نوشته می‌شوند.
-<label style="display:block;margin:6px 0"><input type="checkbox" id="man"> ویرایش دستی (override): اگر روشن شود اعداد زیر به‌جای مقادیر استاندارد به کار می‌روند. اگر خاموش باشد، همین خانه‌ها مقدار استاندارد مورد استفاده را نشان می‌دهند.</label>
-<div class="grid">
+  </div>
+  <div class="group">
+    <div class="section-title">پارامترهای استاندارد (قابل تنظیم)</div>
+    <p class="note" style="margin:0 0 8px">همهٔ اعداد این بخش با واحد انتخاب‌شده در بالا خوانده و نوشته می‌شوند.</p>
+    <div style="margin-bottom:8px"><label style="display:block;margin:6px 0"><input type="checkbox" id="man"> ویرایش دستی (override): اگر روشن شود اعداد زیر به‌جای مقادیر استاندارد به کار می‌روند. اگر خاموش باشد، همین خانه‌ها مقدار استاندارد مورد استفاده را نشان می‌دهند.</label></div>
+    <div class="grid">
 <div><label class="kv" data-v="ZJ">ZJ: بیرون‌زدگی بیرونی (SMD)</label><input id="pZJ" type="number" step="any" data-d="1"></div>
 <div><label class="kv" data-v="GJ">GJ: بیرون‌زدگی داخلی (SMD)</label><input id="pGJ" type="number" step="any" data-d="1"></div>
 <div><label class="kv" data-v="SJ">SJ: اضافه‌ی کناره (SMD)</label><input id="pSJ" type="number" step="any" data-d="1"></div>
@@ -80,18 +253,49 @@ math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math
 <div><label>شکل پد در خروجی Altium</label><select id="pShape"><option value="auto">خودکار (بیضوی برای پایه‌دار)</option><option value="o">بیضوی</option><option value="r">مستطیلی</option></select></div>
 <div><label class="kv" data-v="GAP">حداقل فاصله‌ی خالی بین پدها (هشدار)</label><input id="pGap" type="number" step="any" data-d="1" value="0.15"></div>
 <div><label>ارقام اعشار (mm)</label><input id="pDec" type="number" step="1" min="2" max="4" value="2" data-d="0"></div>
-</div></div>
-<div class="warn" id="warn"></div>
-<div class="box"><svg id="svg" viewBox="0 0 700 440" width="100%" role="img" aria-label="نقشه‌ی پد"></svg></div>
-<div class="box tw"><b>نتیجه‌ی نهایی</b><table id="res"></table></div>
-<div class="box" id="why"></div>
+    </div>
+  </div>
+ </div>
+</aside>
+
+<!-- ================= ستون میانی: نقشه + نتیجه ================= -->
+<main class="stage">
+<section id="t1" class="on">
+  <div class="stage-inner">
+    <div class="canvas-toolbar">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span class="pill">2D EDITOR</span><span>نمای بالا · واحد: <b id="unitLabel" style="color:#c8d6e6">mm</b></span>
+      </div>
+      <div class="tools">
+        <button class="tool" id="fitBtn">تناسب نما</button>
+        <button class="tool" id="gridBtn">شبکهٔ نقطه‌ای</button>
+      </div>
+    </div>
+    <div class="canvas-wrap" id="canvasWrap">
+      <svg id="svg" viewBox="0 0 700 440" role="img" aria-label="نقشه‌ی پد"></svg>
+      <div class="canvas-label">TOP COPPER · COURTYARD · SILKSCREEN</div>
+      <div id="stageEmpty" hidden style="position:absolute;inset:0;display:grid;place-items:center;color:#5d7189;font-size:12px;text-align:center;padding:20px">ورودی معتبر وارد کن تا نقشه ساخته شود</div>
+    </div>
+    <div class="metrics">
+      <div class="metric"><span>اندازهٔ پد</span><strong id="mPad">—</strong></div>
+      <div class="metric"><span>گام</span><strong id="mPitch">—</strong></div>
+      <div class="metric"><span>تعداد پد</span><strong id="mCount">—</strong></div>
+      <div class="metric"><span>Courtyard</span><strong id="mCourt">—</strong></div>
+    </div>
+  </div>
+  <div class="warn" id="warn"></div>
+  <div class="tw" style="margin:9px 0"><table id="res"></table></div>
+  <div id="why" class="box" style="margin-top:8px"></div>
+  <details class="box"><summary style="cursor:pointer;font-size:11.5px;font-weight:700">دادهٔ خروجی (فهرست پدها و اسکریپت Altium)</summary>
+    <div style="margin-top:9px">
 <div class="box"><b>فهرست پدها (برای وارد کردن در ابزار ECAD)</b>
 <textarea id="pads" readonly></textarea>
-<button class="btn" id="cp">کپی فهرست</button><span class="note" id="cpm"></span></div>
-<div class="box"><b>خروجی Altium (PcbLib)</b>
+<button class="btn" id="cp">کپی فهرست</button><span class="note" id="cpm"></span></div><div class="box"><b>خروجی Altium (PcbLib)</b>
 <p class="note">اسکریپت DelphiScript می‌سازد که پدها (با مختصات و ابعاد) و خط Courtyard (لایه‌ی Mechanical 15) را در یک PcbLib ایجاد می‌کند. روش: یک PcbLib باز کن؛ File ← New ← Project ← Script Project؛ یک Script Unit (.pas) اضافه کن و متن را جای‌گذاری کن؛ از Run Script رویه‌ی <code>CreateIPC7352Footprint</code> را اجرا کن. این اسکریپت در Altium اجرا و آزمایش نشده است؛ اگر خطا داد پیام آن را بفرست. لایه‌ی Courtyard را با استاندارد کتابخانه‌ی خودت تطبیق بده.</p>
 <button class="btn" id="mkA">ساخت اسکریپت Altium</button><button class="btn" id="cpA">کپی اسکریپت</button><span class="note" id="cpAm"></span>
 <textarea id="alt" readonly></textarea></div>
+    </div>
+  </details>
 </section>
 
 <section id="t2">
@@ -138,6 +342,46 @@ math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math
 <li>پد = سوراخ + 0.5 (≤1)، 0.75 (تا 1.25)، 1.0 (تا 1.75)، 1.25 (تا 2.25)، 1.5 (بیشتر).</li></ul></div>
 </section>
 </main>
+
+<!-- ================= ستون بازرس (Inspector) ================= -->
+<aside class="inspector">
+ <div class="stick">
+  <div class="section-title">بازرس فوت‌پرینت</div>
+  <div class="head"><b id="insName">—</b><span class="pill">IPC-7352</span></div>
+  <div class="readout">
+    <div class="readout-row"><span>اندازهٔ پد</span><b id="insPad">—</b></div>
+    <div class="readout-row"><span>فاصلهٔ داخلی (G)</span><b id="insG">—</b></div>
+    <div class="readout-row"><span>طول کل پدها (Z)</span><b id="insZ">—</b></div>
+    <div class="readout-row"><span>کمینه فاصلهٔ خالی</span><b id="insGap">—</b></div>
+    <div class="readout-row"><span>تعداد پد</span><b id="insCount">—</b></div>
+    <div class="readout-row"><span>چگالی</span><em id="insLv">B</em></div>
+  </div>
+
+  <div class="section-title" style="margin-top:20px">لایه‌ها</div>
+  <div class="readout">
+    <div class="readout-row"><span>Top Layer · پدهای مسی</span><b style="color:var(--accent)">نمایش</b></div>
+    <div class="readout-row"><span>Top Overlay · سیلک</span><b style="color:var(--accent)">نمایش</b></div>
+    <div class="readout-row"><span>Mechanical 15 · Courtyard</span><b style="color:var(--accent)">نمایش</b></div>
+  </div>
+  <div class="legend">
+    <span><i style="background:#d6a34e"></i>پد مسی</span>
+    <span><i style="background:#6b8199"></i>بدنه</span>
+    <span><i style="background:#d3a75f"></i>Courtyard</span>
+    <span><i style="background:#4a90e2"></i>اندازه‌گذاری</span>
+  </div>
+
+  <div class="section-title" style="margin-top:20px">خروجی</div>
+  <div class="export-grid">
+    <button class="btn" id="goAlt">اسکریپت Altium</button>
+    <button class="btn" id="cpTop">کپی پدها</button>
+    <button class="btn" id="rowUnit">واحد: mm</button>
+    <button class="btn" id="rowReset">بازنشانی ورودی‌ها</button>
+  </div>
+  <p class="note warnbox">نتیجه فقط نقطهٔ شروع است: با دیتاشیت قطعه، حداقل پد IPC-222X و توان سازندهٔ برد تأیید کن. اسکریپت Altium در خود Altium آزمایش نشده است.</p>
+ </div>
+</aside>
+</div><!-- /workspace -->
+
 <div id="tip" hidden><b id="tipT"></b><div id="tipP"></div><button class="btn" id="tX">بستن</button></div>
 <script type="text/javascript">
 (function(){
@@ -198,7 +442,7 @@ K.tx=function(x,y,s,a){var e=el('text',{x:x,y:y,'text-anchor':a||'middle'});e.te
 K.ar=function(a,b,c,e){svg.appendChild(el('line',{x1:a,y1:b,x2:c,y2:e,stroke:'#4a90e2','stroke-width':1.4,'marker-start':'url(#ar)','marker-end':'url(#ar)'}))};
 K.hd=function(a,b,y,s,ey,t){K.ln(a,ey,a,y);K.ln(b,ey,b,y);K.ar(a,y,b,y);K.tx((a+b)/2,y-4,s+' '+(t||''))};
 K.vd=function(y1,y2,x,s,ex,a){K.ln(ex,y1,x,y1);K.ln(ex,y2,x,y2);K.ar(x,y1,x,y2);K.tx(x+(a==='end'?-6:6),(y1+y2)/2+4,s,a||'start')};return K}
-var R=[],P=[],W='',M={},MP=[];function SHP(F){var s=$('pShape').value;return s==='auto'?(['gull','jlead','sof','inl'].indexOf(F)>-1?'o':'r'):s}function RC(v){var s=rd('pCR');return s>0?Math.ceil(v/s-1e-9)*s:v}
+var R=[],P=[],W='',M={},MP=[],PITCH_TXT='';function SHP(F){var s=$('pShape').value;return s==='auto'?(['gull','jlead','sof','inl'].indexOf(F)>-1?'o':'r'):s}function RC(v){var s=rd('pCR');return s>0?Math.ceil(v/s-1e-9)*s:v}
 V.A='A: عرض بدنه‌ی قطعه (Figure 3-3). اگر Smax از A بزرگ‌تر نباشد، هدف فیلت پاشنه برای gull-wing کوچک‌تر می‌شود (یادداشت 3 جدول 3-1، ص 9).';V.Th='Th: اندازه‌ی پد حرارتی (Exposed pad) QFN؛ یک پین به تعداد پین‌ها اضافه می‌کند و در نام به شکل T365 می‌آید.';V.HOLE='قطر نهایی سوراخ. اگر بزرگ‌تر از صفر باشد، به‌جای محاسبه‌ی جدول‌ها استفاده می‌شود (مثلاً برای press-fit مقدار سازنده).';V.NA='سوراخ غیرآبکاری = حداکثر بُعد پایه + این مقدار (ص 24 استاندارد: 0.4).';V.CR='Courtyard به مضرب این مقدار به بالا (ceil) گرد می‌شود؛ مثال استاندارد 0.5 است (ص 13).';
 V.PADN='پین ۱ معمولاً مربع گرفته می‌شود تا قطبیت دیده شود، ولی بند 4.2.3 برای سمت درج حلقهٔ دایره‌ای می‌خواهد. اگر سمت مقابل یا نشانه‌گذاری دیگری داری، دایره را انتخاب کن.';
 V.SLD='تلرانس سوراخ: ±0.08 مربوط به جدول‌های سوراخ آبکاری‌شده است. برای NPTH معمول ±0.10 و تا ±0.05 (بند 4.6.2) و برای Press-fit تلرانس سازنده.';
@@ -237,15 +481,44 @@ R=[];M={};MP=[];
 $('res').innerHTML='<tr><td colspan="3">'+(msg||'خروجی پاک شد؛ ورودی معتبر وارد کن.')+'</td></tr>';
 $('pads').value='';$('alt').value='';$('cpAm').textContent='';$('cpm').textContent='';
 var sv=$('svg');if(sv)sv.innerHTML='';
+PITCH_TXT='';
+['mPad','mPitch','mCount','mCourt','insPad','insG','insZ','insGap','insCount'].forEach(function(i){if($(i))$(i).textContent='—'});
+if($('insName'))$('insName').textContent='—';
+if($('stageEmpty'))$('stageEmpty').hidden=false;
 }
 function invalidate(clear){if(clear)clearOut()}
 function out(rows,pads,hdr,warn){
+try{var kd=$('kind').value;PITCH_TXT=kd==='smd'?fu(rd('P')):kd==='bga'?fu(rd('bP')):fu(rd('tP'))}catch(e){PITCH_TXT=''} // گام برای کارت متریک
 M.pads=MP;                        // همان داده‌ای که در فهرست و اسکریپت می‌رود
 R=rows;
 $('res').innerHTML='<tr><th>پارامتر</th><th>مقدار</th><th>منبع / دلیل</th></tr>'+
  rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="v">'+r[1]+'</td><td>'+(r[2]||'')+'</td></tr>'}).join('');
 $('pads').value=hdr+'\n'+pads.join('\n');
 $('warn').textContent=warn||'';
+syncInspect();
+}
+// ---- بازرس و کارت‌های متریک: فقط نمایشی، از همان ردیف‌های نتیجه ----
+function rowV(re){for(var i=0;i<R.length;i++){if(new RegExp(re).test(R[i][0]))return R[i][1]}return '—'}
+function syncInspect(){
+ if($('stageEmpty'))$('stageEmpty').hidden=true;
+ var any=MP.filter(function(p){return !p.skip}).length;
+ var padsTxt=R.length?rowV('اندازهٔ هر پد|قطر هر پد'):'—';
+ if(padsTxt==='—'&&MP.length)padsTxt=fm(MP[0].w)+' × '+fm(MP[0].h)+' '+U;
+ $('mPad').textContent=padsTxt;
+ $('mPitch').textContent=PITCH_TXT||'—';
+ $('mCount').textContent=any?String(any):'—';
+ $('mCourt').textContent=rowV('Courtyard');
+ $('insPad').textContent=padsTxt;
+ $('insG').textContent=rowV('G \\(|G\\(');
+ $('insZ').textContent=rowV('Z \\(|Z\\(');
+ var gpTxt=rowV('کمینه فاصلهٔ خالی').split(' / ').pop();
+ $('insGap').textContent=(gpTxt==='—'?'—':(/(mm|mil|inch)$/.test(gpTxt)?gpTxt:gpTxt+' '+U));
+ $('insCount').textContent=$('mCount').textContent;
+ var nm=rowV('نام پیشنهادی');
+ if(nm==='—')nm=rowV('نام Padstack');
+ if(nm==='—')nm='—';
+ $('insName').textContent=nm;
+ $('insLv').textContent=$('lv').value;
 }
 function smd(){
 var F=$('fam').value,sd=+$('sides').value,lv=$('lv').value,i={A:0,B:1,C:2}[lv],
@@ -498,24 +771,24 @@ try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){$('warn').textContent='خطای 
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
 why(k);save()
 }
-function save(){try{var o={};document.querySelectorAll('#t1 input,#t1 select').forEach(function(e){o[e.id]=e.type==='checkbox'?e.checked:e.value});o._u=U;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
-function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';document.querySelectorAll('#t1 input,#t1 select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else e.value=o[e.id]}});$('unit').value=U}catch(e){}}
+function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){o[e.id]=e.type==='checkbox'?e.checked:e.value});o._u=U;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
+function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else e.value=o[e.id]}});$('unit').value=U}catch(e){}}
 function syncUnitLabels(){var t=$('unit');}
 $('unit').onchange=function(){var nu=$('unit').value;
  // مقادیر را از واحد قبلی به واحد جدید تبدیل کن؛ مقدار داخلی تغییر نمی‌کند (ایراد ۲۱/۳۷)
- document.querySelectorAll('#t1 input[data-d="1"]').forEach(function(e){
+ document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){
    var raw=e.value;if(raw==='')return;
    var mm=(+raw)*PX[UOLD];
    e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
  UOLD=nu;U=nu;run()};
-document.querySelectorAll('#t1 input,#t1 select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',run)});
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',run)});
 var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',autoS:0,Lmax:3.4,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
 $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  // نمونه‌ها بر حسب mm تعریف شده‌اند؛ فیلدهای دیگر هم به همان واحد بازنویسی می‌شوند (ایراد ۲۱/۳۷)
  U='mm';UOLD='mm';$('unit').value='mm';
- document.querySelectorAll('#t1 input[data-d="1"]').forEach(function(e){e.value=''});
+ document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){e.value=''});
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
- document.querySelectorAll('#t1 input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
+ document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
  run()};
 document.addEventListener('change',function(e){
  if(e.target&&e.target.id==='fam'){var f=e.target.value,c=$('cType');if(!c)return;
@@ -524,7 +797,51 @@ document.addEventListener('change',function(e){
   if(['chip','qfn'].indexOf(f)<0){c.value=''} }
 });
 $('cp').onclick=function(){var t=$('pads'),done=function(){$('cpm').textContent=' کپی شد'};try{navigator.clipboard.writeText(t.value).then(done,function(){t.select();document.execCommand('copy');done()})}catch(e){t.select();try{document.execCommand('copy');done()}catch(x){}}};
-document.querySelectorAll('.tabs .btn').forEach(function(b){b.onclick=function(){document.querySelectorAll('.tabs .btn').forEach(function(x){x.classList.toggle('on',x===b)});document.querySelectorAll('main>section').forEach(function(s){s.classList.toggle('on',s.id===b.dataset.t)})}});
+function showTab(id){
+ document.querySelectorAll('[data-t]').forEach(function(x){x.classList.toggle('on',x.dataset.t===id)});
+ document.querySelectorAll('main>section').forEach(function(s){s.classList.toggle('on',s.id===id)});
+ if($('sb'))$('sb').scrollTop=0;
+}
+document.querySelectorAll('[data-t]').forEach(function(b){b.addEventListener('click',function(){showTab(b.dataset.t)})});
+/* ================= تعامل‌های پوستهٔ استودیو ================= */
+function copyText(el,msgEl){
+ var done=function(){if(msgEl)msgEl.textContent=' کپی شد';
+   if(el&&el.id==='pads'&&$('cpTop')){$('cpTop').textContent='کپی شد ✓';setTimeout(function(){$('cpTop').textContent='کپی پدها'},1400)}};
+ try{navigator.clipboard.writeText(el.value).then(done,function(){el.select();document.execCommand('copy');done()})}
+ catch(e){el.select();try{document.execCommand('copy');done()}catch(x){}}
+}
+if($('cpTop'))$('cpTop').onclick=function(){var p=$('pads');if(!p.value){$('cpTop').textContent='خروجی خالی';setTimeout(function(){$('cpTop').textContent='کپی پدها'},1400);return}copyText(p,$('cpm'))};
+if($('goAlt'))$('goAlt').onclick=function(){var d=document.querySelector('details.box');if(d)d.open=true;
+  if($('mkA'))$('mkA').click();var a=$('alt');if(a&&a.scrollIntoView)a.scrollIntoView({block:'center',behavior:'smooth'})};
+if($('helpBtn'))$('helpBtn').onclick=function(){
+ $('tipT').textContent='راهنمای سریع';
+ $('tipP').innerHTML='۱) نوع قطعه و واحد را انتخاب کن. ۲) ابعاد دیتاشیت را در خانه‌های زرد وارد کن (یا یک «نمونهٔ آماده» بزن). '
+  +'۳) روی نام هر پارامتر (خط‌چین) بزن تا معنی و نام آن در دیتاشیت را ببینی. ۴) نتیجه، نقشه و بازرس خودکار به‌روز می‌شوند. '
+  +'۵) برای ورود به ECAD، «کپی پدها» یا «اسکریپت Altium» را بزن. هر عدد را با دیتاشیت و سازندهٔ برد تأیید کن.';
+ $('tip').hidden=false;
+};
+if($('rowReset'))$('rowReset').onclick=function(){
+ if(!confirm('همهٔ ورودی‌ها به مقدار پیش‌فرض برگردند؟ (نام‌گذاری و رمزگشا دست‌نخورده می‌مانند)'))return;
+ try{localStorage.removeItem('fp7352')}catch(e){}
+ location.reload();
+};
+if($('rowUnit')){
+ var syncUnitBtn=function(){var u=$('unit').value;$('rowUnit').textContent='واحد: '+u;if($('unitLabel'))$('unitLabel').textContent=u;$('rowUnit').classList.toggle('on',u!=='mm')};
+ $('rowUnit').onclick=function(){var o=['mm','mil','in'],i=o.indexOf($('unit').value);$('unit').value=o[(i+1)%3];$('unit').onchange();syncUnitBtn()};
+ $('unit').addEventListener('change',syncUnitBtn);syncUnitBtn();
+}
+// زوم با چرخ ماوس روی نقشه و بازگشت با «تناسب نما»
+if($('svg')&&$('canvasWrap')){
+ var VM=[0,0,700,440],Z=1;
+ $('canvasWrap').addEventListener('wheel',function(e){e.preventDefault();Z=Math.min(4,Math.max(.4,Z*(e.deltaY<0?1.12:.89)));apply()},{passive:false});
+ function apply(){var cx=350,cy=220,w=700/Z,h=440/Z;
+  $('svg').setAttribute('viewBox',(cx-w/2)+' '+(cy-h/2)+' '+w+' '+h)}
+ if($('fitBtn'))$('fitBtn').onclick=function(){Z=1;$('svg').setAttribute('viewBox','0 0 700 440');$('fitBtn').classList.add('active');setTimeout(function(){$('fitBtn').classList.remove('active')},500)};
+ if($('gridBtn')){$('gridBtn').classList.add('active');
+  $('gridBtn').onclick=function(){var w=$('canvasWrap'),off=w.style.backgroundImage==='none';
+   w.style.backgroundImage=off?'':'none';$('gridBtn').classList.toggle('active',off);
+   $('gridBtn').textContent=off?'شبکهٔ نقطه‌ای':'شبکه: خاموش'};}
+}
 function T(v){return Math.round(v*100)}
 function nm(){var t=$('nT').value,P=+$('nP').value,L=+$('nL').value,W=+$('nW').value,H=+$('nH').value,N=$('nN').value,Th=+$('nTh').value,D=$('nD').value,pf=$('nPf').value.trim(),o,err='';
  // اعتبارسنجی: هیچ بُعد لازم صفر یا منفی نباید بی‌صدا حذف شود (ایراد ۳۳/۵۹/۴۲)
@@ -678,7 +995,10 @@ o.push("  PCBServer.PostProcess;","  Lib.CurrentComponent := Comp;","  Lib.Board
 $("alt").value=o.join("\r\n")}
 $("mkA").onclick=altium;
 $("cpA").onclick=function(){var x=$("alt");altium();try{navigator.clipboard.writeText(x.value).then(function(){$("cpAm").textContent=" کپی شد"},function(){x.select();document.execCommand("copy");$("cpAm").textContent=" کپی شد"})}catch(e){x.select();try{document.execCommand("copy");$("cpAm").textContent=" کپی شد"}catch(z){}}};
-load();$('kind').dispatchEvent(new Event('input'));run();nm();ps();dec();rt();
+load();
+// اجرای اول: اگر کاربر قبلاً چیزی ذخیره نکرده، نمونهٔ SOIC-16 بارگذاری می‌شود تا استودیو خالی نباشد
+try{if(!localStorage.getItem('fp7352')){var _s=$('smp');_s.value='soic';_s.onchange&&_s.onchange()}}catch(e){}
+$('kind').dispatchEvent(new Event('input'));run();nm();ps();dec();rt();
 })();
 </script>
 <script type="text/javascript">
