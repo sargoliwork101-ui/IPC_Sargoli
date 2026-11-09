@@ -465,7 +465,7 @@ m2.appendChild(el('path',{d:'M1 1L9 5L1 9z',fill:'#5fb0ff'}));d.appendChild(m2);
 // مبدأ در مرکز نقشه؛ قاب (viewBox) خودکار از روی ابعاد واقعی ساخته می‌شود
 var K={svg:svg,sc:sc,PX:function(v){return v*sc},PY:function(v){return -v*sc}};
 K.frame=function(extX,extY){                       // extX/extY: نیم‌عرض و نیم‌ارتفاع محتوا (پیکسل نقشه)
- window.TOT=Math.max(extX,extY)*2/sc;               // بزرگ‌ترین بُعد قطعه (mm)
+ window.TOT=Math.max(extX,extY)*2/sc;K.tagged=false;               // بزرگ‌ترین بُعد قطعه (mm)
  // اندازهٔ قلم برچسب‌ها به نسبت اندازهٔ قطعه (نه عدد ثابت)
  FS=Math.max(7,Math.min(30,TOT*0.055*sc));
  K.dim=el('g',{id:'dimG'});K.padLbl=el('g',{id:'padG'});
@@ -519,20 +519,28 @@ K.fitContent=function(){
  window.SVG_BASE=nb.slice();
  var cam=window.CAM;
  if(cam&&cam.z&&Math.abs(cam.z-1)>1e-6){
-   var z=Math.min(14,Math.max(.5,cam.z)),w=nb[2]/z,h=nb[3]/z;
+   var z=Math.min(20,Math.max(.5,cam.z)),w=nb[2]/z,h=nb[3]/z;
    window.SVG_VB=[nb[0]+nb[2]/2+cam.fx*nb[2]-w/2,nb[1]+nb[3]/2+cam.fy*nb[3]-h/2,w,h];
    setVB(window.SVG_VB);
  }else{fitView()}
 };
 K.txt=function(x,y,t,a,cls){
- var anchor=a||'middle';
- var w=String(t).length*FS*.56+FS*.8,h=FS*1.45;
- var l=/^start/.test(anchor)?x:w&&anchor==='end'?x-w:x-w/2;
- K.grow(l,y-h,l+w,y+h*.4);
- var bx=anchor==='start'?x-FS*.25:anchor==='end'?x-w+FS*.25:x-w/2;
- K.dim.appendChild(el('rect',{x:bx.toFixed(1),y:(y-h+FS*.3).toFixed(1),width:w.toFixed(1),height:h.toFixed(1),rx:(h/2).toFixed(1),fill:'#0b121c','fill-opacity':.9,stroke:'#22364b','stroke-width':.6}));
- var e=el('text',{x:x.toFixed(1),y:(y+FS*.12).toFixed(1),'text-anchor':anchor,'font-size':FS.toFixed(2),fill:'#e2eefa','font-weight':'600','class':cls||'dimt'});
- e.textContent=t;(K.dim||K.svg).appendChild(e);return e};
+ var anchor=a||'middle',str=String(t);
+ // اندازهٔ واقعی متن: در مرورگر با getComputedTextLength (دقیق)، در آزمون با تخمین
+ // محافظه‌کارانه (۱em به ازای هر نویسه + حاشیه) تا متن هیچ‌وقت از کادر بیرون نزند
+ var fs=FS, tw=0, tmp=el('text',{'font-size':fs.toFixed(2),fill:'#e2eefa','font-weight':'600'});
+ tmp.textContent=str;K.svg.appendChild(tmp);
+ try{tw=tmp.getComputedTextLength?tmp.getComputedTextLength():0}catch(e){tw=0}
+ K.svg.removeChild(tmp);
+ if(!(tw>0))tw=str.length*fs*0.62;
+ var padX=fs*0.45, padY=fs*0.32, h=fs*1.35+padY*2, w=tw+padX*2;
+ var left=anchor==='start'?x:anchor==='end'?x-w:x-w/2;
+ K.grow(left,y-h,left+w,y+fs*.5);
+ K.dim.appendChild(el('rect',{x:left.toFixed(1),y:(y-fs*0.92-padY).toFixed(1),width:w.toFixed(1),height:h.toFixed(1),
+   rx:(h/2).toFixed(1),fill:'#0b121c','fill-opacity':.92,stroke:'#2a4157','stroke-width':.6}));
+ var e=el('text',{x:x.toFixed(1),y:y.toFixed(1),'text-anchor':anchor,'font-size':fs.toFixed(2),
+   fill:'#e6f1fb','font-weight':'600','dominant-baseline':'auto','class':cls||'dimt'});
+ e.textContent=str;(K.dim||K.svg).appendChild(e);return e};
 K.hDim=function(x1,x2,y,label){     // اندازهٔ افقی با خط رابط و برچسب بالای خط
  if(!(Math.abs(x2-x1)>1e-9))return;
  K.dim.appendChild(el('line',{x1:x1.toFixed(1),y1:(y-1.2).toFixed(1),x2:x2.toFixed(1),y2:y.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
@@ -542,10 +550,23 @@ K.vDim=function(y1,y2,x,label,side){  // side='left' (پیش‌فرض) یا 'rig
  K.dim.appendChild(el('line',{x1:(x-1.2).toFixed(1),y1:y1.toFixed(1),x2:x.toFixed(1),y2:y2.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
  if(side==='right')K.txt(x+FS*.4,(y1+y2)/2+FS*.4,label,'start');
  else K.txt(x-FS*.4,(y1+y2)/2+FS*.4,label,'end')};
-// برچسب اندازهٔ خود پد: روی خود پد نوشته می‌شود و با زوم خوانا می‌شود
-K.padTag=function(cx,cy,w,h,txt){var fs=Math.min(h*sc*.42,w*sc*.42,FS*.8);if(fs<1.5)return null;
- K.grow(cx-w*sc/2,cy-h*sc/2,cx+w*sc/2,cy+h*sc/2);
- var e=el('text',{x:cx.toFixed(1),y:(cy+fs*.36).toFixed(1),'text-anchor':'middle','font-size':fs.toFixed(2),fill:'#1b1405','font-weight':'800'});e.textContent=txt;(K.padLbl||K.svg).appendChild(e);return e};
+// برچسب اندازهٔ خود پد (روی پد). وقتی این برچسب روشن است، اندازهٔ پد دیگر
+// با رنگ سفید کنار نقشه تکرار نمی‌شود.
+K.tagged=false;
+K.padTag=function(cx,cy,w,h,txt,opt){if(txt===null||txt==='')return null;
+ opt=opt||{};
+ // اندازهٔ نوشته طوری انتخاب می‌شود که هم در ارتفاع و هم در عرض پد جا شود
+ var str=String(txt),chars=str.length||1,
+     // ۰٫۹۲ تا متن دو طرف کمی حاشیه داشته باشد (عرض نویسهٔ فارسی/× حدود ۰٫۶em است)
+     fs=Math.min(h*sc*0.46, (w*sc*0.86)/(chars*0.60), FS*0.8);
+ if(fs<1.2)return null;K.tagged=true;
+ var half=chars*fs*0.31;
+ K.grow(cx-half,cy-h*sc/2,cx+half,cy+h*sc/2);
+ // روی پد THT سوراخ تیره زیر متن است؛ برای خوانایی، متن روشن با دورخط تیره
+ var e=el('text',{x:cx.toFixed(1),y:(cy+fs*0.36).toFixed(1),'text-anchor':'middle','font-size':fs.toFixed(2),
+   fill:opt.light?'#fff4cf':'#241a04','font-weight':'800','letter-spacing':'-0.02em'});
+ if(opt.light){e.setAttribute('stroke','#1c1503');e.setAttribute('stroke-width',(fs*0.11).toFixed(2));e.setAttribute('paint-order','stroke');}
+ e.textContent=str;(K.padLbl||K.svg).appendChild(e);return e};
 K.lead=function(x1,y1,x2,y2){K.svg.appendChild(el('line',{x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}))};
 return K}
 var FS=11,R=[],P=[],W='',M={},MP=[],PITCH_TXT='';   // FS: اندازهٔ قلم برچسب‌ها، نسبت به اندازهٔ قطعه
@@ -731,7 +752,7 @@ pads.forEach(function(p){
   K.tip(K.rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,p.th?'#2c7a5b':'#d4a017',p.th?.55:.6,ex),
     'پد '+p.n+' · '+fm(p.w)+' × '+fm(p.h)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')');
   // اندازهٔ همین پد، روی خودِ پد (با زوم بزرگ می‌شود و خوانا می‌ماند)
-  K.padTag(K.PX(p.x),K.PY(p.y),p.w,p.h,p.th?'':fm(p.w)+'×'+fm(p.h));});
+  K.padTag(K.PX(p.x),K.PY(p.y),p.w,p.h,p.th?'':fm(p.w)+'×'+fm(p.h));});   // پد حرارتی برچسب نمی‌گیرد
 K.circle(K.PX(-Z/2-.25),K.PY((n-1)*Pt/2),4,{fill:'#000'});
 // ---------- اندازه‌گذاری روی تصویر (بالای قطعه و کناره‌ها، بدون تداخل) ----------
 (function(){
@@ -740,8 +761,10 @@ K.circle(K.PX(-Z/2-.25),K.PY((n-1)*Pt/2),4,{fill:'#000'});
  K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(cw)+K.u());                       // عرض Courtyard (پایین)
  K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(ch)+K.u(),'right');                        // ارتفاع Courtyard (راست)
  K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-FS*3.4,'Z '+fm(Z)+K.u());                  // طول کل پدها (بالا)
- K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-FS*1.5,'L '+fm(p0.w)+K.u()); // طول یک پد (بالا، نزدیک‌تر)
- K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-FS*1.4,'X '+fm(p0.h)+K.u()); // عرض پد (چپ)
+ if(!K.tagged){                                    // اندازهٔ پد روی خود پد نوشته شده؛ تکرار لازم نیست
+  K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-FS*1.5,'L '+fm(p0.w)+K.u());
+  K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-FS*1.4,'X '+fm(p0.h)+K.u());
+ }
  // گام بین دو پد هم‌ستون
  if(pads.length>1&&Math.abs(pads[1].y-p0.y)>1e-9){
    var yA=K.PY(p0.y),yB=K.PY(pads[1].y),xp=X0-FS*.7;
@@ -840,7 +863,6 @@ var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;
  K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(ch)+K.u(),'right');
  K.hDim(K.PX(-x0-pd/2),K.PX(-x0+pd/2),Y0-FS*3.4,'Ø '+fm(pd)+K.u());
  if(c>1)K.hDim(K.PX(x0),K.PX(x0+PtX),Y0-FS*1.5,'P '+fm(PtX)+K.u());
- if(b0)K.vDim(K.PY(b0.y+pd/2),K.PY(b0.y-pd/2),X0-FS*1.4,'Ø '+fm(pd)+K.u());
 })();
 M.cw=cw;M.ch=ch;
 M.name='BGA'+count+ty+Math.round(Pt*100)+'P'+c+'X'+rw+'_'+Math.round(BL*100)+'X'+Math.round(BW*100)+'X'+Math.round(BH*100)+'D'+Math.round(b*100)+'N';
@@ -911,7 +933,7 @@ pads.forEach(function(p){
   var tInfo='پد '+p.n+' · Ø '+fm(pad)+' '+U+' · سوراخ Ø'+fm(hole)+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')';
   if(p.n===1&&p1==='r')K.tip(K.rect(p.x-pad/2,p.y-pad/2,pad,pad,'#d4a017',.6,{stroke:'#8a6d0b'}),tInfo);
   else K.tip(K.circle(K.PX(p.x),K.PY(p.y),pad/2*sc,{fill:'#d4a017','fill-opacity':.6,stroke:'#8a6d0b'}),tInfo);
-  K.padTag(K.PX(p.x),K.PY(p.y),pad,pad,fm(pad));
+  K.padTag(K.PX(p.x),K.PY(p.y),pad,pad,fm(pad),{light:true});
   K.circle(K.PX(p.x),K.PY(p.y),hole/2*sc,{fill:'#1b2a26','fill-opacity':.85});
   MP.push({n:p.n,x:p.x,y:p.y,w:pad,h:pad,sh:(p.n===1&&p1==='r')?'r':'c',hole:hole,pl:HT!=='N'});
 });
@@ -922,7 +944,8 @@ var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
  var p0=MP[0];
  K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(M.cw)+K.u());
  K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(M.ch)+K.u(),'right');
- K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*2.6,'Pad '+fm(pad)+K.u());
+ if(!K.tagged)                                      // قطر پد روی خود پد نوشته شده؛ تکرار لازم نیست
+  K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*2.6,'Pad '+fm(pad)+K.u());
  K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-FS*1.25,'Hole Ø'+fm(hole)+K.u());
  if(two){
    K.hDim(K.PX(-R2/2),K.PX(R2/2),Y1+FS*5.2,'Row span '+fm(R2)+K.u());
@@ -1016,14 +1039,16 @@ function syncLabelScale(){
  var w=Math.max(9,Math.min(30,26-Math.min(16,Math.log(r)*7)));
  sv.setAttribute('stroke-width','1');
  var g=sv.querySelector('#dimG');if(g&&g.style)g.style.setProperty('font-size',(w).toFixed(1)+'px');
- // برچسب اندازهٔ پد: در نمای کلی پنهان، با زوم کردن خوانا و نمایان می‌شود
- var pb=sv.querySelector('#padG');if(pb&&pb.style)pb.style.setProperty('opacity',r<1.25?'0':'1');
+ // برچسب اندازهٔ پد همیشه دیده می‌شود (اندازهٔ پد را همین نوشته می‌گوید)
+ var pb=sv.querySelector('#padG');if(pb&&pb.style)pb.style.setProperty('opacity','1');
+ // در زوم‌های خیلی بالا، برچسب‌های کلی (که بزرگ می‌شوند) کنار می‌روند تا دید پدها باز بماند
+ var dg=sv.querySelector('#dimG');if(dg&&dg.style)dg.style.setProperty('opacity',r>3.2?'0':'1');
 }
 function updZoomInfo(){var e=$('zoomInfo');if(!e)return;var b=window.SVG_BASE;if(!b)return;
  e.textContent='×'+(b[2]/vbNow()[2]).toFixed(2).replace(/\.?0+$/,'')}
 function zoomAt(f,cx,cy){var b=window.SVG_BASE;if(!b)return;var v=vbNow();
  if(cx==null){cx=v[0]+v[2]/2;cy=v[1]+v[3]/2}
- var z=Math.min(14,Math.max(.5,(b[2]/v[2])*f)),w=b[2]/z,h=b[3]/z;
+ var z=Math.min(20,Math.max(.5,(b[2]/v[2])*f)),w=b[2]/z,h=b[3]/z;
  var kx=(cx-v[0])/v[2],ky=(cy-v[1])/v[3];
  setVB([cx-kx*w,cy-ky*h,w,h])}
 function panBy(dx,dy){var v=vbNow();setVB([v[0]+dx,v[1]+dy,v[2],v[3]])}
@@ -1035,14 +1060,45 @@ window.SCAM={fit:function(){fitView()},set:function(v){setVB(v)},zoom:function(f
   return [v[0]+(e.clientX-r.left)/r.width*v[2],v[1]+(e.clientY-r.top)/r.height*v[3]]}
  wrap.addEventListener('wheel',function(e){e.preventDefault();
   if(e.ctrlKey||e.metaKey||!e.shiftKey){var p=toMap(e);zoomAt(e.deltaY<0?1.12:.89,p[0],p[1])}
-  else panBy(e.deltaX*.5,e.deltaY*.5)},{passive:false});
+  else{var r2=sv.getBoundingClientRect(),v2=vbNow();
+   panBy(e.deltaX*v2[2]/Math.max(1,r2.width),e.deltaY*v2[3]/Math.max(1,r2.height))}},{passive:false});
+ // ---- جابه‌جایی (pan): ماوس، قلم و لمس ----
+ // نکته: viewBox در واحد نقشه است، پس جابه‌جایی باید با اختلاف «پیکسل صفحه» ×
+ // نسبت واحد-به-پیکسل محاسبه شود، نه با مختصات نقشه (وگرنه در زوم، پرش می‌کند).
  var drag=null;
- sv.addEventListener('pointerdown',function(e){if(e.button!==0)return;drag=toMap(e);
-  wrap.classList.add('grabbing');try{sv.setPointerCapture(e.pointerId)}catch(x){};e.preventDefault()});
- sv.addEventListener('pointermove',function(e){if(!drag)return;var p=toMap(e);
-  setVB([vbNow()[0]-(p[0]-drag[0]),vbNow()[1]-(p[1]-drag[1]),vbNow()[2],vbNow()[3]]);drag=p});
- function end(e){drag=null;wrap.classList.remove('grabbing')}
- sv.addEventListener('pointerup',end);sv.addEventListener('pointercancel',end);
+ function down(e){
+  if(e.button!=null&&e.button!==0)return;
+  drag={x:e.clientX,y:e.clientY,id:e.pointerId};
+  wrap.classList.add('grabbing');
+  try{sv.setPointerCapture(e.pointerId)}catch(x){}
+  e.preventDefault();
+ }
+ function move(e){
+  if(!drag||(drag.id!=null&&e.pointerId!==drag.id))return;
+  var r=sv.getBoundingClientRect(),v=vbNow();
+  var ux=v[2]/Math.max(1,r.width),uy=v[3]/Math.max(1,r.height);
+  var dx=(e.clientX-drag.x)*ux,dy=(e.clientY-drag.y)*uy;
+  if(!dx&&!dy)return;
+  setVB([v[0]-dx,v[1]-dy,v[2],v[3]]);
+  drag.x=e.clientX;drag.y=e.clientY;
+  e.preventDefault();
+ }
+ function up(e){drag=null;wrap.classList.remove('grabbing')}
+ sv.addEventListener('pointerdown',down);
+ sv.addEventListener('pointermove',move);
+ window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+ // پشتیبان برای مرورگرهای بدون Pointer Events و برای لمس
+ sv.addEventListener('mousedown',function(e){if(e.buttons!==1||drag)return;down(e)});
+ sv.addEventListener('mousemove',function(e){if(drag)move(e)});
+ window.addEventListener('mouseup',up);
+ sv.addEventListener('touchstart',function(e){
+   if(e.touches.length===1){down({clientX:e.touches[0].clientX,clientY:e.touches[0].clientY,button:0,preventDefault:function(){}});
+     e.preventDefault()}
+ },{passive:false});
+ sv.addEventListener('touchmove',function(e){
+   if(e.touches.length===1&&drag)move({clientX:e.touches[0].clientX,clientY:e.touches[0].clientY,pointerId:drag.id,preventDefault:function(){}});
+   e.preventDefault()},{passive:false});
+ sv.addEventListener('touchend',up);
  sv.addEventListener('dblclick',function(e){var p=toMap(e);zoomAt(1.8,p[0],p[1])});
  if($('fitBtn'))$('fitBtn').onclick=fitView;
  if($('zoomIn'))$('zoomIn').onclick=function(){zoomAt(1.3)};

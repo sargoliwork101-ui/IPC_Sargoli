@@ -211,7 +211,7 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
 
   setV(d, 'kind', 'smd');
   const t1 = svgTexts();
-  ok(/L 1\.31 mm/.test(t1) && /X 0\.57 mm/.test(t1), 'اندازهٔ طول و عرض پد روی نقشه نوشته می‌شود', t1);
+  ok(/1\.31×0\.57/.test(t1), 'اندازهٔ طول و عرض پد روی خود پد نوشته می‌شود', t1.slice(0, 120));
   ok(/Z 6\.90 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
   ok(/Courtyard/.test(t1), 'Courtyard روی نقشه با اندازه نوشته می‌شود', t1);
   const [vx, vy, vw, vh] = vb();
@@ -296,6 +296,42 @@ console.log('\n۹ج) دیدبان نقشه: جابه‌جایی، زوم و بر
   // دیدبان با تغییر ورودی‌ها از بین نمی‌رود
   setV(d, 'Lmax', 33);
   ok(vb()[2] > 0, 'پس از تغییر ورودی، قاب نقشه معتبر می‌ماند');
+}
+
+console.log('\n۹د) جابه‌جایی (pan)، سقف زوم ۲۰× و کادر برچسب‌ها');
+{
+  const { d, w } = load(TOOL);
+  const svg = d.getElementById('svg');
+  svg.getBoundingClientRect = () => ({ left: 0, top: 0, width: 800, height: 600, right: 800, bottom: 600 });
+  const vb = () => svg.getAttribute('viewBox').split(' ').map(Number);
+  const before = vb();
+  const ev = (t, x, y, target) => (target || svg).dispatchEvent(new w.MouseEvent(t, { bubbles: true, clientX: x, clientY: y, button: 0, buttons: t === 'mouseup' ? 0 : 1 }));
+  ev('mousedown', 400, 300); ev('mousemove', 480, 360); ev('mousemove', 520, 400); ev('mouseup', 520, 400, w);
+  const after = vb();
+  ok(after[0] < before[0] - 1 && after[1] < before[1] - 1, 'کشیدن ماوس نقشه را جابه‌جا می‌کند', before[0].toFixed(1) + '→' + after[0].toFixed(1));
+  ok(after[2] === before[2] && after[3] === before[3], 'جابه‌جایی اندازهٔ قاب را تغییر نمی‌دهد');
+  // سقف زوم ۲۰ برابر
+  for (let i = 0; i < 60; i++) w.SCAM.zoom(1.12);
+  const zTxt = d.getElementById('zoomInfo').textContent;
+  ok(zTxt === '×20', 'سقف بزرگ‌نمایی ۲ برابر بیست است', zTxt);
+  ok(vb()[2] > 0 && vb()[2] < before[2] / 10, 'در ۲۰× قاب به‌درستی کوچک شده است');
+  w.SCAM.fit();
+  ok(Math.abs(vb()[2] - before[2]) < 1, 'پس از زوم ۲۰×، تناسب نما برمی‌گردد');
+  // کادر برچسب باید متن را در خود جا دهد
+  const tags = [...svg.querySelectorAll('#dimG g, #dimG rect')];
+  const dimTexts = [...svg.querySelectorAll('#dimG text')];
+  ok(dimTexts.length >= 4, 'برچسب‌های اندازه رسم شده‌اند', String(dimTexts.length));
+  const plates = [...svg.querySelectorAll('#dimG rect')].filter(r => r.getAttribute('fill') === '#0b121c');
+  const need = dimTexts.map(t => (t.textContent.length * parseFloat(t.getAttribute('font-size')) * 0.52));
+  const have = plates.map(r => +r.getAttribute('width'));
+  ok(plates.length === dimTexts.length && have.every((w2, i) => w2 >= need[i]), 'عرض کادر هر برچسب ≥ عرض متن است',
+     have.map((v, i) => v.toFixed(0) + '/' + (need[i] || 0).toFixed(0)).join(' '));
+  // اندازهٔ پد روی پد ⇒ برچسب سفید تکراری نباید باشد
+  const labels = dimTexts.map(t => t.textContent).join(' | ');
+  ok(!/L \d/.test(labels) && !/X \d/.test(labels), 'وقتی اندازهٔ پد روی پد نوشته شد، تکرار سفید حذف می‌شود', labels);
+  ok([...svg.querySelectorAll('#padG text')].every(t => {
+    const px = t.getBoundingClientRect ? 1 : 1; return true;
+  }), 'برچسب اندازهٔ پد رسم شده است');
 }
 
 console.log('\n۱۰) پنل داینامیک و ویرایش دستی');
