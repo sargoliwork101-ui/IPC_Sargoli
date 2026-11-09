@@ -76,6 +76,17 @@ const engine = chromiumPackage.default || chromiumPackage;
   assert((await page.locator('#pads').inputValue()).includes('1.2000'));
   assert(await page.locator('#manufacturerReference').isVisible());
   console.log('Official manufacturer template, direct editing and reload: PASS');
+  await page.locator('#footprintSearch').fill('SN74LVC1G04');
+  await page.locator('#footprintSearchResults button').first().click();
+  assert.equal(await page.locator('#smp').inputValue(),'ti-db5');
+  assert((await page.locator('#dimG').textContent()).includes('C-C X 2.60 mm'));
+  await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-horizontal-centers.png'});
+  await page.locator('#footprintSearch').fill('CFR-25');await page.locator('#footprintSearchResults button').first().click();
+  assert.equal(await page.locator('#tExample').inputValue(),'cfr25');assert.equal(await page.locator('#mCount').textContent(),'2');
+  await page.locator('#footprintSearch').fill('no-match-xyz');assert.equal(await page.locator('#footprintSearchResults button').count(),0);
+  await page.locator('#footprintSearch').press('Escape');assert.equal(await page.locator('#footprintSearch').inputValue(),'');
+  console.log('Global footprint search and horizontal center-to-center dimension: PASS');
+
 
 
 

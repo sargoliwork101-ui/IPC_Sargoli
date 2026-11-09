@@ -249,6 +249,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 <div><label>روش نصب / مدل هندسی (پیشرفته)</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
+<div class="wide"><label for="footprintSearch">جستجوی فوت‌پرینت / پکیج / نمونه<small>مثلاً SOT-23، SN74LVC1G04، مقاومت یا 0603؛ جستجو در همهٔ گروه‌ها</small></label><input id="footprintSearch" type="search" autocomplete="off" placeholder="نام قطعه یا پکیج…" aria-controls="footprintSearchResults"><div id="footprintSearchResults" aria-live="polite" style="display:grid;gap:6px;margin-top:8px;max-height:260px;overflow:auto"></div></div>
 <div><label>۱. نوع قطعه</label><select id="component"><option value="resistor">مقاومت</option><option value="capacitor">خازن</option><option value="inductor">سلف</option><option value="ferrite">فریت‌بید</option><option value="diode">دیود</option><option value="led">LED</option><option value="transistor">ترانزیستور / قطعهٔ قدرت</option><option value="ic" selected>آی‌سی</option><option value="crystal">کریستال</option><option value="oscillator">اسیلاتور</option><option value="fuse">فیوز</option><option value="thermistor">ترمیستور</option><option value="varistor">واریستور</option><option value="connector">کانکتور / هدر / سوکت</option><option value="jumper">جامپر</option><option value="switch">کلید / رله</option><option value="transformer">ترانس / قطعات مغناطیسی خاص</option><option value="custom">طراحی سفارشی / سایر قطعات</option></select></div>
 <div><label>۲. نوع پکیج</label><select id="package"></select></div>
 <div id="padShapeControl"><label>شکل پد SMD — نقشه و خروجی<small>انتخاب مستقل از ویرایش دستی؛ بند 3.2 الزام شکل واحدی ندارد.</small></label><select id="pShape"><option value="auto">پیش‌فرض خانواده (نه الزام استاندارد)</option><option value="o">دو‌سرگرد (Oblong)</option><option value="r">مستطیلی (Rectangular)</option></select></div>
@@ -791,7 +792,9 @@ K.circle(K.PX(-Z/2-.25),K.PY((n-1)*Pt/2),4,{fill:'#000'});
  var X0=K.PX(-cw/2),X1=K.PX(cw/2),Y0=K.PY(ch/2),Y1=K.PY(-ch/2);      // کادر Courtyard
  K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(cw)+K.u());                       // عرض Courtyard (پایین)
  K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(ch)+K.u(),'right');                        // ارتفاع Courtyard (راست)
- K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-FS*3.4,'Z '+fm(Z)+K.u());                  // طول کل پدها (بالا)
+ K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-FS*3.4,'Z '+fm(Z)+K.u());
+ // فاصلهٔ افقی مراکز دو ردیف، مستقل از طول کل و فاصلهٔ خالی
+ K.hDim(K.PX(-ce),K.PX(ce),Y0-FS*5.7,'C-C X '+fm(2*ce)+K.u());                  // طول کل پدها (بالا)
  if(!K.tagged){                                    // اندازهٔ پد روی خود پد نوشته شده؛ تکرار لازم نیست
   K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-FS*1.5,'L '+fm(p0.w)+K.u());
   K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-FS*1.4,'X '+fm(p0.h)+K.u());
@@ -1171,7 +1174,7 @@ $('unit').onchange=function(){var nu=$('unit').value;
    e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
  UOLD=nu;U=nu;run()};
 $('tExample').onchange=function(){var ex=this.value;if(!ex)return;document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value!=='')e.value=+(Number(e.value)*PX[UOLD]).toFixed(6)});U=UOLD='mm';$('unit').value='mm';$('component').value=ex==='cfr25'?'resistor':'diode';refreshPackages('axial');$('kind').value='th';$('tModel').value='axial-h';$('tHoleShape').value='round';$('smp').value='';$('man').checked=false;var vals=ex==='cfr25'?{tK:2,tP:10.16,tR:0,tW:.60,tBodyL:6.8,tBodyD:2.6,tBodyH:2.6,tB:1.6}:{tK:2,tP:7.62,tR:0,tW:.55,tBodyL:3.4,tBodyD:1.75,tBodyH:1.75,tB:1.6};for(var id in vals)$(id).value=vals[id];$('tS').value='0';$('tPr').value='1';run()};
-document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3')&&['component','package'].indexOf(e.id)<0){if(e.closest('#bsmd,#bbga,#bth,#advancedGeometry')||e.id==='kind')$('smp').value='';if(['kind','fam','sides','layout'].indexOf(e.id)>=0){$('component').value='custom';refreshPackages('custom')}run()}})});
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp'&&e.id!=='footprintSearch')e.addEventListener('input',function(){if(!e.closest('#t2,#t3')&&['component','package'].indexOf(e.id)<0){if(e.closest('#bsmd,#bbga,#bth,#advancedGeometry')||e.id==='kind')$('smp').value='';if(['kind','fam','sides','layout'].indexOf(e.id)>=0){$('component').value='custom';refreshPackages('custom')}run()}})});
 var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',cType:'RESC',autoS:0,Lmin:3.0,Lmax:3.4,Tmin:0,Tmax:0,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
 SM.soic8=Object.assign({},SM.soic,{n:4});
 SM.soic14=Object.assign({},SM.soic,{n:7});
@@ -1775,6 +1778,28 @@ function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp
  if(!PACKAGE_TYPES[comp]||PACKAGE_TYPES[comp].indexOf(pk)<0)comp=pk==='chip'?'resistor':/^sot23/.test(pk)?'transistor':'ic';
  $('component').value=comp;refreshPackages(pk);
 }
+
+function searchKey(text){return String(text).toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/[\s\-–—_\u200c]/g,'')}
+function searchFootprints(){
+ var root=$('footprintSearchResults'),query=searchKey($('footprintSearch').value);root.textContent='';if(!query)return;
+ var matches=[];
+ function groupText(pkg){return Object.keys(PACKAGE_TYPES).filter(function(c){return PACKAGE_TYPES[c].indexOf(pkg)>=0}).map(function(c){var opt=Array.from($('component').options).find(function(o){return o.value===c});return opt?opt.textContent:c}).join(' ')}
+ Array.from($('tExample').options).forEach(function(o){if(o.value&&searchKey(o.textContent+' '+o.value).indexOf(query)>=0)matches.push({thExample:o.value,pkg:'axial',label:o.textContent+' — نمونهٔ پایه‌دار سازنده'})});
+ Array.from($('smp').options).forEach(function(o){if(o.value&&searchKey(o.textContent+' '+o.value+' '+groupText(presetPackage(o.value))).indexOf(query)>=0)matches.push({sample:o.value,pkg:presetPackage(o.value),label:o.textContent+' — نمونهٔ آماده'})});
+ Object.keys(PACKAGE_CATALOG).forEach(function(pkg){var spec=PACKAGE_CATALOG[pkg];if(searchKey(pkg+' '+spec.label+' '+groupText(pkg)).indexOf(query)>=0)matches.push({pkg:pkg,label:spec.label+' — '+({sample:'نمونه دارد',configure:'قابل تنظیم',unavailable:'هنوز پیاده‌سازی نشده',blocked:'نیازمند اصلاح',custom:'سفارشی'}[spec.state])})});
+ if(!matches.length){root.textContent='نتیجه‌ای پیدا نشد؛ نام دیگری امتحان کن.';return}
+ var info=document.createElement('small');info.textContent=matches.length+' نتیجه'+(matches.length>30?'؛ ۳۰ مورد اول نمایش داده می‌شود، جستجو را دقیق‌تر کن.':'');root.appendChild(info);
+ matches.slice(0,30).forEach(function(item){var button=document.createElement('button');button.type='button';button.className='btn';button.style.cssText='white-space:normal;text-align:right;justify-content:flex-start';button.textContent=item.label;
+ button.onclick=function(){
+  if(item.thExample){rememberPackage();$('tExample').value=item.thExample;$('tExample').onchange();activePackage=$('component').value+':'+$('package').value}
+  else if(item.sample){rememberPackage();$('smp').value=item.sample;$('smp').onchange()}
+  else{var comp=$('component').value;if(PACKAGE_TYPES[comp].indexOf(item.pkg)<0)comp=Object.keys(PACKAGE_TYPES).find(function(c){return PACKAGE_TYPES[c].indexOf(item.pkg)>=0});if(!comp)return;$('component').value=comp;refreshPackages(item.pkg);choosePackage()}
+  $('footprintSearch').value='';root.textContent='';
+ };root.appendChild(button)});
+}
+$('footprintSearch').addEventListener('input',searchFootprints);
+$('footprintSearch').addEventListener('keydown',function(e){if(e.key==='Escape'){this.value='';$('footprintSearchResults').textContent=''}if(e.key==='Enter'){var first=$('footprintSearchResults').querySelector('button');if(first){e.preventDefault();first.click()}}});
+
 var activePackage='',packageDrafts={},demoPackage='';
 function rememberPackage(){
  if(!activePackage)return;

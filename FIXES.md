@@ -262,3 +262,8 @@ node tests/run-tests.js
 - Added TI DBV0005A / SN74LVC1G04DBVR, DBV0006A / TLV4062-Q1 and PW0016A reference copper dimensions/positions, loaded through normal sample selection.
 - Editable manufacturer length/width/row-center spacing mode kept separate from IPC formulas. Explicit source links, corner-shape/mask/stencil limitations, unit conversion and persisted edits.
 - 270 jsdom checks pass; Chromium manufacturer-edit/reload smoke passes. Remaining families are not claimed to have sourced templates yet.
+
+### Footprint search and horizontal pad centers (2026-11-09)
+- Added offline global search over catalogue families, component-group labels, ready SMD/BGA/DIP samples and the two manufacturer THT examples. Case/space/hyphen and Arabic/Persian letter normalization; explicit unsupported status, no-result feedback, keyboard Enter/Escape. Search typing does not alter current geometry; selecting a result uses the existing selection/validation flow.
+- Added a separate `C-C X` horizontal dimension for SMD row centers (`2 × ce`), not pad outer span Z or inner gap G. Manufacturer basis uses its editable row-center spacing. Uses existing unit conversion and dimension layout/fit helpers on a separate track above Z.
+- 282 jsdom checks pass; extended Chromium smoke passes. Screenshot `/tmp/ipc-horizontal-centers.png` visually checked for readable non-overlapping C-C and Z labels.

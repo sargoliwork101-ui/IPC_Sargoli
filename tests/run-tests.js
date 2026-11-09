@@ -328,7 +328,7 @@ console.log('\n۹د) جابه‌جایی (pan)، سقف زوم ۲۰× و کاد�
      have.map((v, i) => v.toFixed(0) + '/' + (need[i] || 0).toFixed(0)).join(' '));
   // اندازهٔ پد روی پد ⇒ برچسب سفید تکراری نباید باشد
   const labels = dimTexts.map(t => t.textContent).join(' | ');
-  ok(!/L \d/.test(labels) && !/X \d/.test(labels), 'وقتی اندازهٔ پد روی پد نوشته شد، تکرار سفید حذف می‌شود', labels);
+  ok(dimTexts.every(t=>!/^L \d/.test(t.textContent)&&!/^X \d/.test(t.textContent)), 'وقتی اندازهٔ پد روی پد نوشته شد، تکرار سفید حذف می‌شود', labels);
   ok([...svg.querySelectorAll('#padG text')].every(t => {
     const px = t.getBoundingClientRect ? 1 : 1; return true;
   }), 'برچسب اندازهٔ پد رسم شده است');
@@ -694,6 +694,30 @@ console.log('\n۲۲) الگوهای واقعی سازنده و ویرایش مس
  setV(d,'unit','mil');ok(Math.abs(padsOf(d)[0][3]*.0254-1.2)<.0002,'ابعاد مستقیم مرجع با تبدیل واحد حفظ می‌شوند');
  setV(d,'unit','mm');setV(d,'padBasis','ipc');
  ok(!!d.getElementById('pads').value&&d.getElementById('mfrL').disabled,'بازگشت آگاهانه از مرجع سازنده به محاسبه IPC ممکن است');
+ w.close();
+}
+
+
+console.log('\n۲۳) جستجو و فاصلهٔ افقی مراکز');
+{
+ const {d,w}=load(TOOL);
+ setV(d,'smp','ti-db5');
+ const labels=()=>[...d.querySelectorAll('#dimG text')].map(t=>t.textContent);
+ ok(labels().some(t=>/^C-C X 2.60 mm$/.test(t)),'فاصله افقی مراکز نمونهٔ TI پنج‌پایه 2.60 mm است، نه Z');
+ setV(d,'mfrSpan',2.8);ok(labels().includes('C-C X 2.80 mm'),'اندازهٔ افقی با ویرایش فاصلهٔ مراکز به‌روز می‌شود');
+ for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const factor={mil:.0254,in:25.4,mm:1}[unit];const text=labels().find(t=>t.startsWith('C-C X '));ok(text&&text.endsWith(' '+unit)&&Math.abs(Number(text.split(' ')[2])*factor-2.8)<.01,'فاصلهٔ افقی با واحد '+unit+' درست نمایش داده می‌شود')}
+ const before=d.getElementById('pads').value;
+ setV(d,'footprintSearch','sOt23');
+ ok(d.querySelectorAll('#footprintSearchResults button').length>=3,'جستجوی بدون حساسیت به حروف و خط تیره');
+ ok(d.getElementById('pads').value===before,'تایپ جستجو هندسه را تغییر نمی‌دهد');
+ setV(d,'footprintSearch','SN74LVC1G04');d.querySelector('#footprintSearchResults button').click();
+ ok(d.getElementById('smp').value==='ti-db5'&&padsOf(d).length===5,'کلیک نتیجهٔ شماره‌قطعه، نمونهٔ واقعی را باز می‌کند');
+ setV(d,'footprintSearch','CFR-25');d.querySelector('#footprintSearchResults button').click();
+ ok(d.getElementById('tExample').value==='cfr25'&&padsOf(d).length===2,'جستجوی نمونهٔ THT سازنده هم کار می‌کند');
+ setV(d,'footprintSearch','مقاومت');ok(!!d.querySelector('#footprintSearchResults button'),'جستجوی فارسی در گروه‌های قطعه');
+ setV(d,'footprintSearch','not-a-real-footprint-xyz');ok(!d.querySelector('#footprintSearchResults button')&&/پیدا نشد/.test(d.getElementById('footprintSearchResults').textContent),'جستجوی بی‌نتیجه پیام روشن دارد');
+ setV(d,'footprintSearch','SOT223');d.querySelector('#footprintSearchResults button').click();
+ ok(d.getElementById('package').value==='sot223'&&!d.getElementById('pads').value,'نتیجهٔ پکیج پشتیبانی‌نشده وضعیت واقعی نشان می‌دهد، نه نقشهٔ قبلی');
  w.close();
 }
 
