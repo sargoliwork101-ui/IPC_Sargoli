@@ -167,3 +167,9 @@ Added automatically selectable reference examples, not hypothetical demo dimensi
 - TI PW0016A (TSSOP-16): sixteen lands 1.50 × 0.45 mm; row centers 5.80 mm apart; pitch 0.65 mm. Drawing 4220204/B, 12/2023.
 
 These reference copper lengths/widths/row centers are a distinct editable input mode, not values back-solved into IPC coefficients. User can switch explicitly to IPC-7352 computation. Source links are visible in the UI; operation remains offline. Source drawings specify R0.05 corners: this version instead uses the user's rectangular/oblong choice and clearly discloses that it is not exact corner reproduction. Mask/stencil are not copied. Courtyard remains tool-generated. Other configurable packages still need sourced starting examples; no claim of complete manufacturer-template coverage.
+
+## Current sourced-reference inventory (2026-11-09)
+
+The earlier table describes the original solver catalogue and is **not** the current reference-template availability table. An actual starting reference is now available for **49/66 groups**: 46 KiCad library examples plus the 3 direct TI package examples. Source names, commit-pinned links, files, licensing, exact limitations and the **17 still-unverified groups** are listed in [reference-footprints/README.md](IPC-7352/reference-footprints/README.md).
+
+A reference example is not an IPC formula solver, manufacturer approval, latest-library guarantee or a universal footprint for every electrical type in a broad package category. Every example now displays a named-model/adapt-to-your-datasheet comment; imported references additionally have numeric pad editing and advanced editable pad/body JSON. Full sourced coverage is still incomplete; no unrelated “equivalent” is invented for the remaining groups.

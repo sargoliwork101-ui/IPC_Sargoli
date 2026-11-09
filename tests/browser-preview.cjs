@@ -56,7 +56,7 @@ const engine = chromiumPackage.default || chromiumPackage;
   for(const [id,v] of Object.entries({Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.7,bodyLength:3}))await page.locator('#'+id).fill(String(v));
   assert.equal(await page.locator('#mCount').textContent(),'6');
   console.log('User-selected shape, reload and SOT-23-5/6 geometry: PASS');
-  await page.selectOption('#component','resistor');await page.selectOption('#package','axial');
+  await page.selectOption('#component','resistor');await page.selectOption('#package','axial');if(await page.locator('#leaveReference').isVisible())await page.locator('#leaveReference').click();
   await page.selectOption('#tExample','cfr25');assert.equal(await page.locator('#mCount').textContent(),'2');
   await page.selectOption('#smp','soic');assert.equal(await page.locator('#mCount').textContent(),'16');
   assert.equal(await page.locator('#tModel').inputValue(),'axial-h');
@@ -91,16 +91,26 @@ const engine = chromiumPackage.default || chromiumPackage;
 
 
   await page.selectOption('#component','ic');await page.selectOption('#package','qfn');
-  assert.equal(await page.locator('#Lmax').inputValue(),'');
-  assert(await page.locator('#stageEmpty').isVisible());
+  assert(await page.locator('#referenceEditor').isVisible());assert((await page.locator('#pads').inputValue()).length>0);
   await page.selectOption('#package','lga');
-  assert.equal(await page.locator('#pads').inputValue(),'');
-  assert((await page.locator('#packageStatus').textContent()).includes('پیاده‌سازی نشده'));
+  assert((await page.locator('#pads').inputValue()).length>0);
+  assert((await page.locator('#packageStatus').textContent()).includes('KiCad'));
   await page.reload();
   assert.equal(await page.locator('#package').inputValue(),'lga');
-  assert.equal(await page.locator('#pads').inputValue(),'');
+  assert((await page.locator('#pads').inputValue()).length>0);
   await page.selectOption('#component','led');assert.equal(await page.locator('#cType').inputValue(),'LEDC');
   console.log('Catalogue filtering, blocked output and persisted package: PASS');
+  await page.selectOption('#smp','lib-sot223');
+  assert(await page.locator('#referenceComment').textContent().then(t=>t.includes('SOT-223-3_TabPin2')&&t.includes('دیتاشیت')));
+  await page.locator('#referenceTable input[data-row="0"][data-key="w"]').fill('1.7');
+  assert((await page.locator('#pads').inputValue()).includes('1.7000'));
+  await page.reload();assert.equal(await page.locator('#referenceTable input[data-row="0"][data-key="w"]').inputValue(),'1.7');
+  await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-ref-sot223.png'});
+  await page.selectOption('#smp','lib-sot89');assert.equal(await page.locator('#svg polygon').count(),1);
+  await page.selectOption('#smp','lib-connector-smd');assert.equal(await page.locator('#mCount').textContent(),'13');
+  await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-ref-usb.png'});
+  console.log('Library references, numeric editing, polygon, slot and persisted geometry: PASS');
+
   // Old 1206 state must survive a reload without becoming blank.
   await page.selectOption('#smp','chip');
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('fp7352'));o.Lmin='5.8';localStorage.setItem('fp7352',JSON.stringify(o))});

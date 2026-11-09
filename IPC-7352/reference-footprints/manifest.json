@@ -1,0 +1,232 @@
+{
+  "chip": {
+    "path": "Resistor_SMD.pretty/R_1206_3216Metric.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/chip.kicad_mod"
+  },
+  "soic": {
+    "path": "Package_SO.pretty/SOIC-8_3.9x4.9mm_P1.27mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/soic.kicad_mod"
+  },
+  "qfp": {
+    "path": "Package_QFP.pretty/LQFP-48_7x7mm_P0.5mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/qfp.kicad_mod"
+  },
+  "bga": {
+    "path": "Package_BGA.pretty/BGA-100_11.0x11.0mm_Layout10x10_P1.0mm_Ball0.5mm_Pad0.4mm_NSMD.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/bga.kicad_mod"
+  },
+  "dip": {
+    "path": "Package_DIP.pretty/DIP-14_W7.62mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/dip.kicad_mod"
+  },
+  "sot23": {
+    "path": "Package_TO_SOT_SMD.pretty/SOT-23.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sot23.kicad_mod"
+  },
+  "qfn": {
+    "path": "Package_DFN_QFN.pretty/QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/qfn.kicad_mod"
+  },
+  "son": {
+    "path": "Package_DFN_QFN.pretty/DFN-10-1EP_3x3mm_P0.5mm_EP1.55x2.48mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/son.kicad_mod"
+  },
+  "soj": {
+    "path": "Package_SO.pretty/SOJ-36_10.16x23.49mm_P1.27mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/soj.kicad_mod"
+  },
+  "plcc": {
+    "path": "Package_LCC.pretty/PLCC-44.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/plcc.kicad_mod"
+  },
+  "melf": {
+    "path": "Diode_SMD.pretty/D_MiniMELF.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/melf.kicad_mod"
+  },
+  "axial": {
+    "path": "Resistor_THT.pretty/R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/axial.kicad_mod"
+  },
+  "radial": {
+    "path": "Capacitor_THT.pretty/CP_Radial_D5.0mm_P2.00mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/radial.kicad_mod"
+  },
+  "array-conc": {
+    "path": "Resistor_SMD.pretty/R_Array_Concave_4x0603.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/array-conc.kicad_mod"
+  },
+  "array-convex": {
+    "path": "Resistor_SMD.pretty/R_Array_Convex_4x0603.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/array-convex.kicad_mod"
+  },
+  "sot223": {
+    "path": "Package_TO_SOT_SMD.pretty/SOT-223-3_TabPin2.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sot223.kicad_mod"
+  },
+  "sot89": {
+    "path": "Package_TO_SOT_SMD.pretty/SOT-89-3.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sot89.kicad_mod"
+  },
+  "sot143": {
+    "path": "Package_TO_SOT_SMD.pretty/SOT-143.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sot143.kicad_mod"
+  },
+  "sod": {
+    "path": "Diode_SMD.pretty/D_SOD-123.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sod.kicad_mod"
+  },
+  "sodfl": {
+    "path": "Diode_SMD.pretty/D_SOD-123F.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sodfl.kicad_mod"
+  },
+  "dpak": {
+    "path": "Package_TO_SOT_SMD.pretty/TO-252-3_TabPin2.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/dpak.kicad_mod"
+  },
+  "to-th": {
+    "path": "Package_TO_SOT_THT.pretty/TO-92_Inline.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/to-th.kicad_mod"
+  },
+  "qfp-rect": {
+    "path": "Package_QFP.pretty/PQFP-100_14x20mm_P0.65mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/qfp-rect.kicad_mod"
+  },
+  "qfn-rect": {
+    "path": "Package_DFN_QFN.pretty/DFN-24-1EP_4x7mm_P0.5mm_EP2.64x6.44mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/qfn-rect.kicad_mod"
+  },
+  "pqfn": {
+    "path": "Package_DFN_QFN.pretty/Infineon_PQFN-22-15-4EP_6x5mm_P0.65mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/pqfn.kicad_mod"
+  },
+  "lga": {
+    "path": "Package_LGA.pretty/Bosch_LGA-14_3x2.5mm_P0.5mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/lga.kicad_mod"
+  },
+  "sip": {
+    "path": "Package_SIP.pretty/SIP-8_19x3mm_P2.54mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/sip.kicad_mod"
+  },
+  "hdr": {
+    "path": "Connector_PinHeader_2.54mm.pretty/PinHeader_1x04_P2.54mm_Vertical.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/hdr.kicad_mod"
+  },
+  "socket": {
+    "path": "Package_LCC.pretty/PLCC-44_THT-Socket.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/socket.kicad_mod"
+  },
+  "connector-smd": {
+    "path": "Connector_USB.pretty/USB_Micro-B_Molex-105017-0001.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/connector-smd.kicad_mod"
+  },
+  "xtal-dfn": {
+    "path": "Crystal.pretty/Crystal_SMD_3225-4Pin_3.2x2.5mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/xtal-dfn.kicad_mod"
+  },
+  "osc-flat": {
+    "path": "Oscillator.pretty/Oscillator_SMD_Abracon_ASE-4Pin_3.2x2.5mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/osc-flat.kicad_mod"
+  },
+  "electrolytic": {
+    "path": "Capacitor_SMD.pretty/C_Elec_6.3x5.4.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/electrolytic.kicad_mod"
+  },
+  "chip-polar": {
+    "path": "Capacitor_Tantalum_SMD.pretty/CP_EIA-3216-18_Kemet-A.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/chip-polar.kicad_mod"
+  },
+  "molded-polar": {
+    "path": "Capacitor_Tantalum_SMD.pretty/CP_EIA-3528-21_Kemet-B.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/molded-polar.kicad_mod"
+  },
+  "flat": {
+    "path": "Diode_SMD.pretty/D_SOD-323F.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/flat.kicad_mod"
+  },
+  "conc": {
+    "path": "Resistor_SMD.pretty/R_Array_Concave_2x0603.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/conc.kicad_mod"
+  },
+  "molded": {
+    "path": "Diode_SMD.pretty/D_SMA.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/molded.kicad_mod"
+  },
+  "dfn-discrete": {
+    "path": "Package_TO_SOT_SMD.pretty/SOT-883.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/dfn-discrete.kicad_mod"
+  },
+  "bga-dual": {
+    "path": "Package_BGA.pretty/BGA-200_10.0x14.5mm_Layout12x22_P0.80x0.65mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/bga-dual.kicad_mod"
+  },
+  "bgas": {
+    "path": "Package_CSP.pretty/WLCSP-12_1.403x1.555mm_P0.4mm_Stagger.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/bgas.kicad_mod"
+  },
+  "npth": {
+    "path": "MountingHole.pretty/MountingHole_2.2mm_M2.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/npth.kicad_mod"
+  },
+  "osc-j": {
+    "path": "Oscillator.pretty/Oscillator_SMD_SeikoEpson_SG8002JA-4Pin_14.0x8.7mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/osc-j.kicad_mod"
+  },
+  "precision-molded": {
+    "path": "Inductor_SMD.pretty/L_Coilcraft_XAL5030.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/precision-molded.kicad_mod"
+  },
+  "custom": {
+    "path": "Button_Switch_THT.pretty/SW_PUSH_6mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/custom.kicad_mod"
+  },
+  "unique": {
+    "path": "Button_Switch_THT.pretty/SW_PUSH_6mm.kicad_mod",
+    "sha": "7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd",
+    "file": "IPC-7352/reference-footprints/unique.kicad_mod"
+  }
+}

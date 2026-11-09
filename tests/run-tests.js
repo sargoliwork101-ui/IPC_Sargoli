@@ -401,7 +401,7 @@ console.log('\n۱۱) گردش واقعی نمونه‌ها، ذخیره و تف�
  d.querySelector('[data-t="t2"]').click();
  ok(d.querySelector('.workspace').dataset.mode==='t2'&&w.getComputedStyle(d.querySelector('.sidebar .group')).display==='none','نام‌گذاری مستقل و بدون تنظیمات فوت‌پرینت است');
  ok(new Set([...d.querySelectorAll('[id]')].map(e=>e.id)).size===d.querySelectorAll('[id]').length,'شناسهٔ تکراری در سند وجود ندارد');
- const presets=[...d.getElementById('smp').options].map(o=>o.value).filter(Boolean);
+ const presets=[...d.getElementById('smp').options].map(o=>o.value).filter(v=>v&&!v.startsWith('lib-'));
  let allTransitions=true,chipCorrect=true;
  for(const from of presets)for(const to of presets){
   sample(from);sample(to);
@@ -455,7 +455,7 @@ console.log('\n۱۴) انتخاب مرحله‌ای و SOT-23-3');
  const change=(id,v)=>{d.getElementById(id).value=v;d.getElementById(id).dispatchEvent(new w.Event('change',{bubbles:true}))};
  change('component','capacitor');
  ok(d.getElementById('fam').value==='chip'&&d.getElementById('cType').value==='CAPC','خازن چیپ روش و پیشوند خودکار دارد');
- ok([...d.getElementById('smp').options].filter(o=>o.value&&!o.hidden).every(o=>o.value.startsWith('chip')),'فقط اندازه‌های مرتبط با پکیج نشان داده می‌شوند');
+ ok([...d.getElementById('smp').options].filter(o=>o.value&&!o.hidden).every(o=>o.value.startsWith('chip')||o.value==='lib-chip'),'فقط اندازه‌های مرتبط با پکیج نشان داده می‌شوند');
  change('component','transistor');
  const csv=d.getElementById('pads').value.trim().split('\n').slice(1).map(row=>row.split(','));
  ok(csv.length===3&&csv.map(p=>p[0]).join(',')==='1,2,3','SOT-23 دقیقاً سه پد شماره‌دار دارد');
@@ -481,10 +481,10 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
   const options=[...d.getElementById('package').options].map(o=>[o.value,o.textContent]);
   for(const [id,label] of options){
    packages.add(id);combos++;change('package',id);
-   if(/هنوز پشتیبانی نمی‌شود|نیازمند اصلاح محاسبه/.test(label)){
+   if(/هنوز پشتیبانی نمی‌شود|نیازمند اصلاح محاسبه/.test(label)&&!label.includes('مرجع واقعی KiCad دارد')){
     blockedSafe=blockedSafe&&!d.getElementById('pads').value&&!d.getElementById('stageEmpty').hidden;
    }
-   if(/ابعاد دیتاشیت لازم/.test(label)&&!d.getElementById('smp').value)configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
+   if(/ابعاد دیتاشیت لازم/.test(label)&&!d.getElementById('smp').value&&!d.getElementById('libraryMode').checked)configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
   }
  }
  ok(packages.size===66&&combos===131,'۶۶ تعریف پکیج و ۱۳۱ ترکیب مرتبط قابل انتخاب است');
@@ -575,7 +575,7 @@ console.log('\n۱۸) مدل بدنهٔ THT');
 {
  const {d,w}=load(TOOL);const valid=()=>!!d.getElementById('pads').value;const name=()=>val(d,'نام پیشنهادی Land Pattern');const ps=()=>padsOf(d);const court=()=>val(d,'Courtyard').match(/[\d.]+/g).map(Number);
  setV(d,'component','resistor');setV(d,'package','axial');
- ok(!d.getElementById('pads').value&&d.getElementById('tW').value==='','محوری بدون دیتاشیت خروجی قبلی نمی‌دهد');
+ ok(d.getElementById('libraryMode').checked&&!!d.getElementById('pads').value,'محوری با مرجع مشخص کتابخانه باز می‌شود');
  setV(d,'tExample','cfr25');
  ok(valid()&&ps().length===2,'نمونه رسمی CFR-25 دو پد دارد');
  ok(Math.abs(ps()[0][4]-1)<1e-9&&Math.abs(ps()[0][3]-1.5)<1e-9,'CFR-25: پایه max 0.60 + 0.40 = سوراخ 1؛ پد 1.5');
@@ -586,7 +586,7 @@ console.log('\n۱۸) مدل بدنهٔ THT');
  setV(d,'tK',3);ok(!d.getElementById('pads').value,'مدل دوپایه تعداد دیگر را رد می‌کند');
  setV(d,'tExample','1n4148');
  ok(valid()&&name()==='DIOAD762W55L340D175B'&&Math.abs(ps()[0][4]-.95)<1e-9,'دیود رسمی با max پایه و نام DIOAD');
- setV(d,'component','capacitor');setV(d,'package','radial');
+ setV(d,'component','capacitor');setV(d,'package','radial');d.getElementById('leaveReference').click();
  setV(d,'tP',5);setV(d,'tW',.65);setV(d,'tBodyL',10.5);setV(d,'tBodyD',10.5);setV(d,'tBodyH',13);setV(d,'tPolar','yes');
  ok(valid()&&name()==='CAPPRD500W65D1050H1300B'&&court()[0]>=10.5&&court()[1]>=10.5,'خازن شعاعی قطبی بدنه و نام و courtyard مستقل دارد');
  for(const [model,prefix] of [['radial-r','CAPRR'],['radial-disc','CAPRB']]){setV(d,'tModel',model);setV(d,'tPolar','no');ok(valid()&&name().startsWith(prefix)&&!!d.querySelector('[data-th-body="'+model+'"]'),'مدل '+model+' رسم و نام دارد')}
@@ -642,8 +642,8 @@ console.log('\n۲۰) مسیر بازشدن پکیج، نمونه و حفظ ور�
   setV(d,'component',component);
   for(const pkg of [...d.getElementById('package').options].map(o=>o.value)){
    setV(d,'package',pkg);
-   if(d.getElementById('previewPackage').hidden||seen.has(pkg))continue;seen.add(pkg);count++;
-   d.getElementById('previewPackage').click();
+   if(!d.getElementById('package').selectedOptions[0].textContent.includes('ابعاد دیتاشیت لازم')||seen.has(pkg))continue;seen.add(pkg);count++;
+   if(!d.getElementById('previewPackage').hidden)d.getElementById('previewPackage').click();
    const valid=!!d.getElementById('pads').value;all=all&&valid;
    ok(valid,'نمونهٔ آموزشی انتخابی '+pkg+' واقعاً نقشه دارد',d.getElementById('warn').textContent);
   }
@@ -717,7 +717,35 @@ console.log('\n۲۳) جستجو و فاصلهٔ افقی مراکز');
  setV(d,'footprintSearch','مقاومت');ok(!!d.querySelector('#footprintSearchResults button'),'جستجوی فارسی در گروه‌های قطعه');
  setV(d,'footprintSearch','not-a-real-footprint-xyz');ok(!d.querySelector('#footprintSearchResults button')&&/پیدا نشد/.test(d.getElementById('footprintSearchResults').textContent),'جستجوی بی‌نتیجه پیام روشن دارد');
  setV(d,'footprintSearch','SOT223');d.querySelector('#footprintSearchResults button').click();
- ok(d.getElementById('package').value==='sot223'&&!d.getElementById('pads').value,'نتیجهٔ پکیج پشتیبانی‌نشده وضعیت واقعی نشان می‌دهد، نه نقشهٔ قبلی');
+ ok(d.getElementById('package').value==='sot223'&&d.getElementById('libraryMode').checked&&!!d.getElementById('pads').value,'نتیجهٔ SOT223 اکنون نمونهٔ مرجع خودش را نشان می‌دهد، نه نقشهٔ قبلی');
+ w.close();
+}
+
+
+console.log('\n۲۴) مرجع‌های واقعی KiCad و پیام مدل');
+{
+ const {d,w}=load(TOOL);const refs=JSON.parse(d.getElementById('referenceFootprintData').textContent);
+ ok(Object.keys(refs).length===46,'۴۶ الگوی واقعی با دادهٔ آفلاین موجود است');
+ for(const [key,ref] of Object.entries(refs)){
+  setV(d,'smp','lib-'+key);
+  const raw=fs.readFileSync(path.join(ROOT,'reference-footprints',key+'.kicad_mod'),'utf8');
+  const first=[...raw.matchAll(/\(pad ("[^"]*"|\S+) (\S+) (\S+) \(at ([^)]*)\)\s*\(size ([^)]*)\)/g)][0];
+  const size=first&&first[5].trim().split(/\s+/).map(Number);const at=first&&first[4].trim().split(/\s+/).map(Number);
+  ok(d.getElementById('libraryMode').checked&&d.getElementById('pads').value.trim().split('\n').length===ref.pads.length+1&&size&&ref.pads[0].w===size[0]&&ref.pads[0].h===size[1]&&ref.pads[0].x===at[0]&&ref.pads[0].y===-at[1],key+': نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی');
+  ok(d.getElementById('referenceComment').textContent.includes(ref.name)&&/دیتاشیت/.test(d.getElementById('referenceComment').textContent)&&d.getElementById('referenceSourceLink').href.includes(ref.sha),key+': مدل و هشدار و منبع نسخه‌دار مشخص است');
+ }
+ setV(d,'smp','lib-sot223');let data=JSON.parse(d.getElementById('referencePads').value);data[0].w+=.1;setV(d,'referencePads',JSON.stringify(data));
+ ok(!!d.getElementById('pads').value&&d.getElementById('pads').value.includes(data[0].w.toFixed(4)),'ابعاد پد نامساوی مرجع قابل ویرایش و صادرات CSV است');
+ const numeric=d.querySelector('#referenceTable input[data-row="0"][data-key="w"]');numeric.value='1.75';numeric.dispatchEvent(new w.Event('input',{bubbles:true}));
+ ok(JSON.parse(d.getElementById('referencePads').value)[0].w===1.75&&d.getElementById('pads').value.includes('1.7500'),'ویرایش عددی ساده بدون نیاز به دستکاری JSON کار می‌کند');
+ const body=JSON.parse(d.getElementById('referenceBody').value);body.lines.push([-20,0,20,0]);setV(d,'referenceBody',JSON.stringify(body));
+ ok(!!d.getElementById('pads').value&&d.getElementById('res').textContent.includes('40.50'),'ابعاد بدنه نیز قابل اصلاح و در کادر لحاظ می‌شوند');
+
+ d.getElementById('mkA').click();ok(/پشتیبانی نمی‌شود/.test(d.getElementById('alt').value),'مرجع چندجزئی به خروجی Altium ساده‌شده و ناقص تبدیل نمی‌شود');
+ setV(d,'referencePads','{bad json');ok(!d.getElementById('pads').value&&!d.getElementById('stageEmpty').hidden,'ویرایش نامعتبر، نقشه و خروجی کهنه نمی‌گذارد');
+ setV(d,'smp','lib-sot89');ok(!!d.querySelector('#svg polygon'),'پلیگون واقعی SOT-89 حفظ می‌شود');
+ setV(d,'smp','lib-connector-smd');ok(d.getElementById('pads').value.includes('slot')===false&&d.getElementById('pads').value.includes('SlotLocalX')&&JSON.parse(d.getElementById('referencePads').value).some(p=>p.holeType==='slot'),'شیارهای USB در داده و CSV با ابعاد محلی صریح حفظ می‌شوند');
+ setV(d,'smp','soic');ok(!d.getElementById('libraryMode').checked&&!!d.getElementById('pads').value,'بازگشت به محاسبهٔ عادی پس از مرجع مستقل است');
  w.close();
 }
 
