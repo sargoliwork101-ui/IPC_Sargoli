@@ -1900,13 +1900,23 @@ function renderReference(){
  }else{$('referenceSourceLink').hidden=false;$('referenceDownload').hidden=false}
  $('man').checked=false;filterParams();
  var pads,body;try{body=JSON.parse($('referenceBody').value||JSON.stringify({lines:ref.lines,circles:ref.circles}));if(!body||!Array.isArray(body.lines)||!Array.isArray(body.circles)||body.lines.length>1000||body.circles.length>1000||!body.lines.every(function(l){return Array.isArray(l)&&l.length===4&&l.every(Number.isFinite)})||!body.circles.every(function(c){return Array.isArray(c)&&c.length===3&&c.every(Number.isFinite)&&c[2]>0}))throw Error('خطوط و دایره‌های بدنه معتبر نیستند');pads=JSON.parse($('referencePads').value);if(!Array.isArray(pads)||!pads.length||pads.length>2000)throw Error('فهرست ۱ تا ۲۰۰۰ پد لازم است');
- pads.forEach(function(p){if(!p||!['x','y','w','h','rotation','hole'].every(function(k){return typeof p[k]==='number'&&Number.isFinite(p[k])})||!(p.w>0&&p.h>0&&p.hole>=0)||!['r','rr','c','o','poly'].includes(p.sh))throw Error('مرکز، ابعاد، زاویه و شکل پد معتبر نیست');if(!/^[A-Za-z0-9_.-]*$/.test(String(p.n)))throw Error('شماره پد فقط حروف، اعداد، نقطه و خط تیره');if(p.hole&&p.holeType!=='slot'&&p.hole>Math.min(p.w,p.h))throw Error('سوراخ از پد بزرگ‌تر است');if(p.sh==='c'&&Math.abs(p.w-p.h)>1e-8)throw Error('پد دایره‌ای طول و عرض یکسان می‌خواهد');if(p.sh==='rr'&&!(Number.isFinite(p.radius)&&p.radius>=0&&p.radius<=Math.min(p.w,p.h)/2))throw Error('شعاع گوشه معتبر نیست');if(p.sh==='poly'&&(!Array.isArray(p.polygon)||p.polygon.length<3||!p.polygon.every(function(v){return Array.isArray(v)&&v.length===2&&v.every(Number.isFinite)})))throw Error('رأس‌های پلیگون معتبر نیستند');if(p.holeType==='slot'&&!(p.holeL>0&&p.holeW>0&&Number.isFinite(p.holeL)&&Number.isFinite(p.holeW)&&p.holeL<=p.w&&p.holeW<=p.h))throw Error('ابعاد شیار محلی باید مثبت و در پد باشند')});
+ pads.forEach(function(p){if(!p||!['x','y','w','h','rotation','hole'].every(function(k){return typeof p[k]==='number'&&Number.isFinite(p[k])})||!(p.w>0&&p.h>0&&p.hole>=0)||!['r','rr','c','o','poly'].includes(p.sh))throw Error('مرکز، ابعاد، زاویه و شکل پد معتبر نیست');if(!['string','number'].includes(typeof p.n)||typeof p.n==='number'&&!Number.isFinite(p.n))throw Error('شناسهٔ پد باید متن یا عدد معتبر باشد');if(typeof p.pl!=='boolean')throw Error('وضعیت آبکاری باید true یا false باشد');if(p.holeType!=null&&!['round','slot'].includes(p.holeType))throw Error('نوع سوراخ فقط round یا slot است');if(!/^[A-Za-z0-9_.-]*$/.test(String(p.n)))throw Error('شماره پد فقط حروف، اعداد، نقطه و خط تیره');if(p.hole&&p.holeType!=='slot'&&p.hole>Math.min(p.w,p.h))throw Error('سوراخ از پد بزرگ‌تر است');if(p.sh==='c'&&Math.abs(p.w-p.h)>1e-8)throw Error('پد دایره‌ای طول و عرض یکسان می‌خواهد');if(p.sh==='rr'&&!(Number.isFinite(p.radius)&&p.radius>=0&&p.radius<=Math.min(p.w,p.h)/2))throw Error('شعاع گوشه معتبر نیست');if(p.sh==='poly'&&(!Array.isArray(p.polygon)||p.polygon.length<3||p.polygon.length>2000||!p.polygon.every(function(v){return Array.isArray(v)&&v.length===2&&v.every(Number.isFinite)})))throw Error('رأس‌های پلیگون معتبر نیستند');if(p.sh==='poly'){var twiceArea=p.polygon.reduce(function(sum,v,i){var next=p.polygon[(i+1)%p.polygon.length];return sum+v[0]*next[1]-next[0]*v[1]},0);if(Math.abs(twiceArea)<1e-12)throw Error('پلیگون باید سطح غیرصفر داشته باشد');}if(p.holeType==='slot'&&!(p.holeL>0&&p.holeW>0&&Number.isFinite(p.holeL)&&Number.isFinite(p.holeW)&&p.holeL<=p.w&&p.holeW<=p.h&&p.hole>0&&Math.abs(p.hole-Math.min(p.holeL,p.holeW))<1e-8))throw Error('ابعاد شیار محلی باید مثبت و در پد باشند')});
  }catch(e){clearOut('ویرایش مرجع: '+e.message);$('warn').textContent='ویرایش مرجع: '+e.message;return}
  if(!$('referenceTable').contains(document.activeElement))buildReferenceTable(pads);
  var xmin=Infinity,xmax=-Infinity,ymin=Infinity,ymax=-Infinity;
  function bounds(x,y){xmin=Math.min(xmin,x);xmax=Math.max(xmax,x);ymin=Math.min(ymin,y);ymax=Math.max(ymax,y)}
  function point(p,x,y){var a=(p.rotation%360)*Math.PI/180;return [p.x+x*Math.cos(a)-y*Math.sin(a),p.y+x*Math.sin(a)+y*Math.cos(a)]}
- pads.forEach(function(p){[[p.w/2,p.h/2],[-p.w/2,p.h/2],[p.w/2,-p.h/2],[-p.w/2,-p.h/2]].concat(p.polygon||[]).forEach(function(v){var q=point(p,v[0],v[1]);bounds(q[0],q[1])})});
+ var requestedShape=$('pShape').value;
+ pads.forEach(function(p){
+  var shape=!p.hole&&p.sh!=='c'&&p.sh!=='poly'&&requestedShape!=='auto'?requestedShape:p.sh;
+  if(shape==='c'){bounds(p.x-p.w/2,p.y-p.h/2);bounds(p.x+p.w/2,p.y+p.h/2);return}
+  if(shape==='o'||shape==='rr'){
+   var radius=shape==='o'?Math.min(p.w,p.h)/2:p.radius,a=p.rotation*Math.PI/180,co=Math.abs(Math.cos(a)),si=Math.abs(Math.sin(a));
+   var dx=(p.w/2-radius)*co+(p.h/2-radius)*si+radius,dy=(p.w/2-radius)*si+(p.h/2-radius)*co+radius;
+   bounds(p.x-dx,p.y-dy);bounds(p.x+dx,p.y+dy);return;
+  }
+  [[p.w/2,p.h/2],[-p.w/2,p.h/2],[p.w/2,-p.h/2],[-p.w/2,-p.h/2]].concat(p.polygon||[]).forEach(function(v){var q=point(p,v[0],v[1]);bounds(q[0],q[1])});
+ });
  body.lines.forEach(function(l){bounds(l[0],l[1]);bounds(l[2],l[3])});body.circles.forEach(function(c){bounds(c[0]-c[2],c[1]-c[2]);bounds(c[0]+c[2],c[1]+c[2])});
  var cw=xmax-xmin+.5,ch=ymax-ymin+.5,sc=Math.min(330/(cw/2),150/(ch/2)),K=kit(sc);K.frame(cw/2*sc,ch/2*sc);
  K.rect(xmin-.25,ymin-.25,cw,ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'6 4'});
@@ -1914,6 +1924,7 @@ function renderReference(){
  body.circles.forEach(function(c){K.circle(K.PX(c[0]),K.PY(c[1]),c[2]*sc,{fill:'none',stroke:'#56c7b5'})});
  var shape=$('pShape').value;$('padShapeControl').hidden=!pads.some(function(p){return !p.hole});$('pShape').disabled=$('padShapeControl').hidden;
  MP=pads.map(function(original){var p=Object.assign({},original);if(!p.hole&&p.sh!=='c'&&p.sh!=='poly'&&shape!=='auto')p.sh=shape;
+ if(p.sh==='o')p.radius=Math.min(p.w,p.h)/2;else if(p.sh!=='rr')delete p.radius;
  var attrs={stroke:'#8a6d0b',transform:'rotate('+(-p.rotation)+' '+K.PX(p.x)+' '+K.PY(p.y)+')'};
  if(p.sh==='rr')attrs.rx=p.radius*sc;if(p.sh==='o')attrs.rx=Math.min(p.w,p.h)/2*sc;
  var node=p.sh==='c'?K.circle(K.PX(p.x),K.PY(p.y),p.w/2*sc,{fill:'#d4a017','fill-opacity':.65,stroke:'#8a6d0b'}):K.rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,'#d4a017',.65,attrs);
@@ -2313,6 +2324,8 @@ function ps(){var sh=$('pS').value,v1=+$('p1').value,v2=+$('p2').value,vh=+$('pH
  else if(!(v1>0))err='اندازهٔ ۱ باید مثبت باشد.';
  else if('rbd'.indexOf(sh)>-1&&sh!=='s'&&!(v2>0))err='شکل «'+sh+'» به اندازهٔ دوم (ضلع دوم) نیاز دارد؛ با صفر نام کامل نمی‌شود.';
  else if((sh==='c'||sh==='s')&&v2>0)err='برای دایره/مربع اندازهٔ دوم مجاز نیست.';
+ if(!err&&sh==='v'&&!(vh>0))err='via به قطر سوراخ مثبت نیاز دارد.';
+ if(!err&&vh>0){var padHeight=v2>0?v2:v1;if(vh2>0?(vh>v1||vh2>padHeight):vh>Math.min(v1,padHeight))err='ابعاد سوراخ از ابعاد پد بزرگ‌تر است.';}
  if(err){$('pOut').textContent='نامعتبر: '+err;$('pOut').dataset.err='1';return ''}
  $('pOut').dataset.err='';
  var o=sh+q(v1);if(v2>0)o+='_'+q(v2);
