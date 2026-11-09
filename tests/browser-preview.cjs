@@ -10,7 +10,7 @@ const engine = chromiumPackage.default || chromiumPackage;
   const page = await browser.newPage({viewport:{width:1440,height:1000}});
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://localhost:8080/tool.html');
-  for (const sample of ['soic','chip','bga100','dip']) {
+  for (const sample of ['soic','chip','bga100','dip','sot23']) {
    await page.selectOption('#smp',sample);
    const result=await page.evaluate(()=>{
     const svg=document.querySelector('#svg'),r=svg.getBoundingClientRect();
@@ -20,6 +20,7 @@ const engine = chromiumPackage.default || chromiumPackage;
    await page.screenshot({path:'/tmp/ipc-'+sample+'.png'});
    console.log(sample,'visible:',result.count,'pads');
   }
+  await page.locator('#advancedGeometry').evaluate(e=>e.open=true);
   await page.selectOption('#smp','chip');
   assert.equal(await page.locator('#fam').inputValue(),'chip');
   await page.selectOption('#fam','gull');
@@ -29,6 +30,18 @@ const engine = chromiumPackage.default || chromiumPackage;
   await page.locator('#Lmax').fill('6.3');
   assert.equal(await page.locator('#smp').inputValue(),'');
   console.log('Preset/family relationship and custom editing: PASS');
+  await page.selectOption('#component','capacitor');
+  assert.equal(await page.locator('#fam').inputValue(),'chip');
+  assert.equal(await page.locator('#cType').inputValue(),'CAPC');
+  await page.selectOption('#smp','chip0603');
+  assert.equal(await page.locator('#mCount').textContent(),'2');
+  await page.selectOption('#component','transistor');
+  assert.equal(await page.locator('#smp').inputValue(),'sot23');
+  assert.equal(await page.locator('#mCount').textContent(),'3');
+  assert((await page.locator('#insName').textContent()).startsWith('SOT'));
+  await page.locator('#mkA').evaluate(e=>e.click());
+  const alt=await page.locator('#alt').inputValue();assert(alt.includes('3'));
+  console.log('Cascading selection and SOT-23: PASS');
   // Old 1206 state must survive a reload without becoming blank.
   await page.selectOption('#smp','chip');
   await page.evaluate(()=>{const o=JSON.parse(localStorage.getItem('fp7352'));o.Lmin='5.8';localStorage.setItem('fp7352',JSON.stringify(o))});

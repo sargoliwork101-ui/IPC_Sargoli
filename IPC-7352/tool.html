@@ -246,10 +246,13 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
   <div class="group">
     <div class="section-title">تنظیمات قطعه</div>
     <div class="grid">
-<div><label>نوع قطعه</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
+<div><label>روش نصب / مدل هندسی (پیشرفته)</label><select id="kind"><option value="smd">SMD (چیپ، IC، QFP، QFN، ...)</option><option value="bga">BGA</option><option value="th">سوراخ‌دار (DIP، ردیفی)</option></select></div>
 <div><label>واحد نمایش و ورودی</label><select id="unit"><option value="mm">mm</option><option value="mil">mil</option><option value="in">inch</option></select></div>
 <div><label data-v="lv" class="kv">چگالی (A/B/C)</label><select id="lv"><option>A</option><option selected>B</option><option>C</option></select></div>
-<div><label>نمونهٔ آماده<small>انتخاب نمونه، نوع، خانواده و ابعاد را تنظیم می‌کند؛ ویرایش دستی = سفارشی</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48 (چهارطرفه)</option><option value="chip">چیپ 1206</option><option value="dip">DIP-14</option></select></div>
+<div><label>۱. نوع قطعه</label><select id="component"><option value="resistor">مقاومت</option><option value="capacitor">خازن</option><option value="inductor">سلف</option><option value="transistor">ترانزیستور</option><option value="ic" selected>آی‌سی</option><option value="custom">طراحی سفارشی / سایر قطعات</option></select></div>
+<div><label>۲. نوع پکیج</label><select id="package"></select></div>
+<div class="note wide" id="methodReadout" aria-live="polite"></div>
+<div><label>۳. اندازه / نمونهٔ آماده<small>ابعاد نمونه‌ها نقطهٔ شروع‌اند؛ دیتاشیت سازنده مرجع نهایی است.</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48</option><option value="chip">1206 اینچی / 3216 متریک</option><option value="chip0805">0805 اینچی / 2012 متریک</option><option value="chip0603">0603 اینچی / 1608 متریک</option><option value="sot23">SOT-23-3 · نمونهٔ هندسی</option><option value="dip">DIP-14</option></select></div>
     </div>
   </div>
   <div class="group">
@@ -440,6 +443,7 @@ function fld(id){return rd(id)}                        // خواندن فیلد 
 var FIELDS={smd:[['Lmin','Lmin','E/HE حداقل',5.8,1],['Lmax','Lmax','E/HE حداکثر',6.2,1],['Tmin','Tmin','L (Foot) حداقل',0.4,1],['Tmax','Tmax','L (Foot) حداکثر',1.27,1],['Smax','Smax','فقط اگر تیک S خاموش',4.98,1],['W','W','b (عرض پایه)',0.51,1],['H','H','A (ارتفاع)',1.75,1],['Hl','Hl','فقط QFN',0.2,1],['P','P','e (گام)',1.27,1],['Amax','A','A: عرض بدنه (فقط gull-wing؛ 0 = نادیده)',0,1],['Th','Th','پد حرارتی QFN: بُعد مربع (0 = ندارد)',0,1],
  ['Th2','Th','پد حرارتی مستطیلی: بُعد دوم (0 = مربع)',0,1],
  ['BW','Wmax','عرض بدنه (برای Courtyard و نام QFN/چیپ؛ 0 = نامعلوم)',0,1],
+ ['bodyLength','طول بدنه','طول بدنه برای Courtyard (0 = برآورد از پایه‌ها)',0,1],
 
  ['n','n','پایه در هر طرف',8,0]],
 bga:[['bB','Ball','قطر توپ',0.5,1],['bP','گام مشترک','گام پیش‌فرض هر دو محور',0.8,1],['bPX','گام X (اختیاری)','0 = استفاده از گام مشترک',0,1],['bPY','گام Y (اختیاری)','0 = استفاده از گام مشترک',0,1],['bC','Cols','ستون',10,0],['bR','Cols','ردیف',10,0],['bL','BL','طول بدنه',9,1],['bW','BL','عرض بدنه',9,1],['bH','H','ارتفاع',1.5,1],['bSkip','Cols','توپ‌های حذف‌شده (مثل A1,B2 — از نقشهٔ دیتاشیت)',0,0]],
@@ -448,7 +452,7 @@ var FAM=[['gull','SOIC / SOP / TSSOP / QFP · Gull-wing (3-1)'],['chip','چیپ 
 function build(){
 var h='<div><label>خانوادهٔ محاسباتی<small>شکل پایه و قواعد محاسبه؛ نه نام یک قطعهٔ مشخص</small></label><select id="fam">'+FAM.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div><div><label>تعداد طرف</label><select id="sides"><option value="2">2 طرف</option><option value="4">4 طرف (مربعی)</option></select></div>'+
 '<div id="cTypeWrap"><label class="kv" data-v="cType">پیشوند نام (چیپ / QFN)</label><select id="cType"><option value="RESC">RESC مقاومت</option><option value="CAPC">CAPC خازن</option><option value="INDC">INDC سلف</option><option value="DIOC">DIOC دیود</option><option value="QFN">QFN</option><option value="SON">SON</option><option value="DFN">DFN</option><option value="">— بدون نام —</option></select></div>'+
-'<div><label>S از L و T</label><input type="checkbox" id="autoS" checked> با RMS</div>';
+'<div><label>آرایش پایه‌ها</label><select id="layout"><option value="symmetric">متقارن</option><option value="sot23">SOT-23-3: دو چپ، یک راست (نمای بالا)</option></select></div><div><label>S از L و T</label><input type="checkbox" id="autoS" checked> با RMS</div>';
 FIELDS.smd.forEach(function(a){h+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});$('bsmd').innerHTML=h;
 ['bga','th'].forEach(function(k){var s='';FIELDS[k].forEach(function(a){s+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});
 if(k==='bga')s+='<div><label>نوع توپ</label><select id="bT"><option value="C">C: فروپاشنده</option><option value="N">N: بدون فروپاشی</option></select></div>';
@@ -723,11 +727,15 @@ r=[ov('pZJ',r[0],1),ov('pGJ',r[1],1),ov('pSJ',r[2],1),ov('pCE',r[3],1)];
 // ---------- Z، G، X (گردکردن جدول 3-1) ----------
 var d3=Pt<0.4?3:2,Z=+(Lm+2*r[0]).toFixed(d3),G=+Math.max(S-2*r[1],0).toFixed(d3),X=+(W+2*r[2]).toFixed(d3),
  pl=(Z-G)/2,ce=(Z+G)/4,pads=[],no=1;
+if($('layout').value==='sot23'){
+ pads=[{n:1,x:-ce,y:Pt/2,w:pl,h:X},{n:2,x:-ce,y:-Pt/2,w:pl,h:X},{n:3,x:ce,y:0,w:pl,h:X}];
+}else{
 for(k=0;k<n;k++){y=((n-1)/2-k)*Pt;pads.push({n:no++,x:-ce,y:y,w:pl,h:X});}
 for(k=0;k<n;k++){y=(-(n-1)/2+k)*Pt;pads.push({n:no++,x:ce,y:y,w:pl,h:X});}
 if(sd===4){
   for(k=0;k<n;k++){y=(-(n-1)/2+k)*Pt;pads.push({n:no++,x:y,y:-ce,w:X,h:pl});}
   for(k=0;k<n;k++){y=((n-1)/2-k)*Pt;pads.push({n:no++,x:y,y:ce,w:X,h:pl});}
+}
 }
 // ---------- پد حرارتی (ایراد ۶) ----------
 var hasTh=(F==='qfn'&&th>0);
@@ -735,7 +743,7 @@ if(hasTh){if(!(th2>0))th2=th;pads.push({n:no++,x:0,y:0,w:th,h:th2,th:1});}
 // ---------- Courtyard = بزرگ‌ترین حدود بدنه و همهٔ پدها + excess ----------
 var exX=0,exY=0;
 pads.forEach(function(p){exX=Math.max(exX,Math.abs(p.x)+p.w/2);exY=Math.max(exY,Math.abs(p.y)+p.h/2)});
-var bodyX=bw>0?bw/2:0,bodyY=bw>0?bw/2:0;
+var bodyX=bw>0?bw/2:0,bodyY=rd('bodyLength')>0?rd('bodyLength')/2:(bw>0?bw/2:0);
 var cx=Math.max(exX,bodyX)+r[3],cv=Math.max(exY,bodyY)+r[3],cw=RC(2*cx),ch=RC(2*cv);
 if(rd('pCR')>0&&(cw<2*cx-1e-9||ch<2*cv-1e-9))WG+='Courtyard به مضرب '+fmo(rd('pCR'))+' '+U+' گرد شد. ';
 // ---------- کمینه فاصلهٔ خالی واقعی بین همهٔ پدها (ایراد ۳۴) ----------
@@ -753,9 +761,10 @@ K.rect(-cw/2,-ch/2,cw,ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'6 4','st
 // بدنهٔ قطعه (بدنه/سیلک): از ابعاد واقعی مشتق می‌شود تا با پدها و Courtyard بخواند
 var padInner=Math.abs(pads[0].x)-pads[0].w/2;              // لبهٔ داخلی پدها (mm)
 var bodyW2=bw>0?bw:Math.max(Ln>0?(Ln-2*(Tn||0)):Lm-2*(Tx||0),.4);   // عرض بدنه = lead span − ۲×طول پایه
-if(sd===2)bodyW2=Math.min(bodyW2,Math.max(padInner-.05,.4));         // بدنه هرگز روی پد نیفتد
+if(sd===2&&!(bw>0))bodyW2=Math.min(bodyW2,Math.max(padInner-.05,.4));         // بدنه هرگز روی پد نیفتد
 var bodyH2=(F==='chip')?Math.max(bw>0?bw:rd('W'),.3)                 // چیپ: بدنه = عرض قطعه
           :(sd===4?bodyW2:Math.max((n-1)*Pt+.6,.4));                  // دوطرفه: طول بدنه از گام
+if(rd('bodyLength')>0)bodyH2=rd('bodyLength');
 if(F==='chip')bodyW2=Math.max(rd('W'),.3);
 K.rect(-bodyW2/2,-bodyH2/2,bodyW2,bodyH2,'#8e9aa3',.5,{stroke:'#6b7883','stroke-width':.9});
 var shp=SHP(F);
@@ -789,8 +798,8 @@ K.circle(K.PX(-Z/2-.25),K.PY((n-1)*Pt/2),4,{fill:'#000'});
 // ---------- نام (جدول 3-16) ----------
 var sf=lv==='A'?'M':lv==='B'?'N':'L',pin=pads.length,asym='',nm='',T=function(v){return Math.round(v*100)},
  lead=(Ln>0?(Ln+Lm)/2:Lm),cT=$('cType').value,
- pr={gull:sd===4?'QFP':'SOP',jlead:sd===4?'PLCC':'SOJ'}[F];
-if(sd===2&&n%2===1)asym='تعداد پد دو طرف فرد شد؛ تعداد و مکان واقعی پایه‌ها را با دیتاشیت تطبیق بده. ';
+ pr=$('layout').value==='sot23'?'SOT':{gull:sd===4?'QFP':'SOP',jlead:sd===4?'PLCC':'SOJ'}[F];
+if(F!=='chip'&&$('layout').value!=='sot23'&&sd===2&&n%2===1)asym='تعداد پد دو طرف فرد شد؛ تعداد و مکان واقعی پایه‌ها را با دیتاشیت تطبیق بده. ';
 if(F==='chip'&&cT)nm=cT+('0'+Math.round(Lm*10)).slice(-2)+('0'+Math.round((bw>0?bw:W)*10)).slice(-2)+'X'+T(H)+sf;
 else if(F==='qfn'&&cT){
   var bodyL=bw>0?bw:Lm,bodyW=bw>0?bw:Lm;
@@ -810,6 +819,7 @@ if(hasTh){ // فاصلهٔ پد حرارتی تا پدهای کناری در م�
 }
 if(F==='gull'&&!(rd('Amax')>0))wr+='عرض بدنه (A) وارد نشده؛ استثنای پاشنهٔ gull-wing (یادداشت ۳ جدول 3-1) ارزیابی نشد و نتیجه با مقادیر عمومی Heel ساخته شده است. ';
 if($('pShape').value==='auto'&&F!=='chip')wr+='شکل پد خودکار انتخاب شده؛ در حالت کوتاه‌شدن پاشنه (فاصلهٔ نشستن کمتر از ضخامت استنسیل) یا تداخل پد حرارتی، بند 3.2 پد مستطیلی را ترجیح می‌دهد — شکل را آگاهانه انتخاب کن. ';
+if($('layout').value==='sot23')wr+='SOT-23-3: نمونهٔ هندسی با پایهٔ Gull-wing؛ ابعاد، جهت نمای بالا و شماره‌گذاری ۱/۲ چپ و ۳ راست را با دیتاشیت سازنده تطبیق بده. این نمونه برای SOT-23-5 یا پایهٔ تخت نیست. ';
 wr+=asym;
 // ---------- خروجی ----------
 var srcT='جدول '+r[4]+'، سطح '+lv+(src.length?' — '+src.join('، '):'')+(F==='melf'?' — توجه: در MELF قطر بدنه به‌جای W در فرمول کناره استفاده شده است؛ محور اندازه‌گیری J از رأس گرد باید با دیتاشیت تأیید شود.':'');
@@ -1010,6 +1020,7 @@ function validateFootprint(k){
  var counts={n:100,bC:100,bR:100,tK:200};
  Object.keys(counts).forEach(function(id){if(inputs.indexOf($(id))>=0){var v=+$(id).value;if(!Number.isInteger(v)||v<1||v>counts[id])error(id,'عدد صحیح بین ۱ و '+counts[id]+' لازم است.')}});
  if(k==='smd'){
+  if($('layout').value==='sot23'&&($('fam').value!=='gull'||$('sides').value!=='2'||+$('n').value!==2))error('layout','آرایش SOT-23-3 فقط با Gull-wing، دو طرف و دو موقعیت در طرف چپ پشتیبانی می‌شود.');
   if(rd('Lmin')>rd('Lmax'))error('Lmin','طول حداقل نباید از طول حداکثر بیشتر باشد.');
   if(rd('Tmin')>rd('Tmax'))error('Tmin','طول حداقل پایه نباید از طول حداکثر آن بیشتر باشد.');
   if(!$('autoS').checked&&(!(rd('Smax')>0)||rd('Smax')>=rd('Lmax')))error('Smax','فاصلهٔ داخلی باید مثبت و کوچک‌تر از طول کل Lmax باشد.');
@@ -1031,7 +1042,7 @@ var k=$('kind').value;
 if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
 ['smd','bga','th'].forEach(function(a){$('b'+a).classList.toggle('on',a===k)});
 $('warn').textContent='';WG='';
-filterParams();
+filterParams();updateMethod();
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
 var issues=validateFootprint(k);if(issues.length){var message=issues.map(function(e){return e.id+': '+e.msg}).join(' • ');clearOut(message);$('warn').textContent=message;why(k);save();return}
 try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){clearOut('خطای رسم: '+e.message);$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
@@ -1059,11 +1070,14 @@ $('unit').onchange=function(){var nu=$('unit').value;
    var mm=(+raw)*PX[UOLD];
    e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
  UOLD=nu;U=nu;run()};
-document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3')){if(e.closest('#bsmd,#bbga,#bth')||e.id==='kind')$('smp').value='';run()}})});
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3')&&['component','package'].indexOf(e.id)<0){if(e.closest('#bsmd,#bbga,#bth,#advancedGeometry')||e.id==='kind')$('smp').value='';if(['kind','fam','sides','layout'].indexOf(e.id)>=0){$('component').value='custom';refreshPackages('custom')}run()}})});
 var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',cType:'RESC',autoS:0,Lmin:3.0,Lmax:3.4,Tmin:0,Tmax:0,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
 SM.soic8=Object.assign({},SM.soic,{n:4});
 SM.soic14=Object.assign({},SM.soic,{n:7});
 SM.tssop=Object.assign({},SM.soic,{Lmin:6.2,Lmax:6.6,Tmin:.45,Tmax:.75,W:.30,H:1.2,P:.65,n:8});
+SM.chip0805=Object.assign({},SM.chip,{Lmin:1.8,Lmax:2.2,Smax:1.0,W:1.45,H:.6});
+SM.chip0603=Object.assign({},SM.chip,{Lmin:1.45,Lmax:1.75,Smax:.75,W:.95,H:.5});
+SM.sot23={kind:'smd',fam:'gull',layout:'sot23',sides:'2',n:2,autoS:1,Lmin:2.1,Lmax:2.5,Tmin:.3,Tmax:.5,W:.48,H:1.1,P:1.9,BW:1.4,bodyLength:3.04};
 SM.bga100={kind:'bga',bB:.5,bP:.8,bPX:0,bPY:0,bC:10,bR:10,bL:9,bW:9,bH:1.5,bT:'C'};
 $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  showTab('t1');
@@ -1072,11 +1086,44 @@ $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  U='mm';UOLD='mm';$('unit').value='mm';
  // نمونه فقط خانوادهٔ خودش را بازنشانی می‌کند؛ سایر خانواده‌ها دست‌نخورده می‌مانند.
  FIELDS[s.kind].forEach(function(a){var e=$(a[0]);if(e)e.value=a[3]});
- if(s.kind==='smd'){$('cType').value=s.fam==='chip'?'RESC':s.fam==='qfn'?'QFN':''}
+ if(s.kind==='smd'){$('layout').value='symmetric';$('cType').value=s.fam==='chip'?'RESC':s.fam==='qfn'?'QFN':''}
  window.CAM=null;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
+ syncHierarchyFromSample($('smp').value);
+ if($('fam').value==='chip')$('cType').value={resistor:'RESC',capacitor:'CAPC',inductor:'INDC'}[$('component').value]||'RESC';
  run()};
+var PACKAGE_MAP={resistor:[['chip','چیپ SMD']],capacitor:[['chip','چیپ SMD غیرقطبی']],inductor:[['chip','چیپ SMD']],transistor:[['sot23','SOT-23-3 · Gull-wing']],ic:[['soic','SOIC / SOP'],['tssop','TSSOP'],['qfp','QFP مربعی'],['bga','BGA'],['dip','DIP']],custom:[['custom','پکیج سفارشی / تنظیمات پیشرفته']]};
+function presetPackage(id){return /^chip/.test(id)?'chip':/^soic/.test(id)?'soic':id==='bga100'?'bga':id}
+function refreshPackages(selected){
+ $('package').innerHTML=PACKAGE_MAP[$('component').value].map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('');
+ if(selected)$('package').value=selected;
+ filterSamples();
+}
+function filterSamples(){var pk=$('package').value;
+ Array.from($('smp').options).forEach(function(o){o.hidden=!!o.value&&presetPackage(o.value)!==pk});
+}
+function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp=$('component').value;
+ if(pk==='chip'){if(['resistor','capacitor','inductor'].indexOf(comp)<0)comp='resistor'}
+ else comp=pk==='sot23'?'transistor':'ic';
+ $('component').value=comp;refreshPackages(pk);
+}
+function choosePackage(){filterSamples();var first=Array.from($('smp').options).find(function(o){return o.value&&!o.hidden});
+ if(first){$('smp').value=first.value;$('smp').onchange()}
+ else{$('smp').value='';$('advancedGeometry').open=true;run()}
+}
+$('component').onchange=function(){refreshPackages();choosePackage()};
+$('package').onchange=choosePackage;
+// خانواده و مدل هندسی برای کار عادی خودکارند؛ دسترسی دستی برای کاربر حرفه‌ای حفظ می‌شود.
+var advanced=document.createElement('details');advanced.id='advancedGeometry';advanced.className='box';
+advanced.innerHTML='<summary>تنظیمات پیشرفتهٔ هندسه و خانواده</summary><p class="note">تغییر این گزینه‌ها طراحی را سفارشی می‌کند. بسته‌های خارج از فهرست نمونهٔ تأییدشده ندارند.</p><div class="grid"></div>';
+$('bsmd').parentNode.appendChild(advanced);
+['kind','fam','sides','layout','cType'].forEach(function(id){advanced.querySelector('.grid').appendChild($(id).parentNode)});
+refreshPackages('soic');
+function updateMethod(){var k=$('kind').value;
+ $('methodReadout').textContent='روش محاسبه: '+(k==='smd'?$('fam').selectedOptions[0].textContent:k==='bga'?'BGA · جدول 3-11':'سوراخ‌دار · بخش 4')+($('smp').value?'':' · ابعاد سفارشی');
+ ['fam','sides','layout','cType'].forEach(function(id){$(id).parentNode.hidden=k!=='smd'});
+}
 $('restoreDrawing').onclick=function(){$('man').checked=false;$('smp').value='soic';$('smp').onchange()};
 document.addEventListener('change',function(e){
  if(e.target&&e.target.id==='fam'){var f=e.target.value,c=$('cType');if(!c)return;
@@ -1394,6 +1441,7 @@ $("alt").value=o.join("\r\n")}
 $("mkA").onclick=altium;
 $("cpA").onclick=function(){var x=$("alt");altium();try{navigator.clipboard.writeText(x.value).then(function(){$("cpAm").textContent=" کپی شد"},function(){x.select();document.execCommand("copy");$("cpAm").textContent=" کپی شد"})}catch(e){x.select();try{document.execCommand("copy");$("cpAm").textContent=" کپی شد"}catch(z){}}};
 load();
+if($('smp').value)syncHierarchyFromSample($('smp').value);
 // اجرای اول: اگر کاربر قبلاً چیزی ذخیره نکرده، نمونهٔ SOIC-16 بارگذاری می‌شود تا استودیو خالی نباشد
 try{if(!localStorage.getItem('fp7352')){var _s=$('smp');_s.value='soic';_s.onchange&&_s.onchange()}}catch(e){}
 $('kind').dispatchEvent(new Event('input'));run();nm();ps();dec();rt();

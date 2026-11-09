@@ -449,6 +449,26 @@ console.log('\n۱۳) قیدهای ورودی و پیام کنار خانه');
  w.close();
 }
 
+console.log('\n۱۴) انتخاب مرحله‌ای و SOT-23-3');
+{
+ const {d,w}=load(TOOL);
+ const change=(id,v)=>{d.getElementById(id).value=v;d.getElementById(id).dispatchEvent(new w.Event('change',{bubbles:true}))};
+ change('component','capacitor');
+ ok(d.getElementById('fam').value==='chip'&&d.getElementById('cType').value==='CAPC','خازن چیپ روش و پیشوند خودکار دارد');
+ ok([...d.getElementById('smp').options].filter(o=>o.value&&!o.hidden).every(o=>o.value.startsWith('chip')),'فقط اندازه‌های مرتبط با پکیج نشان داده می‌شوند');
+ change('component','transistor');
+ const csv=d.getElementById('pads').value.trim().split('\n').slice(1).map(row=>row.split(','));
+ ok(csv.length===3&&csv.map(p=>p[0]).join(',')==='1,2,3','SOT-23 دقیقاً سه پد شماره‌دار دارد');
+ ok(csv.length===3&&+csv[0][1]<0&&+csv[1][1]<0&&+csv[2][1]>0&&+csv[0][2]>0&&+csv[1][2]<0&&+csv[2][2]===0,'SOT-23: دو پد چپ و یک پد راست با مختصات نامتقارن');
+ ok(/^SOT/.test(d.getElementById('insName').textContent)&&/Gull-wing/.test(d.getElementById('warn').textContent),'نام SOT و هشدار تطبیق با دیتاشیت مشخص است');
+ d.getElementById('mkA').click();
+ ok((d.getElementById('alt').value.match(/  AddPad\('/g)||[]).length===3,'اسکریپت Altium نیز دقیقاً سه پد دارد');
+ setV(d,'layout','symmetric');
+ ok(d.getElementById('component').value==='custom'&&d.getElementById('smp').value==='','تغییر پیشرفته، انتخاب را به سفارشی تبدیل می‌کند');
+ ok(d.getElementById('advancedGeometry').contains(d.getElementById('fam')),'خانواده در تنظیمات پیشرفته است');
+ w.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }
