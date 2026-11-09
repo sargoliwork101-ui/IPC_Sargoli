@@ -138,13 +138,13 @@ console.log('\n۵) سوراخ‌دار (ایراد ۷، ۸، ۱۵، ۲۳، ۲۷�
   ok(/±0\.10/.test(val(d, 'سوراخ')), 'تلرانس NPTH برابر 0.10 است', val(d, 'سوراخ'));
   setV(d, 'pHole', 0); setV(d, 'tHT', 'F');
   ok(!val(d, 'سوراخ') && /Press-fit/.test(d.getElementById('warn').textContent), 'Press-fit بدون قطر سازنده خروجی نمی‌دهد');
-  setV(d, 'pHole', 1.0); setV(d, 'tHT', 'P'); setV(d, 'tPr', '0');
+  setV(d, 'man', true); setV(d, 'pHole', 1.0); setV(d, 'tTol', 0); setV(d, 'tPr', '0');
   setV(d, 'tW', 0.6);
   ok(!!val(d, 'سوراخ'), 'Press-fit با قطر سازنده محاسبه می‌شود');
 }
 { // مرز جدول 4-4 با مقدار واقعی سوراخ سنجیده می‌شود
   const { d } = load(TOOL);
-  setV(d, 'kind', 'th'); setV(d, 'tHT', 'P'); setV(d, 'tPr', '0'); setV(d, 'tW', 0.6); setV(d, 'pHole', 1.004);
+  setV(d, 'kind', 'th'); setV(d, 'tHT', 'P'); setV(d, 'tPr', '0'); setV(d, 'tS', '0'); setV(d, 'tW', 0.854);
   ok(/1\.00/.test(val(d, 'سوراخ')) && /1\.75/.test(val(d, 'پد')), 'سوراخ 1.004 (ردیف پد بعدی) و پد 1.75', val(d, 'سوراخ') + ' / ' + val(d, 'پد'));
 }
 
@@ -499,6 +499,41 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
  ok(!d.getElementById('pads').value&&/ممیزی/.test(d.getElementById('emptyReason').textContent),'MELF با ویرایش عددی از قفل ممیزی عبور نمی‌کند');
  d.getElementById('mkA').click();
  ok(!/  AddPad\('/.test(d.getElementById('alt').value),'پکیج مسدود خروجی Altium معتبر نمی‌سازد');
+ w.close();
+}
+
+console.log('\n۱۶) مرجع مستقل سوراخ و پد طبق IPC-7352');
+{
+ const {d,w}=load(TOOL);
+ function sample(){d.getElementById('smp').value='dip';d.getElementById('smp').onchange()}
+ function pair(){const p=padsOf(d)[0];return p?[p[3],p[4]]:[]}
+ for(const shape of [0,1,2])for(const process of [0,1]){
+  sample();setV(d,'tS',shape);setV(d,'tW',.5);setV(d,'tW2',.3);setV(d,'tPr',process);
+  const diagonal=shape===0?.5:shape===1?Math.hypot(.5,.5):Math.hypot(.5,.3);
+  const raw=diagonal+([.15,.15,.1][shape])*(process===0?1:0)+(process===1?[.4,.4,.35][shape]:0);
+  const hole=Math.round(raw*100)/100,allowance=raw<=1?.5:raw<=1.25?.75:raw<=1.75?1:raw<=2.25?1.25:1.5;
+  const pad=Math.round((hole+allowance)*100)/100,[actualPad,actualHole]=pair();
+  ok(Math.abs(actualHole-hole)<1e-8&&Math.abs(actualPad-pad)<1e-8,'شکل '+shape+' / فرایند '+process+': سوراخ و پد از مرجع مستقل محاسبه می‌شوند',pair().join('/'));
+ }
+ sample();setV(d,'tS',1);setV(d,'tW',.5);setV(d,'tPr',0);
+ ok(pair()[0]===1.36&&pair()[1]===.86&&/0.25/.test(val(d,'حلقهٔ مسی')),'مثال مربع 0.5: سوراخ 0.86، پد 1.36 و حلقهٔ اسمی 0.25');
+ setV(d,'tPr',1);
+ ok(pair()[0]===1.86&&pair()[1]===1.11,'همان مربع در لحیم دستی/موجی: سوراخ 1.11 و پد 1.86');
+ setV(d,'tS',2);setV(d,'tW2',.3);setV(d,'tPr',0);const h1=pair()[1];setV(d,'tW2',.8);
+ ok(h1===.68&&pair()[1]===1.04,'تغییر ضلع دوم مستطیل واقعاً سوراخ را تغییر می‌دهد');
+ setV(d,'tHT','N');
+ ok(pair()[1]===1.34,'NPTH نیز از قطر قطری مستطیل استفاده می‌کند');
+ setV(d,'tHT','P');setV(d,'tS',1);setV(d,'tW',.5);setV(d,'man',true);setV(d,'pHole',1.2);
+ ok(pair()[1]===1.2,'override روشن قطر دستی را اعمال می‌کند');
+ setV(d,'man',false);
+ ok(pair()[1]===.86&&pair()[0]===1.36,'override خاموش به سوراخ و پد خودکار برمی‌گردد');
+ for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const factor={mm:1,mil:.0254,in:25.4}[unit];const p=pair();
+  ok(Math.abs(p[1]*factor-.86)<.0001&&Math.abs(p[0]*factor-1.36)<.0001,'تبدیل واحد '+unit+' هندسهٔ سوراخ و پد را حفظ می‌کند');
+ }
+ d.getElementById('mkA').click();
+ ok(/1\.3600, 1\.3600, 0\.8600/.test(d.getElementById('alt').value),'Altium قطر پد و سوراخ اصلاح‌شده را می‌گیرد');
+ setV(d,'man',true);setV(d,'pPadd',0);
+ ok(!d.getElementById('pads').value&&/حلقهٔ مسی/.test(d.getElementById('warn').textContent),'پد بدون مس دور سوراخ رد می‌شود');
  w.close();
 }
 

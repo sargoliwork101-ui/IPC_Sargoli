@@ -595,7 +595,7 @@ V.W='W: پهنای یک پایه. ورودی باید حداکثر (max) باش�
 V.H='H: ارتفاع اسمی قطعه (Nominal). دیتاشیت: A (Typ). جدول‌های 3-3، 3-4، 3-6، 3-8 و 3-10 از ارتفاع اسمی استفاده می‌کنند.';
 V.Tmin='Tmin: کوتاه‌ترین طول پایه (پاشنه تا پنجه). برای واردکردن صفرِ مجاز و محاسبهٔ قاعده‌مند راهنمای زیر را بخوان.';
 V.Tmax='Tmax: بلندترین طول پایه (پاشنه تا پنجه). پیش‌فرض صفر یعنی «محاسبه از S دستی».';
-V.Wt2='W: انتخاب واحد؛ برای مقطع گرد قطر، برای مربع ضلع و برای مستطیل دو ضلع (بُعد ۱ و ۲) را وارد کن. قطر قطری فقط برای محاسبهٔ سوراخ ساخته می‌شود و عرض پایه برای نام‌گذاری جدا نگه داشته می‌شود.';V.Wt='W: حداکثر بُعد مقطع پایه. برای مقطع مربع ضلع و برای مستطیل قطر قطری (sqrt(a²+b²)) را خودت وارد کن؛ ابزار در مقطع مستطیل از دو ضلع حساب می‌کند و بعد قطر قطری را می‌سازد.'
+V.Wt2=V.Wt='پایهٔ گرد: حداکثر قطر؛ مربع: حداکثر ضلع؛ مستطیل: حداکثر دو ضلع را وارد کن. ابزار قطر قطری مربع/مستطیل را برای سوراخ حساب می‌کند؛ عرض پایه در نام‌گذاری جدا می‌ماند.';
 V.ZJ='ZJ: چقدر پد از نوک (یا لبه‌ی بیرونی) پایه بیرون می‌زند. Z = Lmax + 2·ZJ. در Gull-wing همان Toe است.';V.GJ='GJ: چقدر پد از پاشنه به داخل ادامه دارد. G = Smax − 2·GJ. در Gull-wing همان Heel است.';V.SJ='SJ: اضافه‌ی پد در هر طرف پهنای پایه. X = W + 2·SJ.';V.CE='CE: مقدار اضافه Courtyard از هر طرف به بزرگ‌ترین بُعد.';V.BR='درصد کاهش (توپ فروپاشنده) یا افزایش (بدون فروپاشی) قطر پد نسبت به قطر اسمی توپ (جدول 3-11).';V.HA='مقداری که به بُعد max پایه اضافه می‌شود تا قطر سوراخ به دست بیاید (جدول 4-1 یا 4-2).';V.GAP='این آستانه از استاندارد نیست؛ استاندارد فقط می‌گوید فاصله باید حداقل فاصله‌ی الکتریکی را رعایت کند. عدد پیش‌فرض 0.15 حدس عملی من است و باید با سازنده‌ی برد تطبیق داده شود.';
 function ov(id,v,dm){var e=$(id);
  if($('man').checked){var x=+e.value;if(e.value===''||isNaN(x))return v;return dm?x*PX[U]:x}
@@ -906,7 +906,7 @@ $('warn').textContent=wr;
 }
 function th(){
 var k=Math.round(+$('tK').value),Pt=rd('tP'),R2=rd('tR'),Wd0=rd('tW'),W2=rd('tW2'),sh=+$('tS').value,
- pr=+$('tPr').value,HT=$('tHT').value,HO=rd('pHole'),bt=rd('tB'),tol=+$('tTol').value,p1=$('tP1').value;
+ pr=+$('tPr').value,HT=$('tHT').value,HO=$('man').checked?rd('pHole'):0,bt=rd('tB'),tol=+$('tTol').value,p1=$('tP1').value;
 WG='';
 function bad(m){$('warn').textContent=m;clearOut(m);return}
 if([k,Pt,Wd0].some(isNaN)||!(k>=1&&k<=200))return bad('تعداد پین باید بین ۱ و ۲۰۰ باشد.');
@@ -915,7 +915,8 @@ if(!(Pt>0))return bad('گام باید بزرگ‌تر از صفر باشد.');
 if(!(Wd0>0))return bad('بُعد پایه باید بزرگ‌تر از صفر باشد.');
 if(R2<0||bt<0)return bad('فاصلهٔ ردیف و ضخامت برد نمی‌توانند منفی باشند.');
 if(sh===2&&!(W2>0))return bad('برای مقطع مستطیلی، بُعد دوم لازم است.');
-var Wd=Wd0,two=R2>0&&k>=4;
+// IPC-7352 tables 4-1/4-2: use maximum diagonal for non-round pins.
+var Wd=sh===1?Math.SQRT2*Wd0:sh===2?Math.hypot(Wd0,W2):Wd0,two=R2>0&&k>=4;
 var add=ov('pHadd',[[.15,.4],[.15,.4],[.10,.35]][sh][pr],1),
     adj=ov('pHadj',pr?(bt<.8?-.2:bt<1?-.1:bt<=2.35?0:bt<=4?.1:.2):0,1),
     hole,holeSrc,tolShow=tol;
@@ -924,11 +925,11 @@ if(HT==='F'){
   hole=HO;holeSrc='مقدار سازنده (Press-fit، بند 4.5)';
 }else if(HT==='N'){
   var nadd=ov('pNadd',.4,1);
-  hole=HO>0?HO:Wd+nadd;holeSrc=HO>0?'مقدار دستی':'NPTH: بُعد پایه + '+fmo(nadd)+' '+U+' (بند 4.6، ص 24)';
+  hole=HO>0?HO:Wd+nadd;holeSrc=HO>0?'مقدار دستی':'NPTH: قطر/قطر قطری پایه + '+fmo(nadd)+' '+U+' (جدول 4-5، ص 22)';
   if(tol===0.08)tolShow=0.1;
 }else{
   hole=HO>0?HO:Wd+add+adj;
-  holeSrc=HO>0?'مقدار دستی':'بُعد پایه '+fmo(Wd)+' + '+fmo(add)+(adj?' + اصلاح ضخامت '+fmo(adj):'')+' '+U;
+  holeSrc=HO>0?'مقدار دستی':'قطر/قطر قطری پایه '+fmo(Wd)+' + '+fmo(add)+(adj?' + اصلاح ضخامت '+fmo(adj):'')+' '+U;
 }
 var raw=hole;
 if(!(raw>0))return bad('قطر سوراخ معتبر نیست.');
@@ -937,6 +938,7 @@ var hpRaw=Math.round(raw*1000), stdPad=hpRaw<=1000?.5:hpRaw<=1250?.75:hpRaw<=175
 hole=Math.round(raw*100)/100;
 if(HO>0&&Math.abs(HO-hole)>1e-9)WG+='قطر واردشده '+f(HO,3)+' در نمایش به '+f(hole,2)+' گرد شد (ردیف پد از مقدار واقعی انتخاب شد). ';
 var pa=ov('pPadd',stdPad,1),pad=Math.round((hole+pa)*100)/100;
+if(!(pad>hole))return bad('قطر پد مسی باید از سوراخ بزرگ‌تر باشد تا حلقهٔ مسی باقی بماند؛ افزودهٔ پد را اصلاح کن.');
 MP=[];var m=two?Math.ceil(k/2):k,j,pads=[];
 for(j=0;j<k;j++){var px,py;if(two){px=(j<m?-1:1)*R2/2;py=j<m?((m-1)/2-j)*Pt:(-(m-1)/2+(j-m))*Pt}else{px=(j-(k-1)/2)*Pt;py=0}
  pads.push({n:j+1,x:px,y:py});}
@@ -988,7 +990,9 @@ if(HT==='N')wr+='NPTH: وجود و ابعاد مس اطراف سوراخ را ب
 if(pr&&(bt<0.8||bt>4)&&!$('man').checked)wr+='برای ضخامت زیر 0.8 یا بالای 4 mm، جدول 4-3 حداکثر اصلاح «تا 0.2» می‌دهد؛ ابزار حداکثر را گرفته است. با فرایند و توان سازنده تطبیق بده یا با «ویرایش دستی» مقدار را تغییر بده. ';
 VALID=true;
 K.raise();K.fitContent();
-out([['سوراخ نهایی',('Ø '+fu(hole))+(tolShow>0?' (±'+fmo(tolShow)+')':' (تلرانس سازنده)'),holeSrc],
+out([['بُعد مؤثر پایه',fu(Wd),sh===0?'حداکثر قطر پایهٔ گرد':sh===1?'قطر قطری مربع = ضلع × √2':'قطر قطری مستطیل = √(ضلع اول² + ضلع دوم²)'],
+ ['حلقهٔ مسی اسمی در هر طرف',fu((pad-hole)/2),'(قطر پد − قطر سوراخ نهایی) / 2؛ پیش از تلرانس و خطای هم‌مرکزی؛ کنترل IPC-222X و توان سازنده لازم است'],
+ ['سوراخ نهایی',('Ø '+fu(hole))+(tolShow>0?' (±'+fmo(tolShow)+')':' (تلرانس سازنده)'),holeSrc],
  ['پد',('Ø '+fu(pad))+(p1==='r'?' (پین ۱ مربع)':''),'سوراخ + '+fmo(pa)+' '+U+' (جدول 4-4)؛ '+MP.length+' پد — حداقل پد IPC-222X و توان سازنده باید جداگانه کنترل شود'],
  ['کمینه فاصلهٔ خالی واقعی پدها',(minGap===null?'— (جفت پدی وجود ندارد)':fm(minGap)+' '+U),'آستانه '+fm(GP())+' '+U],
  [two?'فاصلهٔ دو ردیف':'—',two?fu(R2)+' / خالی '+fm(R2-pad):'—','lead span دیتاشیت'],
@@ -1043,6 +1047,7 @@ if(window.DRAW_KIND!==k){window.CAM=null;window.SVG_VB=null;window.DRAW_KIND=k}
 ['smd','bga','th'].forEach(function(a){$('b'+a).classList.toggle('on',a===k)});
 $('warn').textContent='';WG='';
 filterParams();updateMethod();
+if(k==='th'){var shv=$('tS').value;var lab=$('tW').previousElementSibling;lab.firstChild.nodeValue=shv==='0'?'قطر max پایه':shv==='1'?'ضلع max مربع':'ضلع اول max مستطیل';lab.querySelector('small').textContent='بُعد واقعی پایه؛ نه قطر سوراخ';$('tW2').parentNode.hidden=shv!=='2'}
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
 var blocked=packageBlockReason();if(blocked){clearOut(blocked);$('warn').textContent=blocked;why(k);save();return}
 var issues=validateFootprint(k);if(issues.length){var message=issues.map(function(e){return e.id+': '+e.msg}).join(' • ');clearOut(message);$('warn').textContent=message;why(k);save();return}
@@ -1697,7 +1702,7 @@ function updateMethod(){var k=$('kind').value,spec=PACKAGE_CATALOG[$('package').
  $('packageStatus').textContent=spec?(spec.label+' · مبنای اصلی: IPC-7352:2023 · مرجع '+spec.ref+' · '+(packageBlockReason()||(spec.state==='configure'?'نمونهٔ آماده ندارد؛ خانه‌های خالی را از دیتاشیت پر کن.':spec.state==='sample'?'ابعاد نمونه عمومی‌اند؛ با دیتاشیت تطبیق بده.':'انتخاب مدل به عهدهٔ کاربر است.'))):'';
 
  $('methodReadout').textContent='روش محاسبه: '+(k==='smd'?$('fam').selectedOptions[0].textContent:k==='bga'?'BGA · جدول 3-11':'سوراخ‌دار · بخش 4')+($('smp').value?'':' · ابعاد سفارشی');
- if(k==='th'&&!packageBlockReason())$('packageStatus').textContent+=' هشدار ممیزی: محاسبهٔ سوراخ پایهٔ مربع/مستطیل و خاموش‌شدن override هنوز نیازمند اصلاح‌اند؛ خروجی برای ساخت تأیید نشده است.';
+ if(k==='th'&&!packageBlockReason())$('packageStatus').textContent+=' سوراخ بر اساس حداکثر قطر/قطر قطری پایه و فرایند محاسبه می‌شود؛ قطر سوراخ نهایی پس از آبکاری است، نه قطر مته. کنترل حلقهٔ مسی طبق IPC-222X و توان سازنده همچنان لازم است.';
  ['fam','sides','layout','cType'].forEach(function(id){$(id).parentNode.hidden=k!=='smd'});
 }
 $('restoreDrawing').onclick=function(){$('man').checked=false;$('smp').value='soic';$('smp').onchange()};
