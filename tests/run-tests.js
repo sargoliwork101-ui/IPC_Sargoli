@@ -489,18 +489,21 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
  function change(id,v){const e=d.getElementById(id);e.value=v;e.dispatchEvent(new w.Event('change',{bubbles:true}))}
  const types=[...d.getElementById('component').options].map(o=>o.value);
  ok(types.length===18,'۱۸ گروه قطعه در دسترس است');
- const packages=new Set();let combos=0,blockedSafe=true,configSafe=true;
+ const packages=new Set();let combos=0,blockedSafe=true,configSafe=true,modelsAvailable=true;
  for(const type of types){
   change('component',type);
   const options=[...d.getElementById('package').options].map(o=>[o.value,o.textContent]);
   for(const [id,label] of options){
    packages.add(id);combos++;change('package',id);
+   modelsAvailable=modelsAvailable&&!/پشتیبانی نمی‌شود|پیاده‌سازی نشده/.test(label);
+   if(label.includes('مدل ابعادی قابل تنظیم'))modelsAvailable=modelsAvailable&&!d.getElementById('directModelEditor').hidden;
    if(/هنوز پشتیبانی نمی‌شود|نیازمند اصلاح محاسبه/.test(label)&&!label.includes('مرجع واقعی KiCad دارد')){
     blockedSafe=blockedSafe&&!d.getElementById('pads').value&&!d.getElementById('stageEmpty').hidden;
    }
    if(/ابعاد دیتاشیت لازم/.test(label)&&!d.getElementById('smp').value&&!d.getElementById('libraryMode').checked)configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
   }
  }
+ ok(modelsAvailable,'همهٔ گروه‌ها مسیر مدل دارند و برچسب پکیج پشتیبانی‌نشده باقی نمانده است');
  ok(packages.size===66&&combos===134,'۶۶ تعریف پکیج و ۱۳۴ ترکیب مرتبط قابل انتخاب است');
  ok(blockedSafe,'بسته‌های پشتیبانی‌نشده یا مسدود، نقشه/خروجی قطعهٔ قبلی را نشان نمی‌دهند');
  ok(configSafe,'بستهٔ بدون نمونه، ابعاد قبلی را به جای دیتاشیت استفاده نمی‌کند');
@@ -759,7 +762,7 @@ console.log('\nفیلتر سخت نوع قطعه و پکیج');
 console.log('\n۲۴) مرجع‌های واقعی KiCad و پیام مدل');
 {
  const {d,w}=load(TOOL);const refs=JSON.parse(d.getElementById('referenceFootprintData').textContent);
- ok(Object.keys(refs).length===46,'۴۶ الگوی واقعی با دادهٔ آفلاین موجود است');
+ ok(Object.keys(refs).length===47,'۴۷ الگوی واقعی با دادهٔ آفلاین موجود است');
  for(const [key,ref] of Object.entries(refs)){
   setV(d,'smp','lib-'+key);
   const raw=fs.readFileSync(path.join(ROOT,'reference-footprints',key+'.kicad_mod'),'utf8');

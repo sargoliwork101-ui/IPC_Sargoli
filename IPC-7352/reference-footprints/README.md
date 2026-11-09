@@ -16,7 +16,7 @@ From the repository root: `python audits/import-reference-footprints.py`. This r
 
 ## Coverage
 
-46 library references plus 3 existing direct TI templates cover **49 of the 66 package groups**. This does **not** mean 49 IPC formula solvers. All reference examples have an explicit model name, provenance and a warning requiring the user to adapt values to their own part datasheet.
+47 library references plus 3 existing direct TI templates cover **50 of the 66 package groups**. The remaining 16 groups have formula/configuration paths (6) or explicit user-dimension geometry builders (10), not sourced ready-made references. This does **not** mean 50 IPC formula solvers. All reference examples have an explicit model name, provenance and a warning requiring the user to adapt values to their own part datasheet.
 
 | Group | Specific reference | Original file |
 |---|---|---|
@@ -88,3 +88,9 @@ From the repository root: `python audits/import-reference-footprints.py`. This r
 - `dfn-polar`: DFN قطب‌دار CAPPDFN
 
 These groups retain explicit unsupported/configuration status as applicable. No unrelated sample is fabricated to claim complete coverage.
+
+### Additional source
+
+`sotfl`: [SOT-383FL](https://github.com/KiCad/kicad-footprints/blob/7ebfa6b23cc292a56f751b7b5f4a0e12eeef69dd/Package_TO_SOT_SMD.pretty/SOT-383FL.kicad_mod), original unmodified, same license and pinned version. This specific eight-pad flat-lead model does not represent all SOTFL devices.
+
+The ten direct geometry builders intentionally start without made-up dimensions. Users must supply their exact manufacturer land pattern. These are application code, not derived library examples or IPC formula solvers.
