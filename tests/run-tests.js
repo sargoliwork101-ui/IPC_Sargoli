@@ -633,6 +633,50 @@ console.log('\n۱۹) انتخاب شکل و پکیج‌های جدید');
  w.close();
 }
 
+
+console.log('\n۲۰) مسیر بازشدن پکیج، نمونه و حفظ ورودی');
+{
+ const {d,w}=load(TOOL);let count=0,all=true;const seen=new Set();
+ const components=[...d.getElementById('component').options].map(o=>o.value);
+ for(const component of components){
+  setV(d,'component',component);
+  for(const pkg of [...d.getElementById('package').options].map(o=>o.value)){
+   setV(d,'package',pkg);
+   if(d.getElementById('previewPackage').hidden||seen.has(pkg))continue;seen.add(pkg);count++;
+   d.getElementById('previewPackage').click();
+   const valid=!!d.getElementById('pads').value;all=all&&valid;
+   ok(valid,'نمونهٔ آموزشی انتخابی '+pkg+' واقعاً نقشه دارد',d.getElementById('warn').textContent);
+  }
+ }
+ ok(count===18&&all,'تمام ۱۸ مدل قابل تنظیم از مسیر دکمهٔ واقعی باز می‌شوند');
+ setV(d,'component','transistor');setV(d,'package','sot23-5');d.getElementById('previewPackage').click();
+ setV(d,'W',.47);const before=d.getElementById('pads').value;
+ setV(d,'package','sot23-6');d.getElementById('previewPackage').click();setV(d,'package','sot23-5');
+ ok(+d.getElementById('W').value===.47&&d.getElementById('pads').value===before,'برگشت به پکیج، ورودی و خروجی آن را پاک نمی‌کند');
+ setV(d,'unit','mil');setV(d,'package','sot23-6');setV(d,'package','sot23-5');
+ ok(Math.abs(+d.getElementById('W').value*.0254-.47)<.0002,'پیش‌نویس پکیج بر حسب mm و مستقل از واحد بازگردانی می‌شود');
+ ok(/نمونهٔ آموزشی/.test(d.getElementById('packageStatus').textContent),'برچسب ابعاد آموزشی پس از ویرایش و جابه‌جایی پابرجاست');
+ w.close();
+}
+
+
+console.log('\n۲۱) جداسازی اعتبارسنجی THT و SMD');
+{
+ const {d,w}=load(TOOL);
+ setV(d,'component','resistor');setV(d,'package','axial');setV(d,'tExample','cfr25');
+ for(const sample of ['soic','chip','qfp','sot23','tssop','bga100']){
+  setV(d,'smp',sample);
+  ok(!!d.getElementById('pads').value&&!/مدل محوری|CDIP|SIP مستقیم/.test(d.getElementById('warn').textContent),'پس از THT محوری، '+sample+' مستقل و قابل رسم است');
+ }
+ setV(d,'smp','sot23');
+ const state={_schema:2,_u:'mm'};d.querySelectorAll('.workspace input,.workspace select').forEach(e=>state[e.id]=e.type==='checkbox'?e.checked:e.value);const saved=JSON.stringify(state);
+ const recovered=new JSDOM(fs.readFileSync(TOOL,'utf8'),{runScripts:'dangerously',url:'https://ipc.test/tool.html',beforeParse(win){win.localStorage.setItem('fp7352',saved)}});
+ ok(!!recovered.window.document.getElementById('pads').value,'حالت SMD ذخیره‌شده با tModel محوری نیز پس از بازشدن کار می‌کند');
+ const src=fs.readFileSync(TOOL,'utf8').split('function smd(){')[1].split('function bga(){')[0];
+ ok(!/tModel|tBodyL|tBodyD|tBodyH/.test(src),'محاسبه SMD هیچ وابستگی به ورودی بدنهٔ THT ندارد');
+ recovered.window.close();w.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }

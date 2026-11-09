@@ -311,7 +311,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
     <div class="canvas-wrap" id="canvasWrap">
       <svg id="svg" viewBox="0 0 700 440" role="img" aria-label="نقشه‌ی پد"></svg>
       <div class="canvas-label">TOP COPPER · COURTYARD · SILKSCREEN</div>
-      <div id="stageEmpty" hidden style="position:absolute;inset:0;display:grid;place-items:center;color:#5d7189;font-size:12px;text-align:center;padding:20px"><div><p id="emptyReason">ورودی معتبر وارد کن تا نقشه ساخته شود</p><button class="btn" id="restoreDrawing">بارگذاری نمونهٔ سالم و نمایش نقشه</button></div></div>
+      <div id="stageEmpty" hidden style="position:absolute;inset:0;display:grid;place-items:center;color:#5d7189;font-size:12px;text-align:center;padding:20px"><div><p id="emptyReason">ورودی معتبر وارد کن تا نقشه ساخته شود</p><button class="btn primary" id="previewPackage" hidden>نمایش نمونهٔ هندسی همین پکیج — آموزشی</button><p id="previewDisclaimer" hidden>این نمونه ابعاد یک قطعهٔ واقعی نیست؛ پیش از ساخت با دیتاشیت جایگزین کن.</p><button class="btn" id="restoreDrawing">بازگشت به نمونهٔ SOIC-16</button></div></div>
     </div>
     <div class="metrics">
       <div class="metric"><span>اندازهٔ پد</span><strong id="mPad">—</strong></div>
@@ -702,20 +702,11 @@ var F=$('fam').value,sd=+$('sides').value,lv=$('lv').value,i={A:0,B:1,C:2}[lv],
  Pt=rd('P'),nRaw=+$('n').value,n=Math.round(nRaw),bw=rd('BW'),th=rd('Th'),th2=rd('Th2')||rd('Th'),
  autoS=$('autoS').checked,S=null,srcS='',k,y;
 WG='';
-var model=$('tModel').value,body=model!=='generic',BL=rd('tBodyL'),BD=rd('tBodyD'),BH=rd('tBodyH'),vertical=model==='axial-v',roundBody=vertical||model==='radial-d';
 function bad(m){$('warn').textContent=m;clearOut(m);return}
 // ---------- اعتبارسنجی ورودی (ایراد ۵) ----------
 if(!(Lm>0))return bad('Lmax باید بزرگ‌تر از صفر باشد.');
 if(Ln>0&&!(Ln<=Lm))return bad('Lmin باید کوچک‌تر یا مساوی Lmax باشد.');
 if(!(W>0))return bad('عرض پایه (Wmax) باید بزرگ‌تر از صفر باشد.');
-if(body){
- if(['sip','cdip','dipc'].indexOf(model)<0&&(k!==2||R2!==0))return bad('مدل محوری/شعاعی دقیقاً دو پایه و فاصلهٔ ردیف صفر لازم دارد.');
- if(model==='sip'&&R2!==0)return bad('SIP مستقیم تک‌ردیف است؛ فاصلهٔ ردیف را صفر بگذار.');
- if((model==='cdip'||model==='dipc')&&(!(R2>0)||k<4||k%2))return bad('CDIP/DIPC دو ردیف، تعداد زوج حداقل چهار و فاصلهٔ ردیف مثبت لازم دارد.');
- if(!(BD>0&&BL>0&&BH>0))return bad('ابعاد بدنه باید مثبت و از دیتاشیت باشند.');
- if(model==='axial-h'&&Pt<=BL+Wd0)return bad('فاصلهٔ پایه باید از طول بدنه به‌علاوهٔ قطر پایه بیشتر باشد؛ فضای خم را با سازنده تأیید کن.');
- if(vertical&&Pt<=BD/2+Wd0/2)return bad('پایهٔ برگشتی با بدنهٔ عمودی برخورد می‌کند؛ فاصلهٔ پایه را افزایش بده.');
-}
 if(!(Pt>0))return bad('گام (P) باید بزرگ‌تر از صفر باشد.');
 if(!(n>=1&&n<=100))return bad('تعداد پایه در هر طرف باید بین ۱ و ۱۰۰ باشد.');
 if(Math.abs(nRaw-n)>1e-9)return bad('تعداد پایه باید عدد صحیح باشد (ورودی '+nRaw+' به‌صورت خاموش تغییر داده نمی‌شود).');
@@ -1148,13 +1139,13 @@ filterParams();updateMethod();
 if(k==='th'){var shv=$('tS').value;var lab=$('tW').previousElementSibling;lab.firstChild.nodeValue=shv==='0'?'قطر max پایه':shv==='1'?'ضلع max مربع':'ضلع اول max مستطیل';lab.querySelector('small').textContent='بُعد واقعی پایه؛ نه قطر سوراخ';$('tW2').parentNode.hidden=shv!=='2'}
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
 var blocked=packageBlockReason();if(bodyMode&&$('tHoleShape').value==='slot')blocked='مدل بدنهٔ محوری/شعاعی فعلاً سوراخ گرد دارد؛ شیار را در مدل عمومی سفارشی طراحی کن.';if(blocked){clearOut(blocked);$('warn').textContent=blocked;why(k);save();return}
-var issues=validateFootprint(k);if(issues.length){var message=issues.map(function(e){return e.id+': '+e.msg}).join(' • ');clearOut(message);$('warn').textContent=message;why(k);save();return}
+var issues=validateFootprint(k);if(issues.length){var message=issues.map(function(e){return e.id+': '+e.msg}).join(' • ');clearOut((PACKAGE_CATALOG[$('package').value]||{}).state==='configure'?'مدل آماده است، اما ابعاد کامل نیست. ورودی‌های مشخص‌شده را از دیتاشیت پر کن، یا دکمهٔ نمونهٔ هندسی آموزشی را بزن. '+message:message);$('warn').textContent=message;why(k);save();return}
 try{(k==='smd'?smd:k==='bga'?bga:$('tHoleShape').value==='slot'?thSlot:th)()}catch(e){clearOut('خطای رسم: '+e.message);$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
 why(k);save()
 }
-function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){o[e.id]=e.type==='checkbox'?e.checked:e.value});o._schema=2;o._u=U;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
-function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';UOLD=U;
+function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){o[e.id]=e.type==='checkbox'?e.checked:e.value});o._schema=2;o._u=U;o._demoPackage=demoPackage;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
+function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';UOLD=U;demoPackage=o._demoPackage||'';
 // مهاجرت ذخیره‌های قدیمی: نمونهٔ قدیمی تمام ابعاد خانواده‌های دیگر را صفر می‌کرد.
 if(!o._schema){['bga','th'].forEach(function(k){
  var dims=FIELDS[k].filter(function(a){return a[4]===1&&a[3]>0&&!/^tBody/.test(a[0])});
@@ -1197,7 +1188,7 @@ $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  window.CAM=null;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
- syncHierarchyFromSample($('smp').value);
+ syncHierarchyFromSample($('smp').value);activePackage=$('component').value+':'+$('package').value;
  if($('fam').value==='chip')$('cType').value=CHIP_PREFIX[$('component').value]||'RESC';
  run()};
 var PACKAGE_CATALOG={
@@ -1777,7 +1768,24 @@ function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp
  if(!PACKAGE_TYPES[comp]||PACKAGE_TYPES[comp].indexOf(pk)<0)comp=pk==='chip'?'resistor':pk==='sot23'?'transistor':'ic';
  $('component').value=comp;refreshPackages(pk);
 }
-function choosePackage(){filterSamples();var first=Array.from($('smp').options).find(function(o){return o.value&&!o.hidden});
+var activePackage='',packageDrafts={},demoPackage='';
+function rememberPackage(){
+ if(!activePackage)return;
+ var draft={_demo:demoPackage===activePackage};
+ document.querySelectorAll('#bsmd input,#bsmd select,#bth input,#bth select,#bbga input,#bbga select,#advancedGeometry input,#advancedGeometry select').forEach(function(e){
+  draft[e.id]=e.type==='checkbox'?e.checked:e.dataset.d==='1'&&e.value!==''?Number(e.value)*PX[U]:e.value;
+ });
+ packageDrafts[activePackage]=draft;
+ try{localStorage.setItem('fp7352PackageDrafts',JSON.stringify(packageDrafts))}catch(e){}
+}
+function restorePackageDraft(id){
+ var draft=packageDrafts[id];if(!draft)return false;demoPackage=draft._demo?id:'';
+ Object.keys(draft).forEach(function(key){var e=$(key);if(!e)return;if(e.type==='checkbox')e.checked=!!draft[key];else e.value=e.dataset.d==='1'&&draft[key]!==''?+(Number(draft[key])/PX[U]).toFixed(6):draft[key]});
+ $('man').checked=false;$('smp').value='';window.CAM=null;return true;
+}
+function choosePackage(){rememberPackage();activePackage=$('component').value+':'+$('package').value;
+ if(restorePackageDraft(activePackage)){filterSamples();run();return}
+ filterSamples();var first=Array.from($('smp').options).find(function(o){return o.value&&!o.hidden});
  if(first){$('smp').value=first.value;$('smp').onchange()}
  else{
  $('smp').value='';var spec=PACKAGE_CATALOG[$('package').value];if(!spec){run();return}
@@ -1809,14 +1817,35 @@ function packageBlockReason(){var spec=PACKAGE_CATALOG[$('package').value];
  return spec.state==='unavailable'?'این پکیج در فهرست هست، ولی مدل هندسه/نام‌گذاری آن هنوز پیاده‌سازی نشده است؛ فوت‌پرینتِ قطعهٔ قبلی به‌جایش نمایش داده نمی‌شود.':spec.state==='blocked'?'محاسبهٔ این پکیج در ممیزی نیازمند اصلاح تشخیص داده شده است؛ فعلاً خروجی تولید نمی‌شود.':'';
 }
 function updateMethod(){var k=$('kind').value,spec=PACKAGE_CATALOG[$('package').value];
+ $('previewPackage').hidden=!(spec&&spec.state==='configure');$('previewDisclaimer').hidden=$('previewPackage').hidden;
  $('packageStatus').textContent=spec?(spec.label+' · مبنای اصلی: IPC-7352:2023 · مرجع '+spec.ref+' · '+(packageBlockReason()||(spec.state==='configure'?'نمونهٔ آماده ندارد؛ خانه‌های خالی را از دیتاشیت پر کن.':spec.state==='sample'?'ابعاد نمونه عمومی‌اند؛ با دیتاشیت تطبیق بده.':'انتخاب مدل به عهدهٔ کاربر است.'))):'';
 
  $('methodReadout').textContent='روش محاسبه: '+(k==='smd'?$('fam').selectedOptions[0].textContent:k==='bga'?'BGA · جدول 3-11':'سوراخ‌دار · بخش 4')+($('smp').value?'':' · ابعاد سفارشی');
+ if(demoPackage===$('component').value+':'+$('package').value)$('packageStatus').textContent+=' نمونهٔ آموزشی با ابعاد فرضی است؛ دیتاشیت یا تأیید ساخت نیست. پیش از ساخت همهٔ ابعاد را تطبیق بده.';
  if(k==='th'&&$('tModel').value!=='generic')$('packageStatus').textContent+=' مدل بدنه: جدول 4-6؛ سوراخ: بخش 4. نمونه CFR-25: YAGEO CFR، ویرایش 3، 2024-04-03، ص 3: L=6.3±0.5، D=2.4±0.2، d=0.55±0.05 mm. نمونه 1N4148: Vishay سند 81857، 2024-11-07: Lmax=3.4، Dmax=1.75، dmax=0.55 mm. گام نمونه‌های 10.16 و 7.62 mm انتخاب طراحی است، نه دادهٔ الزام‌آور دیتاشیت.';
  if(k==='th'&&$('tHoleShape').value==='slot')$('packageStatus').textContent+=' شیار: نام‌گذاری طبق 5.2.3؛ ابعاد و حلقهٔ مسی از کاربر، بدون فرمول سایزبندی خودکار استاندارد.';
  if(k==='th'&&$('tHoleShape').value==='round'&&!packageBlockReason())$('packageStatus').textContent+=' سوراخ بر اساس حداکثر قطر/قطر قطری پایه و فرایند محاسبه می‌شود؛ قطر سوراخ نهایی پس از آبکاری است، نه قطر مته. کنترل حلقهٔ مسی طبق IPC-222X و توان سازنده همچنان لازم است.';
  ['fam','sides','layout','cType'].forEach(function(id){$(id).parentNode.hidden=k!=='smd'});
 }
+$('previewPackage').onclick=function(){
+ var spec=PACKAGE_CATALOG[$('package').value];if(!spec||spec.state!=='configure')return;
+ var config=spec.config,kind=config.kind;window.CAM=null;$('man').checked=false;$('smp').value='';
+ $('kind').value=kind;demoPackage=$('component').value+':'+$('package').value;
+ FIELDS[kind].forEach(function(a){$(a[0]).value=a[4]===1?a[3]/PX[U]:a[3]});
+ function mm(id,v){$(id).value=v/PX[U]}
+ if(kind==='smd'){
+  $('fam').value=config.fam;$('sides').value=config.sides;$('layout').value=config.layout||'symmetric';$('n').value=config.n||4;$('autoS').checked=false;
+  mm('Lmin',5.8);mm('Lmax',6.2);mm('Tmin',.4);mm('Tmax',.8);mm('Smax',4.6);mm('W',.5);mm('H',1.5);mm('Hl',.2);mm('P',1.27);mm('BW',4);mm('bodyLength',5);mm('Th',0);mm('Th2',0);
+  if(config.layout){mm('Lmin',2.6);mm('Lmax',3);mm('Smax',1.8);mm('P',.95);mm('BW',1.7);mm('bodyLength',3);mm('Tmin',.3);mm('Tmax',.6)}
+  $('cType').value=config.fam==='qfn'?($('package').value==='son'?'SON':'QFN'):'';
+ }else if(kind==='th'){
+  $('tModel').value=config.model;$('tS').value='0';$('tHoleShape').value='round';$('tHT').value='P';$('tPr').value='1';$('tExample').value='';
+  $('tK').value=config.model==='cdip'?14:config.model==='sip'?8:2;
+  mm('tR',config.model==='cdip'?7.62:0);mm('tP',config.model==='cdip'||config.model==='sip'?2.54:10.16);mm('tW',.6);mm('tBodyL',config.model==='cdip'||config.model==='sip'?20:6.8);mm('tBodyD',config.model==='cdip'?6.5:2.6);mm('tBodyH',5);
+ }
+ run();
+ $('packageStatus').textContent+=' نمونهٔ هندسی آموزشی بارگذاری شد؛ این اعداد از دیتاشیت یک قطعهٔ مشخص نیستند. پیش از ساخت همهٔ ابعاد را تأیید کن.';
+};
 $('restoreDrawing').onclick=function(){$('man').checked=false;$('smp').value='soic';$('smp').onchange()};
 document.addEventListener('change',function(e){
  if(e.target&&e.target.id==='fam'){var f=e.target.value,c=$('cType');if(!c)return;
@@ -2135,7 +2164,8 @@ o.push("  PCBServer.PostProcess;","  Lib.CurrentComponent := Comp;","  Lib.Board
 $("alt").value=o.join("\r\n")}
 $("mkA").onclick=altium;
 $("cpA").onclick=function(){var x=$("alt");altium();try{navigator.clipboard.writeText(x.value).then(function(){$("cpAm").textContent=" کپی شد"},function(){x.select();document.execCommand("copy");$("cpAm").textContent=" کپی شد"})}catch(e){x.select();try{document.execCommand("copy");$("cpAm").textContent=" کپی شد"}catch(z){}}};
-load();
+try{packageDrafts=JSON.parse(localStorage.getItem('fp7352PackageDrafts')||'{}');if(!packageDrafts||typeof packageDrafts!=='object'||Array.isArray(packageDrafts))packageDrafts={}}catch(e){packageDrafts={}}
+load();activePackage=$('component').value+':'+$('package').value;
 if($('smp').value)syncHierarchyFromSample($('smp').value);
 // اجرای اول: اگر کاربر قبلاً چیزی ذخیره نکرده، نمونهٔ SOIC-16 بارگذاری می‌شود تا استودیو خالی نباشد
 try{if(!localStorage.getItem('fp7352')){var _s=$('smp');_s.value='soic';_s.onchange&&_s.onchange()}}catch(e){}

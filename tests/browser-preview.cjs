@@ -56,6 +56,20 @@ const engine = chromiumPackage.default || chromiumPackage;
   for(const [id,v] of Object.entries({Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.7,bodyLength:3}))await page.locator('#'+id).fill(String(v));
   assert.equal(await page.locator('#mCount').textContent(),'6');
   console.log('User-selected shape, reload and SOT-23-5/6 geometry: PASS');
+  await page.selectOption('#component','resistor');await page.selectOption('#package','axial');
+  await page.selectOption('#tExample','cfr25');assert.equal(await page.locator('#mCount').textContent(),'2');
+  await page.selectOption('#smp','soic');assert.equal(await page.locator('#mCount').textContent(),'16');
+  assert.equal(await page.locator('#tModel').inputValue(),'axial-h');
+  await page.reload();assert.equal(await page.locator('#mCount').textContent(),'16');
+  await page.selectOption('#component','transistor');await page.selectOption('#package','sot23-5');
+  if(await page.locator('#previewPackage').isVisible())await page.locator('#previewPackage').click();assert.equal(await page.locator('#mCount').textContent(),'5');
+  await page.locator('#W').fill('0.47');
+  await page.selectOption('#package','sot23-6');if(await page.locator('#previewPackage').isVisible())await page.locator('#previewPackage').click();
+  assert.equal(await page.locator('#mCount').textContent(),'6');
+  await page.selectOption('#package','sot23-5');assert.equal(await page.locator('#W').inputValue(),'0.47');
+  assert.equal(await page.locator('#mCount').textContent(),'5');
+  console.log('THT to SMD isolation, persisted stale THT model and per-package input recovery: PASS');
+
 
   await page.selectOption('#component','ic');await page.selectOption('#package','qfn');
   assert.equal(await page.locator('#Lmax').inputValue(),'');

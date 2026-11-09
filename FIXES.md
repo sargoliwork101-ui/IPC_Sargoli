@@ -251,3 +251,9 @@ node tests/run-tests.js
 - Main-settings shape choice: oblong vs rectangular vs family default; independent of manual formula editing; matching SVG/Altium, persisted on reload.
 - Configurable SOT-23-5/6, straight SIP, CDIP/DIPC and wire-jumper models implemented with geometry validation and standard-table naming.
 - 226 jsdom checks pass, extended Chromium smoke passes; SOT-23-5 screenshot visually checked. No complete-catalogue conformity claim.
+
+### Root-cause repair: THT state blocked SMD (2026-11-09)
+- Reproduced cross-family failure: axial THT → SOIC/chip/QFP/SOT/TSSOP. A copied THT body-validation block was erroneously inside `smd()`, reading `tModel` and applying two-pin/row restrictions to SMD. Persisted THT state extended the failure across reloads. Removed that block and all THT body input dependencies from `smd()`; retained THT validation only in `th()`.
+- Previous tests passed because they largely exercised SMD before body-model THT, rather than returning to SMD with non-generic `tModel`. Added regression tests for that exact order and persisted-state recovery.
+- Package switching now retains geometry drafts separately by component + package, in mm; a first-time incomplete model explicitly explains why no drawing is generated. An explicit button loads a clearly labelled illustrative geometry for the selected configurable model instead of jumping to unrelated SOIC. It is not manufacturer data. Demo provenance persists in stored state/drafts.
+- Verified all 18 configurable package models through the sample button: each produces a drawing. Existing unsupported models remain blocked. **256 jsdom checks pass; extended Chromium smoke passes**, including THT→SMD, reload and draft recovery.
