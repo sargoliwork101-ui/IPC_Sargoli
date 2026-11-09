@@ -442,7 +442,16 @@ function f(x,d){return (+x).toFixed(d==null?2:d)}
 function fmo(v){return U==='mm'?f(v,DEC()):U==='mil'?f(v/0.0254,1):f(v/25.4,4)}
 function fm(v){return fmo(v)}
 function fu(v){return fm(v)+' '+U}
-function rd(id){var v=+$(id).value;return v*PX[U]}   // همیشه mm
+var DIMENSION_MM_CACHE=new WeakMap();
+function dimensionMM(input,unit){var cached=DIMENSION_MM_CACHE.get(input);return cached&&cached.unit===unit&&cached.display===input.value?cached.mm:Number(input.value)*PX[unit]}
+function rd(id){return dimensionMM($(id),U)} // canonical mm, independent of rounded unit display
+function convertDimensionInputs(from,to){
+ document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(input){
+  if(input.value==='')return;var mm=dimensionMM(input,from);
+  input.value=Number.isFinite(mm)?String(Number((mm/PX[to]).toPrecision(12))):'';
+  DIMENSION_MM_CACHE.set(input,{mm:mm,display:input.value,unit:to});
+ });
+}
 function toDisp(v){return v/PX[U]}                    // mm → عدد نمایشی
 function fq(v){return U==='mm'?f(v,4):U==='mil'?f(v/0.0254,2):f(v/25.4,6)}  // دقت ساخت، نه دقت نمایش (ایراد ۲۶)
 function fld(id){return rd(id)}                        // خواندن فیلد بر حسب mm
@@ -673,6 +682,7 @@ function out(rows,pads,hdr,warn){
 try{var kd=$('kind').value;PITCH_TXT=kd==='smd'?fu(rd('P')):kd==='bga'?fu(rd('bP')):fu(rd('tP'))}catch(e){PITCH_TXT=''} // گام برای کارت متریک
 M.pads=MP;                        // همان داده‌ای که در فهرست و اسکریپت می‌رود
 if($('kind').value==='smd'&&$('padBasis').value==='manufacturer'&&!M.reference){rows=rows.map(function(row){return [row[0],row[1],'حالت ابعاد مستقیم سازنده / ویرایش کاربر؛ ابعاد پد از ورودی‌های مرجع گرفته شده، نه فرمول IPC. توضیح محدودیت گوشه‌ها در وضعیت پکیج آمده است.']})}
+if(kd==='bga'){var pitchX=rd('bPX')||rd('bP'),pitchY=rd('bPY')||rd('bP');PITCH_TXT=fu(pitchX)+(pitchX!==pitchY?' × '+fu(pitchY):'')}
 if(M.reference)PITCH_TXT='—';
 R=rows;
 $('res').textContent='';
@@ -1209,7 +1219,7 @@ try{(k==='smd'?smd:k==='bga'?bga:$('tHoleShape').value==='slot'?thSlot:th)()}cat
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
 why(k);save()
 }
-function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(!e.id)return;o[e.id]=e.type==='checkbox'?e.checked:e.value});o._schema=2;o._u=U;o._demoPackage=demoPackage;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
+function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(!e.id)return;o[e.id]=e.type==='checkbox'?e.checked:e.value});o._mm={};document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.id&&e.value!==''&&Number.isFinite(rd(e.id)))o._mm[e.id]={mm:rd(e.id),display:e.value,unit:U}});o._schema=3;o._u=U;o._demoPackage=demoPackage;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
 function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=Object.prototype.hasOwnProperty.call(PX,o._u)?o._u:'mm';UOLD=U;demoPackage=o._demoPackage||'';
 // مهاجرت ذخیره‌های قدیمی: نمونهٔ قدیمی تمام ابعاد خانواده‌های دیگر را صفر می‌کرد.
 if(!o._schema){['bga','th'].forEach(function(k){
@@ -1218,6 +1228,7 @@ if(!o._schema){['bga','th'].forEach(function(k){
 })}
 if(o.component&&PACKAGE_TYPES[o.component]){$('component').value=o.component;refreshPackages(o.package)}
 document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else if(e.tagName!=='SELECT'||Array.from(e.options).some(function(opt){return opt.value===String(o[e.id])}))e.value=o[e.id]}});$('unit').value=U;
+if(o._mm&&typeof o._mm==='object')Object.keys(o._mm).forEach(function(id){var e=$(id),cached=o._mm[id];if(e&&e.dataset.d==='1'&&cached&&Number.isFinite(cached.mm)&&cached.unit===U&&cached.display===e.value&&Math.abs(cached.mm-Number(e.value)*PX[U])<=Math.max(1e-12,Math.abs(cached.mm)*1e-10))DIMENSION_MM_CACHE.set(e,{mm:cached.mm,display:e.value,unit:U})});
 if(o.nameBodyL==null&&o.nameBodyW==null&&/^chip/.test(o.smp||'')&&SM[o.smp]){['nameBodyL','nameBodyW'].forEach(function(id){$(id).value=SM[o.smp][id]/PX[U]})}
 // تعمیر دقیق نمونهٔ 1206 ذخیره‌شده با Lmin مربوط به SOIC در نسخهٔ قدیمی.
 if(o.smp==='chip'&&o.fam==='chip'&&Math.abs(rd('Lmin')-5.8)<.001&&Math.abs(rd('Lmax')-3.4)<.001){
@@ -1226,14 +1237,11 @@ if(o.smp==='chip'&&o.fam==='chip'&&Math.abs(rd('Lmin')-5.8)<.001&&Math.abs(rd('L
 }catch(e){}}
 function syncUnitLabels(){var t=$('unit');}
 $('unit').onchange=function(){var nu=$('unit').value;
- // مقادیر را از واحد قبلی به واحد جدید تبدیل کن؛ مقدار داخلی تغییر نمی‌کند (ایراد ۲۱/۳۷)
- document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){
-   var raw=e.value;if(raw==='')return;
-   var mm=(+raw)*PX[UOLD];
-   e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
+ if(!Object.prototype.hasOwnProperty.call(PX,nu))return;
+ convertDimensionInputs(UOLD,nu);
  UOLD=nu;U=nu;run()};
-$('tExample').onchange=function(){var ex=this.value;if(!ex)return;$('libraryMode').checked=false;document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value!=='')e.value=+(Number(e.value)*PX[UOLD]).toFixed(6)});U=UOLD='mm';$('unit').value='mm';$('component').value=ex==='cfr25'?'resistor':'diode';refreshPackages('axial');$('kind').value='th';$('tModel').value='axial-h';$('tHoleShape').value='round';$('smp').value='';$('man').checked=false;var vals=ex==='cfr25'?{tK:2,tP:10.16,tR:0,tW:.60,tBodyL:6.8,tBodyD:2.6,tBodyH:2.6,tB:1.6}:{tK:2,tP:7.62,tR:0,tW:.55,tBodyL:3.4,tBodyD:1.75,tBodyH:1.75,tB:1.6};for(var id in vals)$(id).value=vals[id];$('tS').value='0';$('tPr').value='1';run()};
-document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp'&&e.id!=='footprintSearch')e.addEventListener('input',function(){if(!e.closest('#t2,#t3')&&['component','package'].indexOf(e.id)<0){if(e.closest('#bsmd,#bth,#bbga,#advancedGeometry'))$('libraryMode').checked=false;if(e.closest('#bsmd,#bbga,#bth,#advancedGeometry')||e.id==='kind')$('smp').value='';if(['kind','fam','sides','layout'].indexOf(e.id)>=0){$('component').value='custom';refreshPackages('custom')}run()}})});
+$('tExample').onchange=function(){var ex=this.value;if(!ex)return;$('libraryMode').checked=false;convertDimensionInputs(UOLD,'mm');U=UOLD='mm';$('unit').value='mm';$('component').value=ex==='cfr25'?'resistor':'diode';refreshPackages('axial');$('kind').value='th';$('tModel').value='axial-h';$('tHoleShape').value='round';$('smp').value='';$('man').checked=false;var vals=ex==='cfr25'?{tK:2,tP:10.16,tR:0,tW:.60,tBodyL:6.8,tBodyD:2.6,tBodyH:2.6,tB:1.6}:{tK:2,tP:7.62,tR:0,tW:.55,tBodyL:3.4,tBodyD:1.75,tBodyH:1.75,tB:1.6};for(var id in vals)$(id).value=vals[id];$('tS').value='0';$('tPr').value='1';run()};
+document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp'&&e.id!=='footprintSearch')e.addEventListener('input',function(){if(e.dataset.d==='1')DIMENSION_MM_CACHE.delete(e);if(!e.closest('#t2,#t3')&&['component','package'].indexOf(e.id)<0){if(e.closest('#bsmd,#bth,#bbga,#advancedGeometry'))$('libraryMode').checked=false;if(e.closest('#bsmd,#bbga,#bth,#advancedGeometry')||e.id==='kind')$('smp').value='';if(['kind','fam','sides','layout'].indexOf(e.id)>=0){$('component').value='custom';refreshPackages('custom')}run()}})});
 var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',cType:'RESC',autoS:0,Lmin:3.0,Lmax:3.4,Tmin:0,Tmax:0,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
 SM.soic8=Object.assign({},SM.soic,{n:4});
 SM.soic14=Object.assign({},SM.soic,{n:7});
@@ -1249,7 +1257,7 @@ SM.bga100={kind:'bga',bB:.5,bP:.8,bPX:0,bPY:0,bC:10,bR:10,bL:9,bW:9,bH:1.5,bT:'C
 $('smp').onchange=function(){if(this.value.indexOf('lib-')===0){var key=this.value.slice(4);if(REFERENCE_FOOTPRINTS[key].direct&&!REFERENCE_FOOTPRINTS[key].pads.length){choosePackage();return}loadReference(key);return}$('libraryMode').checked=false;var s=SM[$('smp').value];if(!s)return;
  showTab('t1');demoPackage='';
  // نمونه‌ها بر حسب mm تعریف شده‌اند؛ فیلدهای دیگر هم به همان واحد بازنویسی می‌شوند (ایراد ۲۱/۳۷)
- document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value!=='')e.value=+(Number(e.value)*PX[UOLD]).toFixed(6)});
+ convertDimensionInputs(UOLD,'mm');
  U='mm';UOLD='mm';$('unit').value='mm';
  // نمونه فقط خانوادهٔ خودش را بازنشانی می‌کند؛ سایر خانواده‌ها دست‌نخورده می‌مانند.
  FIELDS[s.kind].forEach(function(a){var e=$(a[0]);if(e)e.value=a[3]});
@@ -1944,6 +1952,7 @@ Object.keys(DIRECT_MODEL_LAYOUTS).forEach(function(key){
  REFERENCE_FOOTPRINTS[key]={name:spec.label+' · ابعاد مستقیم کاربر',direct:true,pads:[],lines:[],circles:[],sha:'',path:''};
 });
 Object.keys(REFERENCE_FOOTPRINTS).forEach(function(key){if(!REFERENCE_FOOTPRINTS[key].direct&&['unavailable','blocked'].includes(PACKAGE_CATALOG[key].state))PACKAGE_CATALOG[key].state='reference'});
+directBox.addEventListener('input',function(e){if(!e.target.matches('input'))return;$('libraryMode').checked=false;clearOut('پارامترهای مدل تغییر کرده‌اند؛ دکمهٔ ساخت مدل را دوباره بزن.');save()});
 function showDirectModel(key){
  directBox.hidden=false;$('dmRows').parentNode.hidden=DIRECT_MODEL_LAYOUTS[key]!=='grid';
  $('directModelError').textContent='';
@@ -1973,7 +1982,7 @@ $('buildDirectModel').onclick=function(){
   REFERENCE_FOOTPRINTS[key].name=name;
   var ref=REFERENCE_FOOTPRINTS[key];ref.pads=pads;ref.lines=[[-bw/2,-bh/2,bw/2,-bh/2],[bw/2,-bh/2,bw/2,bh/2],[bw/2,bh/2,-bw/2,bh/2],[-bw/2,bh/2,-bw/2,-bh/2]];
   loadReference(key);$('directModelError').textContent='مدل ساخته شد؛ جهت پین ۱، شماره‌گذاری و تمام ابعاد را با نقشهٔ سازنده تطبیق بده. سوراخ Press-fit تنها با تلرانس و الزام سازنده معتبر است.';
- }catch(e){clearOut(e.message);$('directModelError').textContent=e.message}
+ }catch(e){$('libraryMode').checked=false;clearOut(e.message);$('directModelError').textContent=e.message;save()}
 };
 
 Object.keys(REFERENCE_FOOTPRINTS).forEach(function(key){var option=document.createElement('option');option.value='lib-'+key;option.textContent=(REFERENCE_FOOTPRINTS[key].direct?'مدل ابعادی: ':'مرجع KiCad: ')+REFERENCE_FOOTPRINTS[key].name;$('smp').appendChild(option)});
@@ -2025,14 +2034,14 @@ function rememberPackage(){
  if(!activePackage)return;
  var draft={_demo:demoPackage===activePackage,libraryMode:$('libraryMode').checked,libraryKey:$('libraryKey').value,referencePads:$('referencePads').value,referenceBody:$('referenceBody').value};
  document.querySelectorAll('#bsmd input,#bsmd select,#bth input,#bth select,#bbga input,#bbga select,#advancedGeometry input,#advancedGeometry select,#directModelEditor input').forEach(function(e){
-  draft[e.id]=e.type==='checkbox'?e.checked:e.dataset.d==='1'&&e.value!==''?Number(e.value)*PX[U]:e.value;
+  draft[e.id]=e.type==='checkbox'?e.checked:e.dataset.d==='1'&&e.value!==''?rd(e.id):e.value;
  });
  packageDrafts[activePackage]=draft;
  try{localStorage.setItem('fp7352PackageDrafts',JSON.stringify(packageDrafts))}catch(e){}
 }
 function restorePackageDraft(id){
  var draft=packageDrafts[id];if(!draft)return false;demoPackage=draft._demo?id:'';
- Object.keys(draft).forEach(function(key){var e=$(key);if(!e)return;if(e.type==='checkbox')e.checked=!!draft[key];else e.value=e.dataset.d==='1'&&draft[key]!==''?+(Number(draft[key])/PX[U]).toFixed(6):draft[key]});
+ Object.keys(draft).forEach(function(key){var e=$(key);if(!e)return;if(e.type==='checkbox')e.checked=!!draft[key];else if(e.dataset.d==='1'&&draft[key]!==''&&Number.isFinite(Number(draft[key]))){var mm=Number(draft[key]);e.value=String(Number((mm/PX[U]).toPrecision(12)));DIMENSION_MM_CACHE.set(e,{mm:mm,display:e.value,unit:U})}else e.value=draft[key]});
  $('man').checked=false;$('smp').value='';window.CAM=null;return true;
 }
 function choosePackage(){directBox.hidden=true;rememberPackage();$('libraryMode').checked=false;activePackage=$('component').value+':'+$('package').value;
@@ -2284,17 +2293,17 @@ function T(v){return Math.round(v*100)}
 function nm(){var t=$('nT').value,P=+$('nP').value,L=+$('nL').value,W=+$('nW').value,H=+$('nH').value,N=$('nN').value,Th=+$('nTh').value,D=$('nD').value,pf=$('nPf').value.trim(),o,err='';
  // اعتبارسنجی: هیچ بُعد لازم صفر یا منفی نباید بی‌صدا حذف شود (ایراد ۳۳/۵۹/۴۲)
  if(['nP','nL','nW','nH','nTh','nN'].some(function(id){return !Number.isFinite(Number($(id).value))||Number($(id).value)<0}))err='ابعاد و تعداد باید متناهی و نامنفی باشند.';
- else if(!(P>0))err='گام (P) باید مثبت باشد.';
+ else if(t!=='3'&&!(P>0))err='گام (P) باید مثبت باشد.';
  else if(!(L>0))err=(t==='3'?'طول چیپ':'طول/lead span')+' باید مثبت باشد.';
  else if((t==='2'||t==='3')&&!(W>0))err='برای ساختار Body، عرض بدنه هم لازم است.';
  else if(!(H>0))err='ارتفاع (H) لازم است.';
- else if(!(N>0)||!Number.isInteger(+N))err='تعداد پین باید عدد صحیح مثبت باشد.';
+ else if(t!=='3'&&(!(N>0)||!Number.isInteger(+N)))err='تعداد پین باید عدد صحیح مثبت باشد.';
  if(err){$('nOut').textContent='نامعتبر: '+err;$('nOut').dataset.err='1';return ''}
- $('nOut').dataset.err='';
+ $('nOut').dataset.err='';N=String(Number(N));
  if(t==='1')o=pf+T(P)+'P'+T(L)+'X'+T(H)+'-'+N+D;
  else if(t==='2')o=pf+T(P)+'P'+T(L)+'X'+T(W)+'X'+T(H)+'-'+N+(Th>0?'T'+T(Th):'')+D;
  else{ // چیپ: هر بُعد یک رقم در دو طرف ممیز، همیشه دو کاراکتر (04 نه 4)
-   o=pf+('0'+Math.round(L*10)).slice(-2)+('0'+Math.round(W*10)).slice(-2)+'X'+T(H)+D}
+   o=pf+String(Math.round(L*10)).padStart(2,'0')+String(Math.round(W*10)).padStart(2,'0')+'X'+T(H)+D}
  $('nOut').textContent=o;return o}
 function ps(){var sh=$('pS').value,v1=+$('p1').value,v2=+$('p2').value,vh=+$('pH').value,
  q=function(v){return Math.round(v*100)},vh2=+$('pH2').value,err='';

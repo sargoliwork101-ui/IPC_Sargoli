@@ -144,17 +144,17 @@
     }
   ],
   "code_lines": {
-    "function smax": 475,
-    "function rule": 476,
-    "function smd": 743,
-    "function bga": 899,
-    "function thSlot": 970,
-    "function th()": 1010,
-    "function validateFootprint": 1137,
-    "function renderReference": 1877,
-    "function nm": 2284,
-    "function ps": 2299,
-    "function dec": 2316,
-    "function altium": 2384
+    "function smax": 484,
+    "function rule": 485,
+    "function smd": 753,
+    "function bga": 909,
+    "function thSlot": 980,
+    "function th()": 1020,
+    "function validateFootprint": 1147,
+    "function renderReference": 1885,
+    "function nm": 2293,
+    "function ps": 2308,
+    "function dec": 2325,
+    "function altium": 2393
   }
 }
