@@ -1013,7 +1013,7 @@ $('unit').onchange=function(){var nu=$('unit').value;
    e.value=+(mm/PX[nu]).toFixed(nu==='mm'?4:nu==='mil'?2:6)});
  UOLD=nu;U=nu;run()};
 document.querySelectorAll('.workspace input,.workspace select').forEach(function(e){if(e.id!=='unit'&&e.id!=='smp')e.addEventListener('input',function(){if(!e.closest('#t2,#t3'))run()})});
-var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',autoS:0,Lmax:3.4,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
+var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.51,H:1.75,P:1.27,n:8},qfp:{kind:'smd',fam:'gull',sides:'4',autoS:1,Lmin:8.8,Lmax:9.2,Tmin:.45,Tmax:.75,W:.27,H:1.6,P:.5,n:12},chip:{kind:'smd',fam:'chip',sides:'2',cType:'RESC',autoS:0,Lmin:3.0,Lmax:3.4,Tmin:0,Tmax:0,Smax:1.9,W:1.8,H:1,P:1.27,n:1},dip:{kind:'th',tK:14,tP:2.54,tR:7.62,tW:.52,tS:'2',tPr:'1',tB:1.6}};
 SM.soic8=Object.assign({},SM.soic,{n:4});
 SM.soic14=Object.assign({},SM.soic,{n:7});
 SM.tssop=Object.assign({},SM.soic,{Lmin:6.2,Lmax:6.6,Tmin:.45,Tmax:.75,W:.30,H:1.2,P:.65,n:8});
@@ -1024,6 +1024,7 @@ $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
  U='mm';UOLD='mm';$('unit').value='mm';
  // نمونه فقط خانوادهٔ خودش را بازنشانی می‌کند؛ سایر خانواده‌ها دست‌نخورده می‌مانند.
  FIELDS[s.kind].forEach(function(a){var e=$(a[0]);if(e)e.value=a[3]});
+ if(s.kind==='smd'){$('cType').value=s.fam==='chip'?'RESC':s.fam==='qfn'?'QFN':''}
  window.CAM=null;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
