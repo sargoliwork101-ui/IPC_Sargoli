@@ -203,6 +203,46 @@ console.log('\n۷) راهنما: شبیه‌سازها (ایراد ۹، ۴۰، �
   }
 }
 
+console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نمای خودکار');
+{
+  const { d } = load(TOOL);
+  const svgTexts = () => [...d.getElementById('svg').querySelectorAll('text')].map(t => t.textContent).join(' | ');
+  const vb = () => d.getElementById('svg').getAttribute('viewBox').split(' ').map(Number);
+
+  setV(d, 'kind', 'smd');
+  const t1 = svgTexts();
+  ok(/L 1\.31 mm/.test(t1) && /X 0\.57 mm/.test(t1), 'اندازهٔ طول و عرض پد روی نقشه نوشته می‌شود', t1);
+  ok(/Z 6\.90 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
+  ok(/Courtyard/.test(t1), 'Courtyard روی نقشه با اندازه نوشته می‌شود', t1);
+  const [vx, vy, vw, vh] = vb();
+  ok(vw > 0 && vh > 0 && vw < 600 && vh < 600, 'نمای نقشه به اندازهٔ محتوا بریده می‌شود (بدون فضای خالی)', vb().join(','));
+
+  setV(d, 'kind', 'bga');
+  const t2 = svgTexts();
+  ok(/Ø 0\.40 mm/.test(t2) && /P 0\.80 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
+  setV(d, 'kind', 'th');
+  const t3 = svgTexts();
+  ok(/Hole Ø0\.92 mm/.test(t3) && /Row span 7\.62 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
+  setV(d, 'unit', 'mil');
+  ok(/mm|mil/.test(svgTexts()), 'برچسب اندازه‌ها واحد فعال را نشان می‌دهد', svgTexts().slice(0, 60));
+}
+
+console.log('\n۱۰) پنل داینامیک');
+{
+  const { d } = load(TOOL);
+  const shown = () => [...d.querySelectorAll('#paramGrid>div')].filter(x => x.style.display !== 'none').map(x => x.querySelector('input,select').id);
+  setV(d, 'kind', 'smd'); const a = shown();
+  setV(d, 'kind', 'bga'); const b = shown();
+  setV(d, 'kind', 'th');  const c = shown();
+  ok(a.includes('pZJ') && !a.includes('pBR'), 'SMD فقط پارامترهای SMD را نشان می‌دهد', a.join(','));
+  ok(b.includes('pBR') && !b.includes('pZJ'), 'BGA فقط پارامترهای BGA را نشان می‌دهد', b.join(','));
+  ok(c.includes('pHole') && !c.includes('pBR'), 'TH فقط پارامترهای سوراخ‌دار را نشان می‌دهد', c.join(','));
+  setV(d, 'showAllP', true);
+  ok([...d.querySelectorAll('#paramGrid>div')].every(x => x.style.display !== 'none'), 'کلید «نمایش همه» همهٔ پارامترها را برمی‌گرداند');
+  const sel = d.querySelector('.grid>div.wide select');
+  ok(!!sel, 'فیلدهای انتخابی تمام‌عرض علامت‌گذاری می‌شوند (متن نصفه نمی‌شود)');
+}
+
 console.log('\n۸) دوره: متن استاندارد (ایراد ۱۴، ۴، ۶۱، ۶۷، ۹۲)');
 {
   const t = fs.readFileSync(COURSE, 'utf8');

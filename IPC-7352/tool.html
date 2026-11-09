@@ -1,3 +1,17 @@
+// زوم با چرخ ماوس روی نقشه؛ «تناسب نما» به نمای خودکار برمی‌گردد
+if($('svg')&&$('canvasWrap')){
+ function applyZoom(z){
+  var b=window.SVG_BASE;if(!b)return;window.SVG_ZOOM=Math.min(6,Math.max(.5,z));
+  var w=b[2]/window.SVG_ZOOM,h=b[3]/window.SVG_ZOOM,cx=b[0]+b[2]/2,cy=b[1]+b[3]/2;
+  $('svg').setAttribute('viewBox',(cx-w/2).toFixed(1)+' '+(cy-h/2).toFixed(1)+' '+w.toFixed(1)+' '+h.toFixed(1));
+ }
+ $('canvasWrap').addEventListener('wheel',function(e){e.preventDefault();applyZoom((window.SVG_ZOOM||1)*(e.deltaY<0?1.12:.89))},{passive:false});
+ if($('fitBtn'))$('fitBtn').onclick=function(){applyZoom(1)};
+ if($('gridBtn')){$('gridBtn').classList.add('active');
+  $('gridBtn').onclick=function(){var w=$('canvasWrap'),off=w.style.backgroundImage==='none';
+   w.style.backgroundImage=off?'':'none';$('gridBtn').classList.toggle('active',off);
+   $('gridBtn').textContent=off?'شبکهٔ نقطه‌ای':'شبکه: خاموش'};}
+}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -65,11 +79,22 @@ math{direction:ltr;font-family:"Latin Modern Math","STIX Two Math","Cambria Math
 .section-title::after{content:"";flex:1;height:1px;background:var(--line2)}
 .group{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line2)}
 .group:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+.group>.section-title{cursor:pointer;user-select:none}
+.group>.section-title::before{content:"▾";font-size:9px;color:#5d7189;margin-inline-end:2px}
+.group.collapsed>.section-title::before{content:"▸"}
+.group.collapsed>*:not(.section-title){display:none!important}
+@keyframes pulse{0%{box-shadow:0 0 0 0 #56c7b566}100%{box-shadow:0 0 0 9px #56c7b500}}
+.dot.ping{animation:pulse .7s ease-out}
 
 /* ---------- fields ---------- */
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 9px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:8px 9px}
 .grid.one{grid-template-columns:1fr}
-.grid.three{grid-template-columns:repeat(3,1fr)}
+.grid.three{grid-template-columns:repeat(auto-fit,minmax(88px,1fr))}
+.grid>.wide{grid-column:1/-1}          /* فیلدهای متنی بلند (select) تمام‌عرض می‌شوند تا نصفه دیده نشوند */
+.grid>.wide label{flex-direction:row;align-items:center}
+.grid>div{min-width:0}
+.grid label{overflow-wrap:anywhere;word-break:break-word}
+select{text-overflow:ellipsis}
 label{font-size:11px;color:var(--muted);display:block;font-weight:600;line-height:1.5}
 .grid label,.field label{display:flex;justify-content:space-between;gap:6px;margin-bottom:5px;color:#b7c4d4}
 label small{display:block;font-size:9.5px;font-weight:500;color:#6f8299;margin-top:1px}
@@ -201,7 +226,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
     <div><b>ابزار طراحی فوت‌پرینت</b><small>IPC-7352 · LAND PATTERN WORKSPACE</small></div>
   </div>
   <div class="top-actions">
-    <span class="status"><i class="dot"></i><span>آفلاین · ذخیرهٔ خودکار در این مرورگر</span></span>
+    <span class="status"><i class="dot"></i><span id="statTxt">آفلاین · به‌روزرسانی زنده</span></span>
     <button class="btn" id="helpBtn">راهنما</button>
     <a class="btn" href="guide.html">صفحهٔ آموزشی</a>
     <a class="btn primary" href="course.html">دورهٔ کامل استاندارد</a>
@@ -234,25 +259,26 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
   </div>
   <div class="group">
     <div class="section-title">پارامترهای استاندارد (قابل تنظیم)</div>
-    <p class="note" style="margin:0 0 8px">همهٔ اعداد این بخش با واحد انتخاب‌شده در بالا خوانده و نوشته می‌شوند.</p>
+    <p class="note" style="margin:0 0 8px">فقط پارامترهای مربوط به نوع قطعهٔ انتخاب‌شده نشان داده می‌شوند؛ اعداد با واحد فعال خوانده و نوشته می‌شوند.</p>
+    <label style="display:block;margin:0 0 8px;font-size:10.5px"><input type="checkbox" id="showAllP"> نمایش همهٔ پارامترها</label>
     <div style="margin-bottom:8px"><label style="display:block;margin:6px 0"><input type="checkbox" id="man"> ویرایش دستی (override): اگر روشن شود اعداد زیر به‌جای مقادیر استاندارد به کار می‌روند. اگر خاموش باشد، همین خانه‌ها مقدار استاندارد مورد استفاده را نشان می‌دهند.</label></div>
-    <div class="grid">
-<div><label class="kv" data-v="ZJ">ZJ: بیرون‌زدگی بیرونی (SMD)</label><input id="pZJ" type="number" step="any" data-d="1"></div>
-<div><label class="kv" data-v="GJ">GJ: بیرون‌زدگی داخلی (SMD)</label><input id="pGJ" type="number" step="any" data-d="1"></div>
-<div><label class="kv" data-v="SJ">SJ: اضافه‌ی کناره (SMD)</label><input id="pSJ" type="number" step="any" data-d="1"></div>
-<div><label class="kv" data-v="CE">CE: Courtyard excess (SMD)</label><input id="pCE" type="number" step="any" data-d="1"></div>
-<div><label class="kv" data-v="BR">درصد تغییر قطر پد BGA (٪)</label><input id="pBR" type="number" step="any" data-d="0"></div>
-<div><label>Courtyard excess (BGA)</label><input id="pBCE" type="number" step="any" data-d="1"></div>
-<div><label class="kv" data-v="HA">اضافه به سوراخ (TH)</label><input id="pHadd" type="number" step="any" data-d="1"></div>
-<div><label>اصلاح ضخامت برد (TH)</label><input id="pHadj" type="number" step="any" data-d="1"></div>
-<div><label>اضافه پد به سوراخ (TH)</label><input id="pPadd" type="number" step="any" data-d="1"></div>
-<div><label class="kv" data-v="HOLE">قطر سوراخ نهایی (override؛ 0 = خودکار)</label><input id="pHole" type="number" step="any" data-d="1" value="0"></div>
-<div><label class="kv" data-v="NA">افزودنی سوراخ غیرآبکاری (NPTH)</label><input id="pNadd" type="number" step="any" data-d="1" value="0.4"></div>
-<div><label class="kv" data-v="CR">گرد کردن Courtyard به بالا (0 = بدون)</label><input id="pCR" type="number" step="any" data-d="1" value="0"></div>
-<div><label class="kv" data-v="MK">نشانهٔ پین ۱ در خروجی Altium</label><select id="pMark"><option value="0">بدون نشانه (خودت اضافه کن)</option><option value="1">دایره روی لایهٔ سیلک (Top Overlay)</option></select></div>
-<div><label>شکل پد در خروجی Altium</label><select id="pShape"><option value="auto">خودکار (بیضوی برای پایه‌دار)</option><option value="o">بیضوی</option><option value="r">مستطیلی</option></select></div>
-<div><label class="kv" data-v="GAP">حداقل فاصله‌ی خالی بین پدها (هشدار)</label><input id="pGap" type="number" step="any" data-d="1" value="0.15"></div>
-<div><label>ارقام اعشار (mm)</label><input id="pDec" type="number" step="1" min="2" max="4" value="2" data-d="0"></div>
+    <div class="grid" id="paramGrid">
+<div data-k="smd"><label class="kv" data-v="ZJ">ZJ: بیرون‌زدگی بیرونی (SMD)</label><input id="pZJ" type="number" step="any" data-d="1"></div>
+<div data-k="smd"><label class="kv" data-v="GJ">GJ: بیرون‌زدگی داخلی (SMD)</label><input id="pGJ" type="number" step="any" data-d="1"></div>
+<div data-k="smd"><label class="kv" data-v="SJ">SJ: اضافه‌ی کناره (SMD)</label><input id="pSJ" type="number" step="any" data-d="1"></div>
+<div data-k="smd"><label class="kv" data-v="CE">CE: Courtyard excess (SMD)</label><input id="pCE" type="number" step="any" data-d="1"></div>
+<div data-k="bga"><label class="kv" data-v="BR">درصد تغییر قطر پد BGA (٪)</label><input id="pBR" type="number" step="any" data-d="0"></div>
+<div data-k="bga"><label>Courtyard excess (BGA)</label><input id="pBCE" type="number" step="any" data-d="1"></div>
+<div data-k="th"><label class="kv" data-v="HA">اضافه به سوراخ (TH)</label><input id="pHadd" type="number" step="any" data-d="1"></div>
+<div data-k="th"><label>اصلاح ضخامت برد (TH)</label><input id="pHadj" type="number" step="any" data-d="1"></div>
+<div data-k="th"><label>اضافه پد به سوراخ (TH)</label><input id="pPadd" type="number" step="any" data-d="1"></div>
+<div data-k="th"><label class="kv" data-v="HOLE">قطر سوراخ نهایی (override؛ 0 = خودکار)</label><input id="pHole" type="number" step="any" data-d="1" value="0"></div>
+<div data-k="th"><label class="kv" data-v="NA">افزودنی سوراخ غیرآبکاری (NPTH)</label><input id="pNadd" type="number" step="any" data-d="1" value="0.4"></div>
+<div data-k="all"><label class="kv" data-v="CR">گرد کردن Courtyard به بالا (0 = بدون)</label><input id="pCR" type="number" step="any" data-d="1" value="0"></div>
+<div data-k="all"><label class="kv" data-v="MK">نشانهٔ پین ۱ در خروجی Altium</label><select id="pMark"><option value="0">بدون نشانه (خودت اضافه کن)</option><option value="1">دایره روی لایهٔ سیلک (Top Overlay)</option></select></div>
+<div data-k="all"><label>شکل پد در خروجی Altium</label><select id="pShape"><option value="auto">خودکار (بیضوی برای پایه‌دار)</option><option value="o">بیضوی</option><option value="r">مستطیلی</option></select></div>
+<div data-k="all"><label class="kv" data-v="GAP">حداقل فاصله‌ی خالی بین پدها (هشدار)</label><input id="pGap" type="number" step="any" data-d="1" value="0.15"></div>
+<div data-k="all"><label>ارقام اعشار (mm)</label><input id="pDec" type="number" step="1" min="2" max="4" value="2" data-d="0"></div>
     </div>
   </div>
  </div>
@@ -434,14 +460,31 @@ melf:[[Math.min(W,1),.4,.2][i],[.2,.1,.02][i],[.55,.35,.15][i],[.5,.25,.1][i],'3
 conc:[[m(.5*H,.65),m(.25*H,.45),.45][i],[.25,.15,.05][i],[.05,0,0][i],[.5,.25,.1][i],'3-6'],
 inl:[[m(.25*H,.8),m(.25*H,.5),.2][i],[.25,.15,.07][i],[.01,0,0][i],[.5,.25,.1][i],'3-8'],
 butt:[[1,.8,.6][i],[1,.8,.6][i],[1,.8,.6][i],[1.5,.8,.2][i],'3-7'],lug:[[.05,.03,.01][i],[.05,.03,.01][i],[.05,.03,.01][i],[.5,.25,.1][i],'3-9']};return t[F]}
-function kit(sc,oy){var svg=$('svg');svg.innerHTML='';var d=el('defs',{}),m=el('marker',{id:'ar',viewBox:'0 0 10 10',refX:'5',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto-start-reverse'});m.appendChild(el('path',{d:'M0 0L10 5L0 10z',fill:'#4a90e2'}));d.appendChild(m);svg.appendChild(d);
-var K={svg:svg,PX:function(v){return 350+v*sc},PY:function(v){return oy-v*sc}};
-K.rect=function(x,y,w,h,fill,o,ex){var r=el('rect',{x:K.PX(x),y:K.PY(y+h),width:Math.max(w*sc,.5),height:Math.max(h*sc,.5),fill:fill,'fill-opacity':o==null?1:o});for(var k in ex||{})r.setAttribute(k,ex[k]);svg.appendChild(r)};
+function kit(sc,oy){var svg=$('svg');svg.innerHTML='';var d=el('defs',{}),m=el('marker',{id:'ar',viewBox:'0 0 10 10',refX:'5',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto-start-reverse'});m.appendChild(el('path',{d:'M0 0L10 5L0 10z',fill:'#4a90e2'}));d.appendChild(m);
+var m2=el('marker',{id:'dm',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto-start-reverse'});
+m2.appendChild(el('path',{d:'M1 1L9 5L1 9z',fill:'#5fb0ff'}));d.appendChild(m2);svg.appendChild(d);
+var K={svg:svg,PX:function(v){return 440+v*sc},PY:function(v){return oy-v*sc}};
+K.view=function(x0,y0,x1,y1){var vb=[x0,y0,x1-x0,y1-y0];
+ svg.setAttribute('viewBox',vb.map(function(v){return v.toFixed(1)}).join(' '));window.SVG_BASE=vb;window.SVG_ZOOM=1};
+K.rect=function(x,y,w,h,fill,o,ex){var r=el('rect',{x:K.PX(x),y:K.PY(y+h),width:Math.max(w*sc,.5),height:Math.max(h*sc,.5),fill:fill,'fill-opacity':o==null?1:o});for(var k in ex||{})r.setAttribute(k,ex[k]);svg.appendChild(r);return r};
+K.tip=function(node,t){if(!node)return;var ti=el('title',{});ti.textContent=t;node.appendChild(ti);return node};
 K.ln=function(a,b,c,e){svg.appendChild(el('line',{x1:a,y1:b,x2:c,y2:e,stroke:'#888','stroke-width':.8,'stroke-dasharray':'2 2'}))};
 K.tx=function(x,y,s,a){var e=el('text',{x:x,y:y,'text-anchor':a||'middle'});e.textContent=s;e.addEventListener('click',function(){var k=s.split(' ')[0];tip(k)});svg.appendChild(e)};
 K.ar=function(a,b,c,e){svg.appendChild(el('line',{x1:a,y1:b,x2:c,y2:e,stroke:'#4a90e2','stroke-width':1.4,'marker-start':'url(#ar)','marker-end':'url(#ar)'}))};
 K.hd=function(a,b,y,s,ey,t){K.ln(a,ey,a,y);K.ln(b,ey,b,y);K.ar(a,y,b,y);K.tx((a+b)/2,y-4,s+' '+(t||''))};
-K.vd=function(y1,y2,x,s,ex,a){K.ln(ex,y1,x,y1);K.ln(ex,y2,x,y2);K.ar(x,y1,x,y2);K.tx(x+(a==='end'?-6:6),(y1+y2)/2+4,s,a||'start')};return K}
+K.vd=function(y1,y2,x,s,ex,a){K.ln(ex,y1,x,y1);K.ln(ex,y2,x,y2);K.ar(x,y1,x,y2);K.tx(x+(a==='end'?-6:6),(y1+y2)/2+4,s,a||'start')};
+// ---- اندازه‌گذاری تمیز (خط راهنما + فلش + برچسب خوانا) ----
+var DIM={stroke:'#5fb0ff','stroke-width':1.1,fill:'none'};
+function dimLine(x1,y1,x2,y2){var l=el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:'#5fb0ff','stroke-width':1.1,'marker-start':'url(#dm)','marker-end':'url(#dm)'});K.svg.appendChild(l)}
+function dimText(x,y,t,a){var g=el('g',{});var tx=el('text',{x:x,y:y,'text-anchor':a||'middle',fill:'#d8ecff','font-size':'12','font-weight':'700'});tx.textContent=t;
+  var w=Math.max(String(t).length*6.6+10,26),h=17,bx=x-(a==='start'?0:a==='end'?w:w/2),by=y-h+4;
+  g.appendChild(el('rect',{x:bx,y:by,width:w,height:h,rx:4,fill:'#0d1a28','fill-opacity':.92,stroke:'#26425c','stroke-width':.8}));
+  g.appendChild(tx);K.svg.appendChild(g)}
+K.dimH=function(xa,xb,y,t){if(Math.abs(xb-xa)<3)return; K.svg.appendChild(el('line',{x1:xa,y1:y,x2:xa,y2:y+6,stroke:'#4a6b8a','stroke-width':.9}));
+  K.svg.appendChild(el('line',{x1:xb,y1:y,x2:xb,y2:y+6,stroke:'#4a6b8a','stroke-width':.9}));dimLine(xa,y,xb,y);dimText((xa+xb)/2,y-4,t)};
+K.dimV=function(ya,yb,x,t,a){if(Math.abs(yb-ya)<3)return;dimLine(x,ya,x,yb);
+  var ty=(ya+yb)/2, ax=el('text',{});dimText(a==='start'?x+9:x-9,ty+5,t,a==='start'?'start':'end')};
+return K}
 var R=[],P=[],W='',M={},MP=[],PITCH_TXT='';function SHP(F){var s=$('pShape').value;return s==='auto'?(['gull','jlead','sof','inl'].indexOf(F)>-1?'o':'r'):s}function RC(v){var s=rd('pCR');return s>0?Math.ceil(v/s-1e-9)*s:v}
 V.A='A: عرض بدنه‌ی قطعه (Figure 3-3). اگر Smax از A بزرگ‌تر نباشد، هدف فیلت پاشنه برای gull-wing کوچک‌تر می‌شود (یادداشت 3 جدول 3-1، ص 9).';V.Th='Th: اندازه‌ی پد حرارتی (Exposed pad) QFN؛ یک پین به تعداد پین‌ها اضافه می‌کند و در نام به شکل T365 می‌آید.';V.HOLE='قطر نهایی سوراخ. اگر بزرگ‌تر از صفر باشد، به‌جای محاسبه‌ی جدول‌ها استفاده می‌شود (مثلاً برای press-fit مقدار سازنده).';V.NA='سوراخ غیرآبکاری = حداکثر بُعد پایه + این مقدار (ص 24 استاندارد: 0.4).';V.CR='Courtyard به مضرب این مقدار به بالا (ceil) گرد می‌شود؛ مثال استاندارد 0.5 است (ص 13).';
 V.PADN='پین ۱ معمولاً مربع گرفته می‌شود تا قطبیت دیده شود، ولی بند 4.2.3 برای سمت درج حلقهٔ دایره‌ای می‌خواهد. اگر سمت مقابل یا نشانه‌گذاری دیگری داری، دایره را انتخاب کن.';
@@ -497,6 +540,14 @@ $('pads').value=hdr+'\n'+pads.join('\n');
 $('warn').textContent=warn||'';
 syncInspect();
 }
+// ---- نمایش فقط پارامترهای مرتبط با نوع قطعه (ایراد «صفحه داینامیک نیست») ----
+function filterParams(){
+ var k=$('kind').value,all=$('showAllP')&&$('showAllP').checked;
+ document.querySelectorAll('#paramGrid>div').forEach(function(d){
+  var ks=(d.getAttribute('data-k')||'all').split('|');
+  d.style.display=(all||ks.indexOf('all')>-1||ks.indexOf(k)>-1)?'':'none'});
+}
+if($('showAllP'))$('showAllP').onchange=filterParams;
 // ---- بازرس و کارت‌های متریک: فقط نمایشی، از همان ردیف‌های نتیجه ----
 function rowV(re){for(var i=0;i<R.length;i++){if(new RegExp(re).test(R[i][0]))return R[i][1]}return '—'}
 function syncInspect(){
@@ -579,7 +630,7 @@ for(var a1=0;a1<pads.length;a1++)for(var b1=a1+1;b1<pads.length;b1++){
   if(g<minGap){minGap=g;pair=pads[a1].n+'/'+pads[b1].n}}
 if(pads.length<2){minGap=null;pair='—'}                     // فاصله فقط برای جفت واقعی (ایراد ۹۵)
 // ---------- نقشه ----------
-var sc=Math.min(420/cw,110/(ch/2)),K=kit(sc,170);
+var sc=Math.min(400/cw,130/ch),K=kit(sc,190);
 K.rect(-cw/2,-ch/2,cw,ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'6 4','stroke-width':1.5});
 var bh=bw>0?bw/2:Math.max(S/2-.35,.4),bv=bw>0?bw/2:Math.max(((n-1)*Pt+X)/2*.92,.4);
 K.rect(-bh,-bv,2*bh,2*bv,'#8e9aa3',.5,{stroke:'#555'});
@@ -587,8 +638,21 @@ var shp=SHP(F);
 pads.forEach(function(p){
   var ex={stroke:p.th?'#1d5a42':'#8a6d0b'};
   if(!p.th&&shp==='o')ex.rx=Math.min(p.w,p.h)/2*sc;   // شکل نقشه = شکل خروجی
-  K.rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,p.th?'#2c7a5b':'#d4a017',p.th?.55:.6,ex)});
+  K.tip(K.rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,p.th?'#2c7a5b':'#d4a017',p.th?.55:.6,ex),
+    'پد '+p.n+' · '+fm(p.w)+' × '+fm(p.h)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')')});
 K.svg.appendChild(el('circle',{cx:K.PX(-Z/2-.25),cy:K.PY((n-1)*Pt/2),r:4,fill:'#000'}));
+// ---------- اندازه‌گذاری روی تصویر (بُعد پد، فاصله، گام، Courtyard) ----------
+(function(){
+ var p0=pads[0]||{w:X,h:X,y:0},eY=0,eX=0;
+ pads.forEach(function(q){eY=Math.max(eY,Math.abs(q.y)+q.h/2);eX=Math.max(eX,Math.abs(q.x)+q.w/2)});
+ eX=Math.max(eX,cw/2);eY=Math.max(eY,ch/2);
+ K.dimH(K.PX(-eX+0),K.PX(-eX+p0.w),K.PY(eY)-14,'L '+fm(p0.w)+' '+U);          // طول پد
+ K.dimH(K.PX(-eX),K.PX(eX),K.PY(eY)-38,'Z '+fm(Z)+' '+U);                      // طول کل پدها
+ K.dimV(K.PY(p0.h/2),K.PY(-p0.h/2),K.PX(-eX)-16,'X '+fm(p0.h)+' '+U,'end');     // عرض پد
+ K.dimH(K.PX(-cw/2),K.PX(cw/2),K.PY(-ch/2)+26,'Courtyard '+fm(cw)+' '+U);
+ K.dimV(K.PY(ch/2),K.PY(-ch/2),K.PX(cw/2)+16,fm(ch)+' '+U,'start');
+ K.view(K.PX(-eX)-56,K.PY(eY)-56,K.PX(eX)+62,K.PY(-eY)+40);
+})();
 // ---------- نام (جدول 3-16) ----------
 var sf=lv==='A'?'M':lv==='B'?'N':'L',pin=pads.length,asym='',nm='',T=function(v){return Math.round(v*100)},
  lead=(Ln>0?(Ln+Lm)/2:Lm),cT=$('cType').value,
@@ -657,7 +721,8 @@ K.rect(-cw/2,-ch/2,cw,ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'6 4','st
 K.rect(-BL/2,-BW/2,BL,BW,'#8e9aa3',.35,{stroke:'#555'});
 padsR.forEach(function(p){
   if(skipt[p.n]){K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd*sc/2*.35,1),fill:'none',stroke:'#bbb','stroke-dasharray':'2 2'}));return}
-  K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd/2*sc,1),fill:'#d4a017','fill-opacity':.7,stroke:'#8a6d0b'}));
+  K.tip(K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd/2*sc,1),fill:'#d4a017','fill-opacity':.7,stroke:'#8a6d0b'})),
+    p.n+' · Ø '+fm(pd)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')');
   MP.push({n:p.n,x:p.x,y:p.y,w:pd,h:pd,sh:'c',hole:0,pl:true});
 });
 var minGap=1e9,pair='';
@@ -665,9 +730,14 @@ for(var a1=0;a1<MP.length;a1++)for(var b1=a1+1;b1<MP.length;b1++){
   var g=Math.max(Math.abs(MP[a1].x-MP[b1].x)-pd,Math.abs(MP[a1].y-MP[b1].y)-pd);
   if(g<minGap){minGap=g;pair=MP[a1].n+'/'+MP[b1].n}}
 if(MP.length<2){minGap=null;pair='—'}
-var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;K.hd(K.PX(x0-pd/2),K.PX(x0+pd/2),K.PY(top)-26,'Ball',K.PY(top-pd/2),'Ø'+fm(pd));
-if(c>1)K.hd(K.PX(x0),K.PX(x0+PtX),K.PY(top)-6,'P',K.PY(top-pd/2),fm(PtX));
-K.hd(K.PX(-cw/2),K.PX(cw/2),K.PY(-ch/2)+22,'Courtyard',K.PY(-ch/2),fm(cw));
+var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;// ---- اندازه‌گذاری BGA روی تصویر: قطر توپ، گام، عرض آرايه، Courtyard ----
+var ax=Math.max(Math.abs(x0),cw/2),ay=Math.max(top-pd/2,ch/2);
+K.dimH(K.PX(x0-pd/2),K.PX(x0+pd/2),K.PY(ay)-14,'Ø '+fm(pd)+' '+U);
+if(c>1)K.dimH(K.PX(x0),K.PX(x0+PtX),K.PY(ay)-38,'P '+fm(PtX)+' '+U);
+K.dimH(K.PX(x0-pd/2),K.PX(-x0+pd/2),K.PY(ay)-62,'Array '+fm(Math.abs(2*x0)+pd)+' '+U);
+K.dimH(K.PX(-cw/2),K.PX(cw/2),K.PY(-ch/2)+26,'Courtyard '+fm(cw)+' '+U);
+K.dimV(K.PY(ch/2),K.PY(-ch/2),K.PX(cw/2)+16,fm(ch)+' '+U,'start');
+K.view(K.PX(-cw/2)-40,K.PY(Math.max(ay,ch/2))-80,K.PX(cw/2)+70,K.PY(-ch/2)+44);
 M.cw=cw;M.ch=ch;
 M.name='BGA'+count+ty+Math.round(Pt*100)+'P'+c+'X'+rw+'_'+Math.round(BL*100)+'X'+Math.round(BW*100)+'X'+Math.round(BH*100)+'D'+Math.round(b*100)+'N';
 var wr=WG;if(count<rw*c)wr+=(rw*c-count)+' موقعیت حذف شد و پد برای آن ساخته نشد. ';
@@ -731,16 +801,21 @@ pads.forEach(function(p){bodyX=Math.max(bodyX,Math.abs(p.x));bodyY=Math.max(body
 M.cw=RC(2*(bodyX+pad/2));M.ch=RC(2*(bodyY+pad/2));
 K.rect(-M.cw/2,-M.ch/2,M.cw,M.ch,'none',1,{stroke:'#c0392b','stroke-dasharray':'6 4','stroke-width':1.5});
 pads.forEach(function(p){
-  if(p.n===1&&p1==='r')K.rect(p.x-pad/2,p.y-pad/2,pad,pad,'#d4a017',.6,{stroke:'#8a6d0b'});
-  else K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:pad/2*sc,fill:'#d4a017','fill-opacity':.6,stroke:'#8a6d0b'}));
+  var tInfo='پد '+p.n+' · Ø '+fm(pad)+' '+U+' · سوراخ Ø'+fm(hole)+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')';
+  if(p.n===1&&p1==='r')K.tip(K.rect(p.x-pad/2,p.y-pad/2,pad,pad,'#d4a017',.6,{stroke:'#8a6d0b'}),tInfo);
+  else K.tip(K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:pad/2*sc,fill:'#d4a017','fill-opacity':.6,stroke:'#8a6d0b'})),tInfo);
   K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:hole/2*sc,fill:'#1b2a26','fill-opacity':.85}));
   MP.push({n:p.n,x:p.x,y:p.y,w:pad,h:pad,sh:(p.n===1&&p1==='r')?'r':'c',hole:hole,pl:HT!=='N'});
 });
 var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
-K.hd(K.PX(x0-pad/2),K.PX(x0+pad/2),K.PY(y0+pad/2)-10,'Pad',K.PY(y0),'Ø'+fm(pad));
-if(two){K.hd(K.PX(-R2/2),K.PX(R2/2),K.PY(y0+pad/2)-34,'Lead',K.PY(y0),'span '+fm(R2));
-  K.vd(K.PY(y0),K.PY(y0-Pt),K.PX(-R2/2)-pad/2*sc-30,'P '+fm(Pt),K.PX(-R2/2)-pad/2*sc,'end')}
-else if(k>1)K.hd(K.PX(x0),K.PX(x0+Pt),K.PY(pad/2)-34,'P',K.PY(0),fm(Pt));
+// ---- اندازه‌گذاری TH روی تصویر: پد، سوراخ، گام، فاصلهٔ ردیف‌ها، Courtyard ----
+K.dimH(K.PX(x0-pad/2),K.PX(x0+pad/2),K.PY(M.ch/2)-14,'Pad '+fm(pad)+' '+U);
+K.dimH(K.PX(x0-hole/2),K.PX(x0+hole/2),K.PY(M.ch/2)-38,'Hole Ø'+fm(hole)+' '+U);
+if(two){K.dimH(K.PX(-R2/2),K.PX(R2/2),K.PY(M.ch/2)-62,'Row span '+fm(R2)+' '+U);
+  K.dimV(K.PY(Pt/2),K.PY(-Pt/2),K.PX(-M.cw/2)-14,'P '+fm(Pt)+' '+U,'end')}
+else if(k>1)K.dimH(K.PX(x0),K.PX(x0+Pt),K.PY(M.ch/2)-62,'P '+fm(Pt)+' '+U);
+K.dimH(K.PX(-M.cw/2),K.PX(M.cw/2),K.PY(-M.ch/2)+26,'Courtyard '+fm(M.cw)+' '+U);
+K.view(K.PX(-M.cw/2)-46,K.PY(M.ch/2)-82,K.PX(M.cw/2)+40,K.PY(-M.ch/2)+44);
 var pfx=p1==='r'?'r':'c';
 var Wname=Wd0;  // W در نام = حداکثر عرض پایه (نه قطر قطری) — ایراد ۵۷
 M.name=(two?'DIP':'SIP')+Math.round((two?R2:Pt)*100)+'W'+Math.round(Wname*100)+'P'+Math.round(Pt*100)+'Q'+k+'B';
@@ -766,6 +841,7 @@ function run(){
 var k=$('kind').value;
 ['smd','bga','th'].forEach(function(a){$('b'+a).classList.toggle('on',a===k)});
 $('warn').textContent='';WG='';
+filterParams();
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
 try{(k==='smd'?smd:k==='bga'?bga:th)()}catch(e){$('warn').textContent='خطای اجرا: '+e.message;VALID=false}
 if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروجی معتبری تولید نشد.</td></tr>';
@@ -804,6 +880,29 @@ function showTab(id){
 }
 document.querySelectorAll('[data-t]').forEach(function(b){b.addEventListener('click',function(){showTab(b.dataset.t)})});
 /* ================= تعامل‌های پوستهٔ استودیو ================= */
+// فیلدهایی که select دارند تمام‌عرض می‌شوند (متن فارسی در ستون باریک نصفه نمی‌شود)
+function markWide(){document.querySelectorAll('.grid>div').forEach(function(d){
+  if(d.querySelector('select')||d.querySelector('textarea'))d.classList.add('wide')})}
+markWide();
+// بخش‌های ستون کناری: باز/بسته شدن با ذخیرهٔ وضعیت
+(function(){
+ var KEY='fp7352_groups',st={};try{st=JSON.parse(localStorage.getItem(KEY)||'{}')}catch(e){}
+ document.querySelectorAll('.sidebar .group').forEach(function(g,i){
+   var t=g.querySelector('.section-title');if(!t)return;
+   var k='g'+i;if(st[k])g.classList.add('collapsed');
+   t.onclick=function(){g.classList.toggle('collapsed');
+     st[k]=g.classList.contains('collapsed');try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+ });
+})();
+// «داینامیک بودن»: هر تغییری در صفحه محاسبه و کل رابط را تازه می‌کند + نشانگر زنده
+(function(){
+ var dot=document.querySelector('.status .dot'),tm=null;
+ function ping(){if(!dot)return;dot.classList.remove('ping');void dot.offsetWidth;dot.classList.add('ping');
+   var t=$('statTxt');if(t){var d=new Date();
+    t.textContent='آخرین به‌روزرسانی '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2)}};
+ document.addEventListener('input',function(e){if(!e.target.closest('.workspace'))return;
+   clearTimeout(tm);tm=setTimeout(ping,80)});
+})();
 function copyText(el,msgEl){
  var done=function(){if(msgEl)msgEl.textContent=' کپی شد';
    if(el&&el.id==='pads'&&$('cpTop')){$('cpTop').textContent='کپی شد ✓';setTimeout(function(){$('cpTop').textContent='کپی پدها'},1400)}};
