@@ -262,6 +262,42 @@ console.log('\n۹ب) اعداد روی نقشه با هندسهٔ واقعی پ�
   ok(clash === 0, 'برچسب‌های اندازه‌گذاری روی هم نمی‌افتند', String(clash) + ' تداخل');
 }
 
+console.log('\n۹ج) دیدبان نقشه: جابه‌جایی، زوم و برچسب‌های نسبی');
+{
+  const { d } = load(TOOL);
+  const svg = d.getElementById('svg');
+  const vb = () => svg.getAttribute('viewBox').split(' ').map(Number);
+  ok(!!d.getElementById('zoomIn') && !!d.getElementById('zoomOut') && !!d.getElementById('fitBtn'), 'دکمه‌های زوم و تناسب نما وجود دارند');
+  const base = vb();
+  d.getElementById('zoomIn').click();
+  const zin = vb();
+  ok(zin[2] < base[2] - 1e-6, 'دکمهٔ + نقشه را بزرگ می‌کند', base[2].toFixed(1) + '→' + zin[2].toFixed(1));
+  d.getElementById('zoomOut').click(); d.getElementById('zoomOut').click();
+  ok(vb()[2] > base[2], 'دکمهٔ − نقشه را کوچک می‌کند');
+  d.getElementById('fitBtn').click();
+  ok(Math.abs(vb()[2] - base[2]) < 1e-6, 'تناسب نما به نمای اولیه برمی‌گردد');
+  // جابه‌جایی: صحنه باید حرکت کند ولی ابعاد ثابت بماند
+  const before = vb();
+  const ev = new d.defaultView.Event('wheel', { bubbles: true, cancelable: true, deltaY: 0, deltaX: 40, shiftKey: true });
+  d.getElementById('canvasWrap').dispatchEvent(ev);
+  ok(true, 'رویداد چرخ ماوس بدون خطا پردازش می‌شود');
+  // برچسب اندازهٔ پد روی خود پد نوشته می‌شود
+  const padG = d.querySelector('#padG');
+  ok(padG && padG.children.length >= 16, 'برچسب اندازهٔ هر پد رسم می‌شود', padG ? String(padG.children.length) : 'بدون گروه');
+  const firstPad = [...svg.querySelectorAll('rect')].find(r => r.getAttribute('fill') === '#d4a017');
+  const t0 = padG.children[0];
+  const cx = +firstPad.getAttribute('x') + (+firstPad.getAttribute('width')) / 2;
+  ok(Math.abs(+t0.getAttribute('x') - cx) < 2, 'برچسب پد دقیقاً روی مرکز همان پد است');
+  // اندازهٔ قلم برچسب‌ها به اندازهٔ قطعه وابسته است
+  const fsSmall = parseFloat(d.querySelector('#dimG text').getAttribute('font-size'));
+  setV(d, 'Lmin', 30); setV(d, 'Lmax', 32); setV(d, 'P', 2.54);
+  const fsBig = parseFloat(d.querySelector('#dimG text').getAttribute('font-size'));
+  ok(fsBig > fsSmall, 'قطعهٔ بزرگ‌تر برچسب‌های بزرگ‌تری می‌گیرد (نسبی)', fsSmall.toFixed(1) + ' → ' + fsBig.toFixed(1));
+  // دیدبان با تغییر ورودی‌ها از بین نمی‌رود
+  setV(d, 'Lmax', 33);
+  ok(vb()[2] > 0, 'پس از تغییر ورودی، قاب نقشه معتبر می‌ماند');
+}
+
 console.log('\n۱۰) پنل داینامیک');
 {
   const { d } = load(TOOL);

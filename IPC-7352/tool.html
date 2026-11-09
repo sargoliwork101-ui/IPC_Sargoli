@@ -1,17 +1,4 @@
 // زوم با چرخ ماوس روی نقشه؛ «تناسب نما» به نمای خودکار برمی‌گردد
-if($('svg')&&$('canvasWrap')){
- function applyZoom(z){
-  var b=window.SVG_BASE;if(!b)return;window.SVG_ZOOM=Math.min(6,Math.max(.5,z));
-  var w=b[2]/window.SVG_ZOOM,h=b[3]/window.SVG_ZOOM,cx=b[0]+b[2]/2,cy=b[1]+b[3]/2;
-  $('svg').setAttribute('viewBox',(cx-w/2).toFixed(1)+' '+(cy-h/2).toFixed(1)+' '+w.toFixed(1)+' '+h.toFixed(1));
- }
- $('canvasWrap').addEventListener('wheel',function(e){e.preventDefault();applyZoom((window.SVG_ZOOM||1)*(e.deltaY<0?1.12:.89))},{passive:false});
- if($('fitBtn'))$('fitBtn').onclick=function(){applyZoom(1)};
- if($('gridBtn')){$('gridBtn').classList.add('active');
-  $('gridBtn').onclick=function(){var w=$('canvasWrap'),off=w.style.backgroundImage==='none';
-   w.style.backgroundImage=off?'':'none';$('gridBtn').classList.toggle('active',off);
-   $('gridBtn').textContent=off?'شبکهٔ نقطه‌ای':'شبکه: خاموش'};}
-}
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
@@ -122,6 +109,11 @@ input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 
   color:var(--muted);font-size:11.5px;cursor:pointer;transition:.15s}
 .tool:hover{color:var(--text);border-color:#39506a}
 .tool.active{color:var(--accent);border-color:#315d5a;background:#122724}
+.canvas-wrap{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+.canvas-wrap.grabbing{cursor:grabbing}
+.zoomgrp{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:8px;padding:2px}
+.zoomgrp .tool{border:0;padding:3px 7px;font-size:13px;line-height:1}
+.zoomval{font-size:10.5px;color:var(--muted);min-width:34px;text-align:center;font-variant-numeric:tabular-nums}
 .canvas-wrap{position:relative;flex:1;display:grid;place-items:center;padding:12px;min-height:300px;
   background-color:#0b121c;background-image:radial-gradient(#22344a 1px,transparent 1px);background-size:22px 22px}
 #svg{width:100%;height:100%;min-height:290px;max-height:calc(100vh - 210px)}
@@ -291,11 +283,16 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
   <div class="stage-inner">
     <div class="canvas-toolbar">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span class="pill">2D EDITOR</span><span>نمای بالا · واحد: <b id="unitLabel" style="color:#c8d6e6">mm</b></span>
+        <span class="pill">2D EDITOR</span><span>نمای بالا · واحد <b id="unitLabel" style="color:#c8d6e6">mm</b> · با ماوس بکش تا جابه‌جا شود؛ چرخ = زوم</span>
       </div>
       <div class="tools">
+        <span class="zoomgrp">
+          <button class="tool" id="zoomOut" title="کوچک‌نمایی">−</button>
+          <span class="zoomval" id="zoomInfo">×1</span>
+          <button class="tool" id="zoomIn" title="بزرگ‌نمایی">+</button>
+        </span>
         <button class="tool" id="fitBtn">تناسب نما</button>
-        <button class="tool" id="gridBtn">شبکهٔ نقطه‌ای</button>
+        <button class="tool" id="gridBtn">شبکه</button>
       </div>
     </div>
     <div class="canvas-wrap" id="canvasWrap">
@@ -467,14 +464,27 @@ m2.appendChild(el('path',{d:'M1 1L9 5L1 9z',fill:'#5fb0ff'}));d.appendChild(m2);
 // مبدأ در مرکز نقشه؛ قاب (viewBox) خودکار از روی ابعاد واقعی ساخته می‌شود
 var K={svg:svg,sc:sc,PX:function(v){return v*sc},PY:function(v){return -v*sc}};
 K.frame=function(extX,extY){                       // extX/extY: نیم‌عرض و نیم‌ارتفاع محتوا (پیکسل نقشه)
- var halfW=extX+150, halfH=extY+100;             // ۱۵۰ واحد جا برای برچسب‌های کنار                 // جای برچسب‌های کنار و بالا/پایین
- if(halfW/halfH<.7)halfW=halfH*.7;                  // نسبت قاب بین ۰٫۷ و ۱٫۴ نگه داشته شود
+ window.TOT=Math.max(extX,extY)*2/sc;               // بزرگ‌ترین بُعد قطعه (mm)
+ // اندازهٔ قلم برچسب‌ها به نسبت اندازهٔ قطعه (نه عدد ثابت)
+ FS=Math.max(7,Math.min(30,TOT*0.055*sc));
+ K.dim=el('g',{id:'dimG'});K.padLbl=el('g',{id:'padG'});
+ svg.appendChild(K.dim);svg.appendChild(K.padLbl);
+ var halfW=extX+FS*10, halfH=extY+FS*5.5;
+ if(halfW/halfH<.7)halfW=halfH*.7;
  if(halfH/halfW<.7)halfH=halfW*.7;
  var vb=[-halfW,-halfH,2*halfW,2*halfH];
  svg.setAttribute('viewBox',vb.map(function(v){return v.toFixed(1)}).join(' '));
- window.SVG_BASE=vb;window.SVG_ZOOM=1;K.extX=extX;K.extY=extY};
-K.view=function(x0,y0,x1,y1){var vb=[x0,y0,x1-x0,y1-y0];
- svg.setAttribute('viewBox',vb.map(function(v){return v.toFixed(1)}).join(' '));window.SVG_BASE=vb;window.SVG_ZOOM=1};
+ window.SVG_BASE=vb.slice();
+ var cam=window.CAM;
+ if(!window.NODRAW&&cam&&cam.z&&Math.abs(cam.z-1)>1e-6){
+   var z=Math.min(14,Math.max(.5,cam.z)),w=vb[2]/z,h=vb[3]/z;
+   window.SVG_VB=[vb[0]+vb[2]/2+cam.fx*vb[2]-w/2, vb[1]+vb[3]/2+cam.fy*vb[3]-h/2, w, h];
+   svg.setAttribute('viewBox',window.SVG_VB.map(function(n){return n.toFixed(1)}).join(' '));
+   setVB(window.SVG_VB);
+ } else { fitView(); }
+ K.extX=extX;K.extY=extY};
+K.view=function(x0,y0,x1,y1){var vb=[x0,y0,x1-x0,y1-y0];      // قاب دستی (مسیر قدیمی)
+ window.SVG_BASE=vb.slice();K.extX=(x1-x0)/2;K.extY=(y1-y0)/2;fitView()};
 K.rect=function(x,y,w,h,fill,o,ex){var r=el('rect',{x:K.PX(x),y:K.PY(y+h),width:Math.max(w*sc,.5),height:Math.max(h*sc,.5),fill:fill,'fill-opacity':o==null?1:o});for(var k in ex||{})r.setAttribute(k,ex[k]);svg.appendChild(r);return r};
 K.tip=function(node,t){if(!node)return;var ti=el('title',{});ti.textContent=t;node.appendChild(ti);return node};
 K.ln=function(a,b,c,e){svg.appendChild(el('line',{x1:a,y1:b,x2:c,y2:e,stroke:'#888','stroke-width':.8,'stroke-dasharray':'2 2'}))};
@@ -485,27 +495,32 @@ K.vd=function(y1,y2,x,s,ex,a){K.ln(ex,y1,x,y1);K.ln(ex,y2,x,y2);K.ar(x,y1,x,y2);
 // ============ اندازه‌گذاری ============
 // همه‌چیز بر حسب mm و با فونت ثابت 11px در فضای viewBox ساخته می‌شود؛
 // سپس نمای نقشه طوری انتخاب می‌شود که این فونت در صفحه حدود 13px دیده شود.
-var FS=11, PADLBL=3.4;                 // اندازهٔ فونت و چند mm حاشیهٔ برچسب
+// FS در K.frame از روی اندازهٔ قطعه تعیین می‌شود (متغیر بالا در kit تعریف شده)
 K.u=function(){return ' '+U};
+K.raise=function(){if(K.dim)K.svg.appendChild(K.dim);if(K.padLbl)K.svg.appendChild(K.padLbl)};
 K.txt=function(x,y,t,a,cls){
  var anchor=a||'middle';
- var w=String(t).length*6.15+9,h=FS+6;
- var bx=anchor==='start'?x-3:anchor==='end'?x-w+3:x-w/2;
- K.svg.appendChild(el('rect',{x:bx.toFixed(1),y:(y-h+3).toFixed(1),width:w.toFixed(1),height:h,rx:(h/2).toFixed(1),fill:'#0b121c','fill-opacity':.92,stroke:'#22364b','stroke-width':.6}));
- var e=el('text',{x:x.toFixed(1),y:(y+1).toFixed(1),'text-anchor':anchor,'font-size':FS,fill:'#e2eefa','font-weight':'600','class':cls||'dimt'});
- e.textContent=t;K.svg.appendChild(e);return e};
+ var w=String(t).length*FS*.56+FS*.8,h=FS*1.45;
+ var bx=anchor==='start'?x-FS*.25:anchor==='end'?x-w+FS*.25:x-w/2;
+ K.dim.appendChild(el('rect',{x:bx.toFixed(1),y:(y-h+FS*.3).toFixed(1),width:w.toFixed(1),height:h.toFixed(1),rx:(h/2).toFixed(1),fill:'#0b121c','fill-opacity':.9,stroke:'#22364b','stroke-width':.6}));
+ var e=el('text',{x:x.toFixed(1),y:(y+FS*.12).toFixed(1),'text-anchor':anchor,'font-size':FS.toFixed(2),fill:'#e2eefa','font-weight':'600','class':cls||'dimt'});
+ e.textContent=t;(K.dim||K.svg).appendChild(e);return e};
 K.hDim=function(x1,x2,y,label){     // اندازهٔ افقی با خط رابط و برچسب بالای خط
  if(!(Math.abs(x2-x1)>1e-9))return;
- K.svg.appendChild(el('line',{x1:x1.toFixed(1),y1:(y-1.2).toFixed(1),x2:x2.toFixed(1),y2:y.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
- K.txt((x1+x2)/2,y-2.2,label)};
+ K.dim.appendChild(el('line',{x1:x1.toFixed(1),y1:(y-1.2).toFixed(1),x2:x2.toFixed(1),y2:y.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
+ K.txt((x1+x2)/2,y-FS*1.1,label)};
 K.vDim=function(y1,y2,x,label,side){  // side='left' (پیش‌فرض) یا 'right'؛ متن افقی و خوانا
  if(!(Math.abs(y2-y1)>1e-9))return;
- K.svg.appendChild(el('line',{x1:(x-1.2).toFixed(1),y1:y1.toFixed(1),x2:x.toFixed(1),y2:y2.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
- if(side==='right')K.txt(x+3,(y1+y2)/2+4,label,'start');
- else K.txt(x-3,(y1+y2)/2+4,label,'end')};
+ K.dim.appendChild(el('line',{x1:(x-1.2).toFixed(1),y1:y1.toFixed(1),x2:x.toFixed(1),y2:y2.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
+ if(side==='right')K.txt(x+FS*.4,(y1+y2)/2+FS*.4,label,'start');
+ else K.txt(x-FS*.4,(y1+y2)/2+FS*.4,label,'end')};
+// برچسب اندازهٔ خود پد: روی خود پد نوشته می‌شود و با زوم خوانا می‌شود
+K.padTag=function(cx,cy,w,h,txt){var fs=Math.min(h*sc*.42,w*sc*.42,FS*.8);if(fs<1.5)return null;
+ var e=el('text',{x:cx.toFixed(1),y:(cy+fs*.36).toFixed(1),'text-anchor':'middle','font-size':fs.toFixed(2),fill:'#1b1405','font-weight':'800'});e.textContent=txt;(K.padLbl||K.svg).appendChild(e);return e};
 K.lead=function(x1,y1,x2,y2){K.svg.appendChild(el('line',{x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}))};
 return K}
-var R=[],P=[],W='',M={},MP=[],PITCH_TXT='';function SHP(F){var s=$('pShape').value;return s==='auto'?(['gull','jlead','sof','inl'].indexOf(F)>-1?'o':'r'):s}function RC(v){var s=rd('pCR');return s>0?Math.ceil(v/s-1e-9)*s:v}
+var FS=11,R=[],P=[],W='',M={},MP=[],PITCH_TXT='';   // FS: اندازهٔ قلم برچسب‌ها، نسبت به اندازهٔ قطعه
+function SHP(F){var s=$('pShape').value;return s==='auto'?(['gull','jlead','sof','inl'].indexOf(F)>-1?'o':'r'):s}function RC(v){var s=rd('pCR');return s>0?Math.ceil(v/s-1e-9)*s:v}
 V.A='A: عرض بدنه‌ی قطعه (Figure 3-3). اگر Smax از A بزرگ‌تر نباشد، هدف فیلت پاشنه برای gull-wing کوچک‌تر می‌شود (یادداشت 3 جدول 3-1، ص 9).';V.Th='Th: اندازه‌ی پد حرارتی (Exposed pad) QFN؛ یک پین به تعداد پین‌ها اضافه می‌کند و در نام به شکل T365 می‌آید.';V.HOLE='قطر نهایی سوراخ. اگر بزرگ‌تر از صفر باشد، به‌جای محاسبه‌ی جدول‌ها استفاده می‌شود (مثلاً برای press-fit مقدار سازنده).';V.NA='سوراخ غیرآبکاری = حداکثر بُعد پایه + این مقدار (ص 24 استاندارد: 0.4).';V.CR='Courtyard به مضرب این مقدار به بالا (ceil) گرد می‌شود؛ مثال استاندارد 0.5 است (ص 13).';
 V.PADN='پین ۱ معمولاً مربع گرفته می‌شود تا قطبیت دیده شود، ولی بند 4.2.3 برای سمت درج حلقهٔ دایره‌ای می‌خواهد. اگر سمت مقابل یا نشانه‌گذاری دیگری داری، دایره را انتخاب کن.';
 V.SLD='تلرانس سوراخ: ±0.08 مربوط به جدول‌های سوراخ آبکاری‌شده است. برای NPTH معمول ±0.10 و تا ±0.05 (بند 4.6.2) و برای Press-fit تلرانس سازنده.';
@@ -667,20 +682,22 @@ pads.forEach(function(p){
   var ex={stroke:p.th?'#1d5a42':'#8a6d0b'};
   if(!p.th&&shp==='o')ex.rx=Math.min(p.w,p.h)/2*sc;   // شکل نقشه = شکل خروجی
   K.tip(K.rect(p.x-p.w/2,p.y-p.h/2,p.w,p.h,p.th?'#2c7a5b':'#d4a017',p.th?.55:.6,ex),
-    'پد '+p.n+' · '+fm(p.w)+' × '+fm(p.h)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')')});
+    'پد '+p.n+' · '+fm(p.w)+' × '+fm(p.h)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')');
+  // اندازهٔ همین پد، روی خودِ پد (با زوم بزرگ می‌شود و خوانا می‌ماند)
+  K.padTag(K.PX(p.x),K.PY(p.y),p.w,p.h,p.th?'':fm(p.w)+'×'+fm(p.h));});
 K.svg.appendChild(el('circle',{cx:K.PX(-Z/2-.25),cy:K.PY((n-1)*Pt/2),r:4,fill:'#000'}));
 // ---------- اندازه‌گذاری روی تصویر (بالای قطعه و کناره‌ها، بدون تداخل) ----------
 (function(){
  var p0=pads[0]||{w:X,h:X,x:0,y:0};
  var X0=K.PX(-cw/2),X1=K.PX(cw/2),Y0=K.PY(ch/2),Y1=K.PY(-ch/2);      // کادر Courtyard
- K.hDim(X0,X1,Y1+40,'Courtyard '+fm(cw)+K.u());                       // عرض Courtyard (پایین)
- K.vDim(Y0,Y1,X1+20,'H '+fm(ch)+K.u(),'right');                        // ارتفاع Courtyard (راست)
- K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-40,'Z '+fm(Z)+K.u());                  // طول کل پدها (بالا)
- K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-18,'L '+fm(p0.w)+K.u()); // طول یک پد (بالا، نزدیک‌تر)
- K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-20,'X '+fm(p0.h)+K.u()); // عرض پد (چپ)
+ K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(cw)+K.u());                       // عرض Courtyard (پایین)
+ K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(ch)+K.u(),'right');                        // ارتفاع Courtyard (راست)
+ K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-FS*3.4,'Z '+fm(Z)+K.u());                  // طول کل پدها (بالا)
+ K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-FS*1.5,'L '+fm(p0.w)+K.u()); // طول یک پد (بالا، نزدیک‌تر)
+ K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-FS*1.4,'X '+fm(p0.h)+K.u()); // عرض پد (چپ)
  // گام بین دو پد هم‌ستون
  if(pads.length>1&&Math.abs(pads[1].y-p0.y)>1e-9){
-   var yA=K.PY(p0.y),yB=K.PY(pads[1].y),xp=X0-8;
+   var yA=K.PY(p0.y),yB=K.PY(pads[1].y),xp=X0-FS*.7;
    [yA,yB].forEach(function(yy){K.svg.appendChild(el('line',{x1:K.PX(p0.x-p0.w/2),y1:yy,x2:xp,y2:yy,stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}))});
    K.vDim(yA,yB,xp,'P '+fm(Pt)+K.u());
    K.svg.appendChild(el('line',{x1:xp,y1:(yA+yB)/2,x2:X0,y2:(yA+yB)/2,stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}));
@@ -714,6 +731,7 @@ wr+=asym;
 // ---------- خروجی ----------
 var srcT='جدول '+r[4]+'، سطح '+lv+(src.length?' — '+src.join('، '):'')+(F==='melf'?' — توجه: در MELF قطر بدنه به‌جای W در فرمول کناره استفاده شده است؛ محور اندازه‌گیری J از رأس گرد باید با دیتاشیت تأیید شود.':'');
 VALID=true;
+K.raise();
 out([['اندازهٔ هر پد (طول × عرض)',fm(pl)+' × '+fm(X)+' '+U,'(Z − G)/2 و X. '+srcT],
  ['Z (طول کل پدها)',fu(Z),'Z = Lmax + 2·'+fmo(r[0])+' '+U],
  ['G (فاصلهٔ داخلی)',fu(G),'G = S − 2·'+fmo(r[1])+' '+U+' ، S='+fm(S)+' ('+srcS+')'],
@@ -757,6 +775,7 @@ padsR.forEach(function(p){
   if(skipt[p.n]){K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd*sc/2*.35,1),fill:'none',stroke:'#bbb','stroke-dasharray':'2 2'}));return}
   K.tip(K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:Math.max(pd/2*sc,1),fill:'#d4a017','fill-opacity':.7,stroke:'#8a6d0b'})),
     p.n+' · Ø '+fm(pd)+' '+U+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')');
+  K.padTag(K.PX(p.x),K.PY(p.y),pd,pd,'');
   MP.push({n:p.n,x:p.x,y:p.y,w:pd,h:pd,sh:'c',hole:0,pl:true});
 });
 var minGap=1e9,pair='';
@@ -769,11 +788,11 @@ var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;
 (function(){
  var X0=K.PX(-cw/2),X1=K.PX(cw/2),Y0=K.PY(ch/2),Y1=K.PY(-ch/2);
  var b0=padsR[0];
- K.hDim(X0,X1,Y1+40,'Courtyard '+fm(cw)+K.u());
- K.vDim(Y0,Y1,X1+20,'H '+fm(ch)+K.u(),'right');
- K.hDim(K.PX(-x0-pd/2),K.PX(-x0+pd/2),Y0-40,'Ø '+fm(pd)+K.u());
- if(c>1)K.hDim(K.PX(x0),K.PX(x0+PtX),Y0-18,'P '+fm(PtX)+K.u());
- if(b0)K.vDim(K.PY(b0.y+pd/2),K.PY(b0.y-pd/2),X0-20,'Ø '+fm(pd)+K.u());
+ K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(cw)+K.u());
+ K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(ch)+K.u(),'right');
+ K.hDim(K.PX(-x0-pd/2),K.PX(-x0+pd/2),Y0-FS*3.4,'Ø '+fm(pd)+K.u());
+ if(c>1)K.hDim(K.PX(x0),K.PX(x0+PtX),Y0-FS*1.5,'P '+fm(PtX)+K.u());
+ if(b0)K.vDim(K.PY(b0.y+pd/2),K.PY(b0.y-pd/2),X0-FS*1.4,'Ø '+fm(pd)+K.u());
 })();
 M.cw=cw;M.ch=ch;
 M.name='BGA'+count+ty+Math.round(Pt*100)+'P'+c+'X'+rw+'_'+Math.round(BL*100)+'X'+Math.round(BW*100)+'X'+Math.round(BH*100)+'D'+Math.round(b*100)+'N';
@@ -782,6 +801,7 @@ if(minGap!==null&&minGap<0)wr+='پدها روی هم افتاده‌اند؛ گ�
 else if(minGap!==null&&minGap<GP())wr+='کوچک‌ترین فاصلهٔ خالی بین پدها '+fm(minGap)+' '+U+' (جفت '+pair+') از آستانه کمتر است. ';
 if(PtX!==PtY)wr+='آرایه با گام متفاوت محورها ساخته شد؛ نام استاندارد تک‌گام است، نوع دوگام را با دیتاشیت تأیید کن. ';
 VALID=true;
+K.raise();
 out([['قطر هر پد','Ø '+fu(pd),'جدول 3-11، سطح '+lv+(ty==='C'?': کاهش از قطر توپ':': افزایش به قطر توپ')+' (گردشده به 0.01)'],
  ['گام / کمینه فاصلهٔ خالی',fm(PtX)+(PtX!==PtY?' × '+fm(PtY):'')+' / '+(minGap===null?'—':fm(minGap)),'آستانه '+fm(GP())+' '+U],
  ['تعداد پد ساخته‌شده',String(count),'از '+rw*c+' موقعیت؛ '+(rw*c-count)+' حذف‌شده'],
@@ -843,6 +863,7 @@ pads.forEach(function(p){
   var tInfo='پد '+p.n+' · Ø '+fm(pad)+' '+U+' · سوراخ Ø'+fm(hole)+' · مرکز ('+fm(p.x)+', '+fm(p.y)+')';
   if(p.n===1&&p1==='r')K.tip(K.rect(p.x-pad/2,p.y-pad/2,pad,pad,'#d4a017',.6,{stroke:'#8a6d0b'}),tInfo);
   else K.tip(K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:pad/2*sc,fill:'#d4a017','fill-opacity':.6,stroke:'#8a6d0b'})),tInfo);
+  K.padTag(K.PX(p.x),K.PY(p.y),pad,pad,fm(pad));
   K.svg.appendChild(el('circle',{cx:K.PX(p.x),cy:K.PY(p.y),r:hole/2*sc,fill:'#1b2a26','fill-opacity':.85}));
   MP.push({n:p.n,x:p.x,y:p.y,w:pad,h:pad,sh:(p.n===1&&p1==='r')?'r':'c',hole:hole,pl:HT!=='N'});
 });
@@ -851,15 +872,15 @@ var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
 (function(){
  var X0=K.PX(-M.cw/2),X1=K.PX(M.cw/2),Y0=K.PY(M.ch/2),Y1=K.PY(-M.ch/2);
  var p0=MP[0];
- K.hDim(X0,X1,Y1+40,'Courtyard '+fm(M.cw)+K.u());
- K.vDim(Y0,Y1,X1+20,'H '+fm(M.ch)+K.u(),'right');
- K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-40,'Pad '+fm(pad)+K.u());
- K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-18,'Hole Ø'+fm(hole)+K.u());
+ K.hDim(X0,X1,Y1+FS*2.6,'Courtyard '+fm(M.cw)+K.u());
+ K.vDim(Y0,Y1,X1+FS*1.4,'H '+fm(M.ch)+K.u(),'right');
+ K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*3.4,'Pad '+fm(pad)+K.u());
+ K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-FS*1.5,'Hole Ø'+fm(hole)+K.u());
  if(two){
-   K.hDim(K.PX(-R2/2),K.PX(R2/2),Y1+62,'Row span '+fm(R2)+K.u());
-   K.vDim(K.PY(p0.y),K.PY(MP.length>1?MP[1].y:p0.y-Pt),K.PX(-M.cw/2)-20,'P '+fm(Pt)+K.u());
+   K.hDim(K.PX(-R2/2),K.PX(R2/2),Y1+FS*5.2,'Row span '+fm(R2)+K.u());
+   K.vDim(K.PY(p0.y),K.PY(MP.length>1?MP[1].y:p0.y-Pt),K.PX(-M.cw/2)-FS*1.4,'P '+fm(Pt)+K.u());
  } else if(k>1){
-   K.hDim(K.PX(x0),K.PX(x0+Pt),Y1+62,'P '+fm(Pt)+K.u());
+   K.hDim(K.PX(x0),K.PX(x0+Pt),Y1+FS*5.2,'P '+fm(Pt)+K.u());
  }
 })();
 var pfx=p1==='r'?'r':'c';
@@ -872,6 +893,7 @@ if(two&&k%2)wr+='DIP با تعداد پین فرد ساخته شد؛ مکان و
 if(HT==='N')wr+='NPTH: وجود و ابعاد مس اطراف سوراخ را با کاربرد و دیتاشیت تعیین کن؛ جدول 4-4 مخصوص PTH است. ';
 if(pr&&(bt<0.8||bt>4)&&!$('man').checked)wr+='برای ضخامت زیر 0.8 یا بالای 4 mm، جدول 4-3 حداکثر اصلاح «تا 0.2» می‌دهد؛ ابزار حداکثر را گرفته است. با فرایند و توان سازنده تطبیق بده یا با «ویرایش دستی» مقدار را تغییر بده. ';
 VALID=true;
+K.raise();
 out([['سوراخ نهایی',('Ø '+fu(hole))+(tolShow>0?' (±'+fmo(tolShow)+')':' (تلرانس سازنده)'),holeSrc],
  ['پد',('Ø '+fu(pad))+(p1==='r'?' (پین ۱ مربع)':''),'سوراخ + '+fmo(pa)+' '+U+' (جدول 4-4)؛ '+MP.length+' پد — حداقل پد IPC-222X و توان سازنده باید جداگانه کنترل شود'],
  ['کمینه فاصلهٔ خالی واقعی پدها',(minGap===null?'— (جفت پدی وجود ندارد)':fm(minGap)+' '+U),'آستانه '+fm(GP())+' '+U],
@@ -925,6 +947,63 @@ function showTab(id){
  if($('sb'))$('sb').scrollTop=0;
 }
 document.querySelectorAll('[data-t]').forEach(function(b){b.addEventListener('click',function(){showTab(b.dataset.t)})});
+// ================= دیدبان نقشه: جابه‌جایی + زوم + تناسب نما =================
+// SVG_BASE = قاب خودکار (fit)؛ SVG_VB = قاب فعلی؛ TOT = بزرگ‌ترین بُعد قطعه (mm)
+window.SVG_BASE=null;window.SVG_VB=null;window.TOT=1;window.SCU=1;
+function vbNow(){var b=window.SVG_VB||window.SVG_BASE;return b?b.slice():[-350,-220,700,440]}
+function fitView(){window.CAM={z:1,fx:.5,fy:.5};
+ window.SVG_VB=(window.SVG_BASE||[-350,-220,700,440]).slice();
+ var sv=$('svg');if(!sv)return;sv.setAttribute('viewBox',window.SVG_VB.map(function(n){return n.toFixed(2)}).join(' '));
+ syncLabelScale();
+ var f=$('fitBtn');if(f){f.classList.add('active');setTimeout(function(){f.classList.remove('active')},450)}}
+function setVB(v){window.SVG_VB=v.slice();
+ var b=window.SVG_BASE;
+ if(b){window.CAM={z:b[2]/v[2],fx:(v[0]+v[2]/2-b[0]-b[2]/2)/b[2],fy:(v[1]+v[3]/2-b[1]-b[3]/2)/b[3]}}
+ var sv=$('svg');if(!sv)return;sv.setAttribute('viewBox',v.map(function(n){return n.toFixed(2)}).join(' '));
+ syncLabelScale();updZoomInfo()}
+// نام قطعه با جابه‌جایی/زوم تغییر نمی‌کند؛ در نمای نزدیک، برچسب پدها قابل خواندن می‌شود
+function syncLabelScale(){
+ var sv=$('svg');if(!sv)return;var b=window.SVG_BASE||vbNow(),v=vbNow();
+ var r=b[2]/v[2];                                   // نسبت زوم
+ var w=Math.max(9,Math.min(30,26-Math.min(16,Math.log(r)*7)));
+ sv.setAttribute('stroke-width','1');
+ var g=sv.querySelector('#dimG');if(g&&g.style)g.style.setProperty('font-size',(w).toFixed(1)+'px');
+ // برچسب اندازهٔ پد: در نمای کلی پنهان، با زوم کردن خوانا و نمایان می‌شود
+ var pb=sv.querySelector('#padG');if(pb&&pb.style)pb.style.setProperty('opacity',r<1.25?'0':'1');
+}
+function updZoomInfo(){var e=$('zoomInfo');if(!e)return;var b=window.SVG_BASE;if(!b)return;
+ e.textContent='×'+(b[2]/vbNow()[2]).toFixed(2).replace(/\.?0+$/,'')}
+function zoomAt(f,cx,cy){var b=window.SVG_BASE;if(!b)return;var v=vbNow();
+ if(cx==null){cx=v[0]+v[2]/2;cy=v[1]+v[3]/2}
+ var z=Math.min(14,Math.max(.5,(b[2]/v[2])*f)),w=b[2]/z,h=b[3]/z;
+ var kx=(cx-v[0])/v[2],ky=(cy-v[1])/v[3];
+ setVB([cx-kx*w,cy-ky*h,w,h])}
+function panBy(dx,dy){var v=vbNow();setVB([v[0]+dx,v[1]+dy,v[2],v[3]])}
+window.SCAM={fit:function(){fitView()},set:function(v){setVB(v)},zoom:function(f,x,y){zoomAt(f,x,y)},
+  pan:function(dx,dy){panBy(dx,dy)},vb:function(){return vbNow()},base:function(){return window.SVG_BASE}};
+(function(){
+ var sv=$('svg'),wrap=$('canvasWrap');if(!sv||!wrap)return;
+ function toMap(e){var r=sv.getBoundingClientRect(),v=vbNow();
+  return [v[0]+(e.clientX-r.left)/r.width*v[2],v[1]+(e.clientY-r.top)/r.height*v[3]]}
+ wrap.addEventListener('wheel',function(e){e.preventDefault();
+  if(e.ctrlKey||e.metaKey||!e.shiftKey){var p=toMap(e);zoomAt(e.deltaY<0?1.12:.89,p[0],p[1])}
+  else panBy(e.deltaX*.5,e.deltaY*.5)},{passive:false});
+ var drag=null;
+ sv.addEventListener('pointerdown',function(e){if(e.button!==0)return;drag=toMap(e);
+  wrap.classList.add('grabbing');try{sv.setPointerCapture(e.pointerId)}catch(x){};e.preventDefault()});
+ sv.addEventListener('pointermove',function(e){if(!drag)return;var p=toMap(e);
+  setVB([vbNow()[0]-(p[0]-drag[0]),vbNow()[1]-(p[1]-drag[1]),vbNow()[2],vbNow()[3]]);drag=p});
+ function end(e){drag=null;wrap.classList.remove('grabbing')}
+ sv.addEventListener('pointerup',end);sv.addEventListener('pointercancel',end);
+ sv.addEventListener('dblclick',function(e){var p=toMap(e);zoomAt(1.8,p[0],p[1])});
+ if($('fitBtn'))$('fitBtn').onclick=fitView;
+ if($('zoomIn'))$('zoomIn').onclick=function(){zoomAt(1.3)};
+ if($('zoomOut'))$('zoomOut').onclick=function(){zoomAt(.77)};
+ if($('gridBtn')){$('gridBtn').classList.add('active');
+  $('gridBtn').onclick=function(){var off=wrap.style.backgroundImage==='none';
+   wrap.style.backgroundImage=off?'':'none';$('gridBtn').classList.toggle('active',off);
+   $('gridBtn').textContent=off?'شبکه':'شبکه: خاموش'};}
+})();
 /* ================= تعامل‌های پوستهٔ استودیو ================= */
 // فیلدهایی که select دارند تمام‌عرض می‌شوند (متن فارسی در ستون باریک نصفه نمی‌شود)
 function markWide(){document.querySelectorAll('.grid>div').forEach(function(d){
@@ -974,18 +1053,6 @@ if($('rowUnit')){
  var syncUnitBtn=function(){var u=$('unit').value;$('rowUnit').textContent='واحد: '+u;if($('unitLabel'))$('unitLabel').textContent=u;$('rowUnit').classList.toggle('on',u!=='mm')};
  $('rowUnit').onclick=function(){var o=['mm','mil','in'],i=o.indexOf($('unit').value);$('unit').value=o[(i+1)%3];$('unit').onchange();syncUnitBtn()};
  $('unit').addEventListener('change',syncUnitBtn);syncUnitBtn();
-}
-// زوم با چرخ ماوس روی نقشه و بازگشت با «تناسب نما»
-if($('svg')&&$('canvasWrap')){
- var VM=[0,0,700,440],Z=1;
- $('canvasWrap').addEventListener('wheel',function(e){e.preventDefault();Z=Math.min(4,Math.max(.4,Z*(e.deltaY<0?1.12:.89)));apply()},{passive:false});
- function apply(){var cx=350,cy=220,w=700/Z,h=440/Z;
-  $('svg').setAttribute('viewBox',(cx-w/2)+' '+(cy-h/2)+' '+w+' '+h)}
- if($('fitBtn'))$('fitBtn').onclick=function(){Z=1;$('svg').setAttribute('viewBox','0 0 700 440');$('fitBtn').classList.add('active');setTimeout(function(){$('fitBtn').classList.remove('active')},500)};
- if($('gridBtn')){$('gridBtn').classList.add('active');
-  $('gridBtn').onclick=function(){var w=$('canvasWrap'),off=w.style.backgroundImage==='none';
-   w.style.backgroundImage=off?'':'none';$('gridBtn').classList.toggle('active',off);
-   $('gridBtn').textContent=off?'شبکهٔ نقطه‌ای':'شبکه: خاموش'};}
 }
 function T(v){return Math.round(v*100)}
 function nm(){var t=$('nT').value,P=+$('nP').value,L=+$('nL').value,W=+$('nW').value,H=+$('nH').value,N=$('nN').value,Th=+$('nTh').value,D=$('nD').value,pf=$('nPf').value.trim(),o,err='';
