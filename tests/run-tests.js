@@ -537,6 +537,39 @@ console.log('\n۱۶) مرجع مستقل سوراخ و پد طبق IPC-7352');
  w.close();
 }
 
+console.log('\n۱۷) شیار: نام‌گذاری صریح استاندارد و ابعاد ورودی سازنده');
+{
+ const {d,w}=load(TOOL);
+ d.getElementById('smp').value='dip';d.getElementById('smp').onchange();
+ setV(d,'tK',1);setV(d,'tR',0);setV(d,'tS',2);setV(d,'tW',2);setV(d,'tW2',.3);
+ setV(d,'tHoleShape','slot');
+ ok(!d.getElementById('pads').value&&d.getElementById('tSlotL').getAttribute('aria-invalid')==='true','شیار بدون ابعاد سازنده، سایزبندی حدسی یا خروجی ندارد');
+ setV(d,'tSlotL',3);setV(d,'tSlotW',1);setV(d,'tSlotRing',.5);
+ const csv=()=>d.getElementById('pads').value.split('\n');
+ let p=csv()[1]?.split(',');
+ ok(p&&+p[3]===4&&+p[4]===2&&+p[5]===3&&+p[6]===1&&p[7]==='slot','شیار 3×1 و حلقهٔ ورودی 0.5 → پد 4×2 و CSV صریح شیار');
+ ok(val(d,'نام Padstack')==='b400_200h300_100','مثال شیار آبکاری‌شدهٔ 5.2.3 دقیقاً تولید می‌شود');
+ ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/Slot 3.00×1.00 mm/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
+ d.getElementById('mkA').click();
+ ok(/شیار/.test(d.getElementById('alt').value)&&!/  AddPad\('/.test(d.getElementById('alt').value),'Altium فاقد پشتیبانی شیار، سوراخ گرد جایگزین نمی‌کند');
+ setV(d,'tHT','N');
+ ok(val(d,'نام Padstack')==='b400_200hn300_100'&&csv()[1].includes('non-plated'),'مثال شیار NPTH با hn و آبکاری صحیح در CSV');
+ setV(d,'tSlotL',2);setV(d,'tSlotW',.3);
+ ok(!d.getElementById('pads').value&&/جا نمی‌شوند/.test(d.getElementById('warn').textContent),'برخورد گوشهٔ پایه با سر گرد شیار رد می‌شود');
+ setV(d,'tSlotL',2.2);setV(d,'tSlotW',.5);setV(d,'tSlotRing',.25);
+ ok(!!d.getElementById('pads').value,'جاگرفتن اسمی پایهٔ 2×0.3 در شیار 2.2×0.5 بررسی می‌شود');
+ for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const f={mm:1,mil:.0254,in:25.4}[unit];p=csv()[1]?.split(',');
+  ok(p&&Math.abs(+p[5]*f-2.2)<.0002&&Math.abs(+p[6]*f-.5)<.0002,'ابعاد شیار در تبدیل '+unit+' حفظ می‌شود');
+ }
+ setV(d,'pS','b');setV(d,'p1',4);setV(d,'p2',2);setV(d,'pH',3);setV(d,'pH2',1);
+ ok(d.getElementById('pOut').textContent==='b400_200h300_100','نام‌ساز مستقل عرض دوم سوراخ را پشتیبانی می‌کند');
+ setV(d,'dIn','b400_200h300_100');
+ ok(/شیار آبکاری‌شده/.test(d.getElementById('dOut').textContent),'رمزگشا دو بُعد h را شیار معرفی می‌کند، نه قطر گرد');
+ setV(d,'tHoleShape','round');
+ ok(d.getElementById('tSlotL').disabled&&!!d.getElementById('pads').value,'بازگشت به سوراخ گرد، ورودی‌های شیار را غیرفعال می‌کند');
+ w.close();
+}
+
 console.log('\n─────────────────────────────');
 console.log('نتیجه: ' + pass + ' موفق، ' + fail + ' ناموفق');
 if (fail) { console.log('موارد ناموفق:\n - ' + failures.join('\n - ')); process.exit(1); }
