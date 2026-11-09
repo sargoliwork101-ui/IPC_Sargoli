@@ -154,13 +154,13 @@ console.log('\n۵) سوراخ‌دار (ایراد ۷، ۸، ۱۵، ۲۳، ۲۷�
   d.getElementById('mkA').click();
   ok(/AddLine/.test(d.getElementById('alt').value), 'خروجی TH خط Courtyard دارد');
   ok(/Shape,Plating/.test(d.getElementById('pads').value.split('\n')[0]), 'فهرست پد TH شکل و آبکاری دارد');
-  ok(/^r/.test(val(d, 'نام Padstack')), 'نام Padstack پین ۱ مربع با r شروع می‌شود', val(d, 'نام Padstack'));
+  ok(/^s/.test(val(d, 'نام Padstack')), 'نام Padstack پین ۱ مربع با s استاندارد شروع می‌شود', val(d, 'نام Padstack'));
   setV(d, 'tHT', 'N');
   ok(/hn/.test(val(d, 'نام Padstack')), 'سوراخ غیرآبکاری hn است', val(d, 'نام Padstack'));
   ok(/±0\.10/.test(val(d, 'سوراخ')), 'تلرانس NPTH برابر 0.10 است', val(d, 'سوراخ'));
   setV(d, 'pHole', 0); setV(d, 'tHT', 'F');
   ok(!val(d, 'سوراخ') && /Press-fit/.test(d.getElementById('warn').textContent), 'Press-fit بدون قطر سازنده خروجی نمی‌دهد');
-  setV(d, 'man', true); setV(d, 'pHole', 1.0); setV(d, 'tTol', 0); setV(d, 'tPr', '0');
+  setV(d, 'man', true); setV(d, 'pHole', 1.0); setV(d,'tFitSource','Test manufacturer specification, page 1');setV(d,'tFitTol',.03); setV(d, 'tTol', 0); setV(d, 'tPr', '0');
   setV(d, 'tW', 0.6);
   ok(!!val(d, 'سوراخ'), 'Press-fit با قطر سازنده محاسبه می‌شود');
 }
@@ -174,7 +174,7 @@ console.log('\n۶) نام‌گذاری و رمزگشایی (ایراد ۱۸، ۲
 {
   const { d } = load(TOOL);
   setV(d, 'fam', 'chip'); setV(d, 'cType', 'CAPC'); setV(d, 'Lmax', 0.4); setV(d, 'Lmin', 0.35); setV(d, 'Tmin', .05); setV(d, 'Tmax', .1);
-  setV(d, 'W', 0.2); setV(d, 'H', 0.2); setV(d, 'P', .4); setV(d, 'n', 1); setV(d, 'autoS', 0); setV(d, 'Smax', 0.2);
+  setV(d,'nameBodyL',.4);setV(d,'nameBodyW',.2);setV(d, 'W', 0.2); setV(d, 'H', 0.2); setV(d, 'P', .4); setV(d, 'n', 1); setV(d, 'autoS', 0); setV(d, 'Smax', 0.2);
   ok(/^CAPC0402/.test(val(d, 'نام پیشنهادی')), 'نام چیپ کوچک صفر ابتدایی و نوع واقعی دارد', val(d, 'نام پیشنهادی'));
   setV(d, 'fam', 'melf');
   setV(d, 'Lmax', 3.5); setV(d, 'Lmin', 3.4); setV(d, 'Tmin', .3); setV(d, 'Tmax', .4); setV(d, 'W', 1.4); setV(d, 'H', 1.4); setV(d, 'P', 2); setV(d, 'n', 1);

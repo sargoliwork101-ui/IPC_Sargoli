@@ -4,9 +4,10 @@
     {
       "id": "A1",
       "topic": "Table 3-4 toe-only rounding",
-      "actual_width_mm": 0.32,
+      "actual_width_mm": 0.321,
       "reference_before_independent_fabrication_rounding_mm": 0.321,
-      "reference": "Table 3-4 note 1, printed p10/PDF20"
+      "reference": "Table 3-4 note 1, printed p10/PDF20",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A2",
@@ -23,20 +24,22 @@
           -0.4
         ]
       ],
-      "actual": "0.80 / 0.40",
+      "actual": "0.80 / 0.73",
       "expected_mm": 0.7313708498984762,
-      "reference": "Euclidean geometry; clearance warning is an application addition, not an IPC equation"
+      "reference": "Euclidean geometry; clearance warning is an application addition, not an IPC equation",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A3a",
       "topic": "chip name from maximum instead of separate body size",
-      "actual": "RESC3418X100N",
+      "actual": "RESC3216X100N",
       "nominal_1206_body_mm": [
         3.2,
         1.6
       ],
       "expected_size_token": "3216",
-      "reference": "Table 3-16, RESC+Body Length+Body Width…; printed p15/PDF25"
+      "reference": "Table 3-16, RESC+Body Length+Body Width…; printed p15/PDF25",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A3b",
@@ -45,8 +48,9 @@
         6,
         4
       ],
-      "actual": "QFN127P400X400X175-16N",
-      "reference": "Table 3-16, body length X body width; printed p16/PDF26"
+      "actual": "QFN127P600X400X175-16N",
+      "reference": "Table 3-16, body length X body width; printed p16/PDF26",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A3c",
@@ -55,94 +59,102 @@
       "actual": "BGA100C80P10X10_900X900X150D50N",
       "expected_density_suffix": "N",
       "result": "NOT A DEFECT: 3.4.3 explicitly excludes BGA from the M/N/L density variation",
-      "reference": "3.4.3 note, printed p16/PDF26"
+      "reference": "3.4.3 note, printed p16/PDF26",
+      "status": "verified non-defect"
     },
     {
       "id": "A3d",
       "topic": "dual pitch still generates a single-pitch name",
-      "actual": "BGA100C80P10X10_900X900X150D50N",
+      "actual": "BGA100C80X60P10X10_900X900X150D50N",
       "pitch_mm": [
         0.8,
         0.6
       ],
-      "reference": "Table 3-16 BGA w/Dual Pitch printed p14/PDF24"
+      "reference": "Table 3-16 BGA w/Dual Pitch printed p14/PDF24",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A4",
       "topic": "thermal pad SVG/Altium shape mismatch",
       "svg_has_corner_radius": false,
-      "last_Altium_pad": "  AddPad('17', 0.0000, 0.0000, 2.0000, 1.0000, 0.0000, 1, True);",
-      "reference": "Application export consistency; IPC-7352 5.3 thermal pad context, printed p29/PDF39"
+      "last_Altium_pad": "  AddPad('17', 0.0000, 0.0000, 2.0000, 1.0000, 0.0000, 0, True);",
+      "reference": "Application export consistency; IPC-7352 5.3 thermal pad context, printed p29/PDF39",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A5",
       "topic": "press-fit accepts generic PTH tolerance without manufacturer tolerance",
-      "actual": "Ø 1.00 mm (±0.08)",
-      "reference": "4.5, printed p21/PDF31, hole sizes AND tolerances provided by component manufacturer"
+      "actual": null,
+      "validation_message": "tFitSource: مدل، سند و صفحهٔ سازنده برای Press-fit لازم است.",
+      "reference": "4.5, printed p21/PDF31, hole sizes AND tolerances provided by component manufacturer",
+      "status": "fixed in calculated THT: explicit manufacturer source and tolerance required"
     },
     {
       "id": "A6",
       "topic": "MELF effective contact width not distinct from diameter, reachable via custom",
-      "actual": "2.70 mm",
+      "actual": null,
+      "validation_message": "برای MELF از مدل مرجع قابل ویرایش استفاده کن؛ طبق ممیزی، مسیر محاسباتی عرض تماس مستقل هنوز به اصلاح نیاز دارد.",
       "zero_foot_width_case_mm": 0.7,
-      "reference": "Table 3-5 note 1, printed p10/PDF20; do not zero the body diameter for toe calculations"
+      "reference": "Table 3-5 note 1, printed p10/PDF20; do not zero the body diameter for toe calculations",
+      "status": "guarded: unsafe formula path disabled; contact-width solver remains incomplete"
     },
     {
       "id": "A7",
       "topic": "invalid identifiers on tall arrays",
-      "bad_identifiers": [
-        "Aundefined1",
-        "Aundefined1",
-        "Aundefined1",
-        "Aundefined1"
-      ],
-      "reference": "Software string-index bug; no claim that the source PDF defines a universal row alphabet"
+      "bad_identifiers": [],
+      "reference": "Software string-index bug; no claim that the source PDF defines a universal row alphabet",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "L1",
       "topic": "NPTH copper pad still calculated from PTH table",
       "actual_hole": "Ø 0.90 mm (±0.10)",
       "actual_pad": "Ø 1.40 mm (پین ۱ مربع)",
-      "reference": "4.6 NPTH vs 4.4.2/table 4-4 PTH; extra copper needs an explicit design choice"
+      "reference": "4.6 NPTH vs 4.4.2/table 4-4 PTH; extra copper needs an explicit design choice",
+      "status": "open modeling limitation"
     },
     {
       "id": "OK1",
       "topic": "previous square-pin diagonal correction still works",
       "actual": "Ø 0.86 mm (±0.08)",
-      "expected_mm": 0.86
+      "expected_mm": 0.86,
+      "status": "verified regression"
     },
     {
       "id": "OK2",
       "topic": "disabled hole override still ineffective",
       "actual": "Ø 0.93 mm (±0.08)",
-      "must_not_equal_mm": 1.2
+      "must_not_equal_mm": 1.2,
+      "status": "verified regression"
     },
     {
       "id": "A8",
       "topic": "square TH pin-1 padstack uses rectangular r instead of square s",
-      "actual": "r143h93",
-      "reference": "5.1 and 5.2.1, printed pp25-26/PDF35-36: square s150h90, rectangle r200_100"
+      "actual": "s143h93",
+      "reference": "5.1 and 5.2.1, printed pp25-26/PDF35-36: square s150h90, rectangle r200_100",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     },
     {
       "id": "A9",
       "topic": "negative hole dimension is silently omitted by independent padstack builder",
-      "actual": "c150",
+      "actual": "نامعتبر: ابعاد باید عدد متناهی و نامنفی باشند؛ برای ویژگیِ غایب صفر وارد کن.",
       "expected": "input validation error, not c150",
-      "reference": "Software validation issue; section 5 encodes the intended padstack structure"
+      "reference": "Software validation issue; section 5 encodes the intended padstack structure",
+      "status": "fixed; regression assertion in tests/audit-regressions.cjs"
     }
   ],
   "code_lines": {
-    "function smax": 473,
-    "function rule": 474,
-    "function smd": 723,
-    "function bga": 877,
-    "function thSlot": 943,
-    "function th()": 983,
-    "function validateFootprint": 1108,
-    "function renderReference": 1805,
-    "function nm": 2206,
-    "function ps": 2220,
-    "function dec": 2236,
-    "function altium": 2304
+    "function smax": 475,
+    "function rule": 476,
+    "function smd": 743,
+    "function bga": 899,
+    "function thSlot": 970,
+    "function th()": 1010,
+    "function validateFootprint": 1137,
+    "function renderReference": 1877,
+    "function nm": 2284,
+    "function ps": 2299,
+    "function dec": 2316,
+    "function altium": 2384
   }
 }

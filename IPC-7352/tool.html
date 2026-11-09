@@ -451,8 +451,9 @@ var FIELDS={smd:[['mfrL','طول پد مرجع سازنده','قابل ویرا�
  ['BW','Wmax','عرض بدنه (برای Courtyard و نام QFN/چیپ؛ 0 = نامعلوم)',0,1],
  ['bodyLength','طول بدنه','طول بدنه برای Courtyard (0 = برآورد از پایه‌ها)',0,1],
 
+ ['nameBodyL','طول اسمی بدنه برای نام چیپ','فقط نام‌گذاری؛ مستقل از حداکثر ابعاد محاسبهٔ مس؛ 0 = نام نامشخص',0,1],['nameBodyW','عرض اسمی بدنه برای نام چیپ','فقط نام‌گذاری؛ از دیتاشیت همان قطعه',0,1],
  ['n','n','پایه در هر طرف',8,0]],
-bga:[['bB','Ball','قطر توپ',0.5,1],['bP','گام مشترک','گام پیش‌فرض هر دو محور',0.8,1],['bPX','گام X (اختیاری)','0 = استفاده از گام مشترک',0,1],['bPY','گام Y (اختیاری)','0 = استفاده از گام مشترک',0,1],['bC','Cols','ستون',10,0],['bR','Cols','ردیف',10,0],['bL','BL','طول بدنه',9,1],['bW','BL','عرض بدنه',9,1],['bH','H','ارتفاع',1.5,1],['bSkip','Cols','توپ‌های حذف‌شده (مثل A1,B2 — از نقشهٔ دیتاشیت)',0,0]],
+bga:[['bB','Ball','قطر توپ',0.5,1],['bP','گام مشترک','گام پیش‌فرض هر دو محور',0.8,1],['bPX','گام X (اختیاری)','0 = استفاده از گام مشترک',0,1],['bPY','گام Y (اختیاری)','0 = استفاده از گام مشترک',0,1],['bC','Cols','ستون',10,0],['bR','Cols','ردیف',10,0],['bL','BL','طول بدنه',9,1],['bW','BL','عرض بدنه',9,1],['bH','H','ارتفاع',1.5,1],['bSkip','Cols','توپ‌های حذف‌شده (مثل A1,B2 — از نقشهٔ دیتاشیت)','',0]],
 th:[['tBodyL','طول بدنه max','برای محوری طول استوانه؛ برای شعاعی مستطیلی طول در X',6.8,1],['tBodyD','قطر / ضخامت بدنه max','قطر استوانه یا ضخامت بدنه در Y',2.6,1],['tBodyH','ارتفاع بدنه max','برای شعاعی؛ برای محوری عمودی طول بدنه در Z است',7,1],['tK','Pins','تعداد پین',14,0],['tP','P','گام',2.54,1],['tR','R','فاصله‌ی دو ردیف (0=تک‌ردیف)',7.62,1],['tW','Wt','بُعد max پایه',0.52,1],['tW2','Wt','بُعد دوم مستطیل (فقط شکل مستطیلی)',0.25,1],['tB','Bd','ضخامت برد',1.6,1]]};
 var FAM=[['gull','SOIC / SOP / TSSOP / QFP · Gull-wing (3-1)'],['chip','چیپ مستطیلی (3-3/3-4)'],['sof','Small outline پایه تخت: SOT/SOD (3-15)'],['jlead','J-lead: SOJ/PLCC (3-2)'],['qfn','QFN/DFN/SON (3-10)'],['pull','Pullback (3-12)'],['alc','الکترولیتی/کریستال (3-14)'],['melf','MELF (3-5)'],['conc','Concave (3-6)'],['inl','L-lead رو به داخل (3-8)'],['butt','Butt/I (3-7)'],['lug','Flat lug (3-9)']];
 function build(){
@@ -466,6 +467,7 @@ else s+='<div><label>شکل پایه</label><select id="tS"><option value="0">گ
 if(k==='th')s+='<div><label>آرایش بدنهٔ THT</label><select id="tModel"><option value="generic">ردیفی / DIP عمومی (بدون بدنه)</option><option value="sip">SIP تک‌ردیف مستقیم</option><option value="cdip">CDIP دو ردیف</option><option value="dipc">DIPC دو ردیف با حفره</option><option value="jump">جامپر سیمی دوپایه</option><option value="axial-h">محوری افقی، استوانه‌ای</option><option value="axial-v">محوری عمودی، استوانه‌ای؛ بدنه روی پین ۱</option><option value="radial-d">شعاعی استوانه‌ای</option><option value="radial-r">شعاعی مستطیلی</option><option value="radial-disc">شعاعی دیسکی</option></select></div><div><label>قطبیت خازن</label><select id="tPolar"><option value="no">غیرقطبی</option><option value="yes">قطبی؛ پین ۱ مثبت</option></select></div><div><label>نمونهٔ مستند (ابعاد mm)</label><select id="tExample"><option value="">سفارشی</option><option value="cfr25">YAGEO CFR-25 · پایه max 0.60</option><option value="1n4148">Vishay 1N4148 · پایه max 0.55</option></select></div>';
 if(k==='th')s+='<div><label>هندسهٔ سوراخ</label><select id="tHoleShape"><option value="round">گرد؛ محاسبه از جداول 4-1/4-2</option><option value="slot">شیار گرددو‌سر؛ ابعاد از دیتاشیت/سازنده</option></select></div><div class="wide" id="slotNotice" hidden><p class="note">IPC-7352 بخش 5.2.3، ص 29، شیار را در نام‌گذاری مثال می‌زند؛ فرمول سایزبندی شیار از پایه ارائه نمی‌کند. طول و عرض نهایی و حلقهٔ مسی را از دیتاشیت/سازنده تعیین کن. جهت شیار X است؛ گوشهٔ تیز پشتیبانی نمی‌شود. این حالت ابعاد را از جدول سوراخ گرد حدس نمی‌زند.</p></div>';
 if(k==='th')[['tSlotL','طول کل شیار نهایی (شامل دو سر گرد)'],['tSlotW','عرض شیار نهایی'],['tSlotRing','حلقهٔ مسی اسمی موردنظر در هر طرف؛ نه مقدار تجویزی IPC']].forEach(function(a){s+='<div data-slot-field hidden><label>'+a[1]+'</label><input id="'+a[0]+'" type="number" step="any" data-d="1" disabled></div>'});
+if(k==='th')s+='<div data-fit-field hidden><label>تلرانس سوراخ Press-fit سازنده، ± mm</label><input id="tFitTol" type="number" step="any" min="0" data-d="1" disabled></div><div data-fit-field hidden><label>مرجع Press-fit (مدل سازنده، سند و صفحه)</label><input id="tFitSource" type="text" maxlength="240" disabled></div>';
 $('b'+k).innerHTML=s});
 if($('bSkip')){$('bSkip').type='text';$('bSkip').placeholder='مثل A1,B2,B3';$('bSkip').value=''}   // فیلد متنی، نه عددی
 }
@@ -639,7 +641,7 @@ function GP(){var v=rd('pGap');return isNaN(v)||v<=0?.15:v}
 function DEC(){var v=Math.round(+$('pDec').value);return v>=2&&v<=4?v:2}
 var TP={'3-1':9,'3-2':9,'3-3':10,'3-4':10,'3-5':10,'3-6':10,'3-7':11,'3-8':11,'3-9':11,'3-10':11,'3-11':12,'3-12':12,'3-13':12,'3-14':12,'3-15':13};
 function pg(p){return 'ص '+p+' استاندارد (ص '+(p+10)+' فایل PDF)'}
-function EX(k){if(k==='smd')return (['butt','lug','pull'].indexOf($('fam').value)>-1?'<li><b>Periphery:</b> جدول‌های 3-7، 3-9 و 3-12 فقط مقدار «Periphery» می‌دهند؛ ابزار همان را در همه‌ی جهت‌ها (Z، G و X) اعمال می‌کند. این برداشت من است و فرمول جداگانه در استاندارد نیست.</li>':'')+'<li><b>گردکردن:</b> Z و G و X تا دو رقم اعشار (برای گام کمتر از 0.4 سه رقم) گرد می‌شوند (جدول 3-1 و یادداشت 4، ص 9).</li><li><b>قاعده‌ی پاشنه‌ی gull-wing:</b> اگر Smax ≤ A (عرض بدنه)، هدف پاشنه 0.25/0.15/0.05 می‌شود (یادداشت 3 جدول 3-1، ص 9). برای فعال‌شدن، A را وارد کن.</li><li><b>شکل پد:</b> پد بیضوی برای لحیم بدون سرب بر مستطیلی ترجیح دارد (بند 3.2، ص 9)؛ خروجی Altium برای پایه‌دارها بیضوی است.</li>';if(k==='th')return '<li><b>علامت «+=>» جدول‌های 4-1 و 4-2:</b> در PDF به همین صورت چاپ شده؛ من آن را «افزودن این مقدار» خوانده‌ام و مقدار قابل تنظیم است.</li><li><b>مقطع مربع/مستطیل:</b> بُعد ورودی قطر قطری است؛ ابزار از اضلاع حساب می‌کند (جدول 4-1، ص 20).</li><li><b>سوراخ غیرآبکاری:</b> حداکثر بُعد پایه + 0.4 با تلرانس ±0.1 (بند 4.6، ص 21 و ص 24).</li><li><b>Press-fit:</b> قطر سوراخ از سازنده گرفته می‌شود (بند 4.5، ص 21)؛ در خانه‌ی «قطر سوراخ نهایی» وارد کن.</li>';return ''}
+function EX(k){if(k==='smd')return (['butt','lug','pull'].indexOf($('fam').value)>-1?'<li><b>Periphery:</b> جدول‌های 3-7، 3-9 و 3-12 فقط مقدار «Periphery» می‌دهند؛ ابزار همان را در همه‌ی جهت‌ها (Z، G و X) اعمال می‌کند. این برداشت من است و فرمول جداگانه در استاندارد نیست.</li>':'')+'<li><b>گردکردن:</b> گردکردن جدول‌محور است؛ در چیپ کوچک جدول 3-4، گردکردن Toe به عرض پد و فاصلهٔ داخلی تعمیم داده نمی‌شود. سایر مسیرهای موجود تا دو رقم اعشار (گام کمتر از 0.4 سه رقم) گرد می‌شوند (جدول 3-1 و یادداشت 4، ص 9).</li><li><b>قاعده‌ی پاشنه‌ی gull-wing:</b> اگر Smax ≤ A (عرض بدنه)، هدف پاشنه 0.25/0.15/0.05 می‌شود (یادداشت 3 جدول 3-1، ص 9). برای فعال‌شدن، A را وارد کن.</li><li><b>شکل پد:</b> پد بیضوی برای لحیم بدون سرب بر مستطیلی ترجیح دارد (بند 3.2، ص 9)؛ خروجی Altium برای پایه‌دارها بیضوی است.</li>';if(k==='th')return '<li><b>علامت «+=>» جدول‌های 4-1 و 4-2:</b> در PDF به همین صورت چاپ شده؛ من آن را «افزودن این مقدار» خوانده‌ام و مقدار قابل تنظیم است.</li><li><b>مقطع مربع/مستطیل:</b> بُعد ورودی قطر قطری است؛ ابزار از اضلاع حساب می‌کند (جدول 4-1، ص 20).</li><li><b>سوراخ غیرآبکاری:</b> حداکثر بُعد پایه + 0.4 با تلرانس ±0.1 (بند 4.6، ص 21 و ص 24).</li><li><b>Press-fit:</b> قطر سوراخ از سازنده گرفته می‌شود (بند 4.5، ص 21)؛ در خانه‌ی «قطر سوراخ نهایی» وارد کن.</li>';return ''}
 function why(k){var h='';
 if(k==='smd'){var t=rule($('fam').value,0,rd('W'),rd('H'),rd('Hl'))[4];
 h='<li><b>فرمول Z، G، X:</b> معادلات 3-5 تا 3-7 بند 3.1.4 ('+pg(8)+'). استاندارد می‌گوید J به ابعاد بیرونی اضافه و از ابعاد داخلی کم می‌شود. ابزار به همین دلیل Z = Lmax + 2·ZJ و G = Smax − 2·GJ و X = W + 2·SJ را حساب می‌کند. (در چاپ PDF علامت معادله‌ی G متناقض است؛ متن می‌گوید داخلی کم می‌شود و من از همین تعبیر پیروی کردم.)</li>'+
@@ -673,8 +675,9 @@ M.pads=MP;                        // همان داده‌ای که در فهرس
 if($('kind').value==='smd'&&$('padBasis').value==='manufacturer'&&!M.reference){rows=rows.map(function(row){return [row[0],row[1],'حالت ابعاد مستقیم سازنده / ویرایش کاربر؛ ابعاد پد از ورودی‌های مرجع گرفته شده، نه فرمول IPC. توضیح محدودیت گوشه‌ها در وضعیت پکیج آمده است.']})}
 if(M.reference)PITCH_TXT='—';
 R=rows;
-$('res').innerHTML='<tr><th>پارامتر</th><th>مقدار</th><th>منبع / دلیل</th></tr>'+
- rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="v">'+r[1]+'</td><td>'+(r[2]||'')+'</td></tr>'}).join('');
+$('res').textContent='';
+var heading=document.createElement('tr');['پارامتر','مقدار','منبع / دلیل'].forEach(function(text){var th=document.createElement('th');th.textContent=text;heading.appendChild(th)});$('res').appendChild(heading);
+rows.forEach(function(row){var tr=document.createElement('tr');[row[0],row[1],row[2]||''].forEach(function(value,index){var td=document.createElement('td');td.textContent=value==null?'':String(value);if(index===1)td.className='v';tr.appendChild(td)});$('res').appendChild(tr)});
 $('pads').value=hdr+'\n'+pads.join('\n');
 $('warn').textContent=warn||'';
 syncInspect();
@@ -771,8 +774,9 @@ if(F==='gull'&&rd('Amax')>0&&S<=rd('Amax')){r[1]=[.25,.15,.05][i];src.push('Heel
 r=[ov('pZJ',r[0],1),ov('pGJ',r[1],1),ov('pSJ',r[2],1),ov('pCE',r[3],1)];
 [['pZJ',0],['pGJ',1],['pSJ',2],['pCE',3]].forEach(function(a){if($('man').checked&&$(''+a[0]).value!==''&&Math.abs(+$(''+a[0]).value-stdv[a[1]])>1e-9)src.push(a[0].slice(1)+' دستی')});
 // ---------- Z، G، X (گردکردن جدول 3-1) ----------
-var d3=Pt<0.4?3:2,Z=+(Lm+2*r[0]).toFixed(d3),G=+Math.max(S-2*r[1],0).toFixed(d3),X=+(W+2*r[2]).toFixed(d3),
+var d3=Pt<0.4?3:2,Z=+(Lm+2*r[0]).toFixed(d3),G=+Math.max(S-2*r[1],0).toFixed(d3),X=(F==='chip'&&W<.5)?W+2*r[2]:+(W+2*r[2]).toFixed(d3),
  pl=(Z-G)/2,ce=(Z+G)/4,pads=[],no=1;
+if(F==='chip'&&W<.5){G=Math.max(S-2*r[1],0);pl=(Z-G)/2;ce=(Z+G)/4}
 if($('padBasis').value==='manufacturer'){pl=rd('mfrL');X=rd('mfrW');ce=rd('mfrSpan')/2;Z=2*ce+pl;G=2*ce-pl}
 if($('layout').value==='sot23'){
  pads=[{n:1,x:-ce,y:Pt/2,w:pl,h:X},{n:2,x:-ce,y:-Pt/2,w:pl,h:X},{n:3,x:ce,y:0,w:pl,h:X}];
@@ -852,13 +856,13 @@ var sf=lv==='A'?'M':lv==='B'?'N':'L',pin=pads.length,asym='',nm='',T=function(v)
  lead=(Ln>0?(Ln+Lm)/2:Lm),cT=$('cType').value,
  pr=/^sot23/.test($('layout').value)?'SOT':{gull:sd===4?'QFP':'SOP',jlead:sd===4?'PLCC':'SOJ'}[F];
 if(F!=='chip'&&!/^sot23/.test($('layout').value)&&sd===2&&n%2===1)asym='تعداد پد دو طرف فرد شد؛ تعداد و مکان واقعی پایه‌ها را با دیتاشیت تطبیق بده. ';
-if(F==='chip'&&cT)nm=cT+('0'+Math.round(Lm*10)).slice(-2)+('0'+Math.round((bw>0?bw:W)*10)).slice(-2)+'X'+T(H)+sf;
+if(F==='chip'&&cT){if(rd('nameBodyL')>0&&rd('nameBodyW')>0)nm=cT+String(Math.round(rd('nameBodyL')*10)).padStart(2,'0')+String(Math.round(rd('nameBodyW')*10)).padStart(2,'0')+'X'+T(H)+sf;else asym='برای نام چیپ، طول و عرض اسمی بدنه را در ورودی‌های مستقل نام‌گذاری وارد کن؛ حداکثرهای محاسبهٔ مس جایگزین نمی‌شوند. ';}
 else if(F==='qfn'&&cT){
-  var bodyL=bw>0?bw:Lm,bodyW=bw>0?bw:Lm;
+  var bodyL=rd('bodyLength')>0?rd('bodyLength'):(bw>0?bw:Lm),bodyW=bw>0?bw:Lm;
   nm=cT+T(Pt)+'P'+T(bodyL)+'X'+T(bodyW)+'X'+T(H)+'-'+pin+(hasTh?'T'+T(th)+(Math.abs(th2-th)>1e-9?'X'+T(th2):''):'')+sf;
   if(bw<=0)asym='برای نام QFN/SON/DFN ابعاد بدنه (BW) لازم است؛ مقدار با Lmax ساخته شد. ';
 }else if(pr)nm=pr+T(Pt)+'P'+T(lead)+(sd===4?'X'+T(lead):'')+'X'+T(H)+'-'+pin+sf;
-MP=pads.map(function(p){return {n:p.n,x:p.x,y:p.y,w:p.w,h:p.h,sh:SHP(F),hole:0,pl:true}});
+MP=pads.map(function(p){return {n:p.n,x:p.x,y:p.y,w:p.w,h:p.h,sh:p.th?'r':SHP(F),hole:0,pl:true}});
 M.cw=cw;M.ch=ch;M.name=nm;
 // ---------- هشدارها ----------
 var wr=WG;
@@ -906,11 +910,13 @@ pd=Math.round(pd*100)/100;                                     // گردکردن
 if(pd<=0)return bad('قطر پد محاسبه‌شده نامعتبر است.');
 var ex=ov('pBCE',[2,1,.5][i],1),x,y,k;
 // نام‌گذاری ردیف چندحرفی (ایراد ۱۳)
-var L='ABCDEFGHJKLMNPRTUVWY'.split(''),names=[],kk=0;
-for(k=0;k<Math.max(rw,1);k++){if(k<L.length)names.push(L[k]);else{names.push(String.fromCharCode(65+Math.floor(kk/24))+L[kk%24]);kk++}}
+var L='ABCDEFGHJKLMNPRTUVWY'.split(''),names=[];
+function rowName(index){var text='';do{text=L[index%L.length]+text;index=Math.floor(index/L.length)-1}while(index>=0);return text}
+for(var k=0;k<rw;k++)names.push(rowName(k));
 var skipt={};skip.forEach(function(t){skipt[t]=1});
 var count=0,padsR=[];
 for(y=0;y<rw;y++)for(x=0;x<c;x++){var name=names[y]+(x+1);padsR.push({n:name,x:(x-(c-1)/2)*PtX,y:((rw-1)/2-y)*PtY});if(!skipt[name])count++}
+var validNames=new Set(padsR.map(function(p){return p.n}));if(skip.some(function(n){return !validNames.has(n)}))return bad('شناسهٔ حذف توپ خارج از آرایه است؛ نقشهٔ پایه‌های دیتاشیت را بررسی کن.');
 if(count===0)return bad('با نقشهٔ حذف‌های واردشده هیچ توپی باقی نمی‌ماند.');
 var aw=(c-1)*PtX+pd,ah=(rw-1)*PtY+pd,w=Math.max(BL,aw)+2*ex,h=Math.max(BW,ah)+2*ex;
 var cw=RC(w),ch=RC(h);if(rd('pCR')>0&&(cw<w||ch<h))WG+='Courtyard به مضرب '+f(rd('pCR'),2)+' گرد شد. ';
@@ -926,9 +932,12 @@ padsR.forEach(function(p){
   MP.push({n:p.n,x:p.x,y:p.y,w:pd,h:pd,sh:'c',hole:0,pl:true});
 });
 var minGap=1e9,pair='';
-for(var a1=0;a1<MP.length;a1++)for(var b1=a1+1;b1<MP.length;b1++){
-  var g=Math.max(Math.abs(MP[a1].x-MP[b1].x)-pd,Math.abs(MP[a1].y-MP[b1].y)-pd);
-  if(g<minGap){minGap=g;pair=MP[a1].n+'/'+MP[b1].n}}
+var ordered=MP.slice().sort(function(a,b){return a.x-b.x||a.y-b.y}),minCentre=Infinity;
+for(var a1=0;a1<ordered.length;a1++)for(var b1=a1+1;b1<ordered.length;b1++){
+ var dx=ordered[b1].x-ordered[a1].x;if(dx>=minCentre)break;
+ var distance=Math.hypot(dx,ordered[b1].y-ordered[a1].y);
+ if(distance<minCentre){minCentre=distance;minGap=distance-pd;pair=ordered[a1].n+'/'+ordered[b1].n}
+}
 if(MP.length<2){minGap=null;pair='—'}
 var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;
 // ---------- اندازه‌گذاری BGA: قطر توپ، گام، عرض آرايه، Courtyard ----------
@@ -941,11 +950,11 @@ var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;
  if(c>1)K.hDim(K.PX(x0),K.PX(x0+PtX),Y0-FS*1.5,'P '+fm(PtX)+K.u());
 })();
 M.cw=cw;M.ch=ch;
-M.name='BGA'+count+ty+Math.round(Pt*100)+'P'+c+'X'+rw+'_'+Math.round(BL*100)+'X'+Math.round(BW*100)+'X'+Math.round(BH*100)+'D'+Math.round(b*100)+'N';
+M.name='BGA'+count+ty+(Math.round(PtX*100)+(PtX!==PtY?'X'+Math.round(PtY*100):''))+'P'+c+'X'+rw+'_'+Math.round(BL*100)+'X'+Math.round(BW*100)+'X'+Math.round(BH*100)+'D'+Math.round(b*100)+'N';
 var wr=WG;if(count<rw*c)wr+=(rw*c-count)+' موقعیت حذف شد و پد برای آن ساخته نشد. ';
 if(minGap!==null&&minGap<0)wr+='پدها روی هم افتاده‌اند؛ گام/سطح را اصلاح کن. ';
 else if(minGap!==null&&minGap<GP())wr+='کوچک‌ترین فاصلهٔ خالی بین پدها '+fm(minGap)+' '+U+' (جفت '+pair+') از آستانه کمتر است. ';
-if(PtX!==PtY)wr+='آرایه با گام متفاوت محورها ساخته شد؛ نام استاندارد تک‌گام است، نوع دوگام را با دیتاشیت تأیید کن. ';
+if(PtX!==PtY)wr+='آرایه با گام متفاوت محورها ساخته شد؛ هر دو گام در نام طبق الگوی دوگام جدول 3-16 آمده‌اند؛ جهت محورها را با دیتاشیت تأیید کن. ';
 VALID=true;
 K.raise();K.fitContent();
 out([['قطر هر پد','Ø '+fu(pd),'جدول 3-11، سطح '+lv+(ty==='C'?': کاهش از قطر توپ':': افزایش به قطر توپ')+' (گردشده به 0.01)'],
@@ -1024,8 +1033,10 @@ var add=ov('pHadd',[[.15,.4],[.15,.4],[.10,.35]][sh][pr],1),
     adj=ov('pHadj',pr?(bt<.8?-.2:bt<1?-.1:bt<=2.35?0:bt<=4?.1:.2):0,1),
     hole,holeSrc,tolShow=tol;
 if(HT==='F'){
+  if(!$('tFitSource').value.trim()||$('tFitTol').value.trim()===''||!Number.isFinite(Number($('tFitTol').value))||rd('tFitTol')<0)return bad('Press-fit به تلرانس صریح و مرجع سازنده نیاز دارد؛ تلرانس عمومی PTH استفاده نمی‌شود.');
+  tolShow=rd('tFitTol');
   if(!(HO>0))return bad('Press-fit بدون قطر سوراخ سازنده محاسبه نمی‌شود: «قطر سوراخ نهایی» را از دیتاشیت سازنده پر کن و تلرانس را «بدون تلرانس/مقدار سازنده» بگذار.');
-  hole=HO;holeSrc='مقدار سازنده (Press-fit، بند 4.5)';
+  hole=HO;holeSrc='ابعاد و تلرانس از ورودی صریح سازنده (Press-fit، بند 4.5)';
 }else if(HT==='N'){
   var nadd=ov('pNadd',.4,1);
   hole=HO>0?HO:Wd+nadd;holeSrc=HO>0?'مقدار دستی':'NPTH: قطر/قطر قطری پایه + '+fmo(nadd)+' '+U+' (جدول 4-5، ص 22)';
@@ -1038,7 +1049,7 @@ var raw=hole;
 if(!(raw>0))return bad('قطر سوراخ معتبر نیست.');
 // ردیف جدول 4-4 با مقدار واقعی (بدون گردکردن) انتخاب می‌شود (ایراد ۲۷/۶۴)
 var hpRaw=Math.round(raw*1000), stdPad=hpRaw<=1000?.5:hpRaw<=1250?.75:hpRaw<=1750?1:hpRaw<=2250?1.25:1.5;
-hole=Math.round(raw*100)/100;
+hole=HT==='F'?raw:Math.round(raw*100)/100;
 if(HO>0&&Math.abs(HO-hole)>1e-9)WG+='قطر واردشده '+f(HO,3)+' در نمایش به '+f(hole,2)+' گرد شد (ردیف پد از مقدار واقعی انتخاب شد). ';
 var pa=ov('pPadd',stdPad,1),pad=Math.round((hole+pa)*100)/100;
 if(!(pad>hole))return bad('قطر پد مسی باید از سوراخ بزرگ‌تر باشد تا حلقهٔ مسی باقی بماند؛ افزودهٔ پد را اصلاح کن.');
@@ -1088,7 +1099,7 @@ var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
    K.hDim(K.PX(x0),K.PX(x0+Pt),Y1+FS*5.2,'P '+fm(Pt)+K.u());
  }
 })();
-var pfx=p1==='r'?'r':'c';
+var pfx=p1==='r'?'s':'c';
 var Wname=Wd0;  // W در نام = حداکثر عرض پایه (نه قطر قطری) — ایراد ۵۷
 M.name=(two?'DIP':'SIP')+Math.round((two?R2:Pt)*100)+'W'+Math.round(Wname*100)+'P'+Math.round(Pt*100)+'Q'+k+'B';
 if(body){var comp=$('component').value,polar=$('tPolar').value==='yes',prefix;
@@ -1111,12 +1122,12 @@ VALID=true;
 K.raise();K.fitContent();
 out([['بُعد مؤثر پایه',fu(Wd),sh===0?'حداکثر قطر پایهٔ گرد':sh===1?'قطر قطری مربع = ضلع × √2':'قطر قطری مستطیل = √(ضلع اول² + ضلع دوم²)'],
  ['حلقهٔ مسی اسمی در هر طرف',fu((pad-hole)/2),'(قطر پد − قطر سوراخ نهایی) / 2؛ پیش از تلرانس و خطای هم‌مرکزی؛ کنترل IPC-222X و توان سازنده لازم است'],
- ['سوراخ نهایی',('Ø '+fu(hole))+(tolShow>0?' (±'+fmo(tolShow)+')':' (تلرانس سازنده)'),holeSrc],
+ ['سوراخ نهایی',('Ø '+(HT==='F'?String(+toDisp(hole).toFixed(6))+' '+U:fu(hole)))+((tolShow>0||HT==='F')?' (±'+(HT==='F'?String(+toDisp(tolShow).toFixed(6)):fmo(tolShow))+')':' (تلرانس سازنده)'),holeSrc],
  ['پد',('Ø '+fu(pad))+(p1==='r'?' (پین ۱ مربع)':''),'سوراخ + '+fmo(pa)+' '+U+' (جدول 4-4)؛ '+MP.length+' پد — حداقل پد IPC-222X و توان سازنده باید جداگانه کنترل شود'],
  ['کمینه فاصلهٔ خالی واقعی پدها',(minGap===null?'— (جفت پدی وجود ندارد)':fm(minGap)+' '+U),'آستانه '+fm(GP())+' '+U],
  [two?'فاصلهٔ دو ردیف':'—',two?fu(R2)+' / خالی '+fm(R2-pad):'—','lead span دیتاشیت'],
  ['Courtyard',fu(M.cw)+' × '+fu(M.ch),(body?'محدودهٔ بدنه و پدها + excess':'محدودهٔ همهٔ پدها + excess')+'؛ خط Courtyard در اسکریپت Altium ساخته می‌شود'],
- ['نام Padstack',pfx+Math.round(pad*100)+((HT==='N')?'hn':'h')+Math.round(hole*100),'شکل پین ۱: '+(p1==='r'?'مربع (r)':'دایره (c)')+'؛ سوراخ '+(HT==='N'?'غیرآبکاری: hn':'آبکاری: h')],
+ ['نام Padstack',pfx+Math.round(pad*100)+((HT==='N')?'hn':'h')+Math.round(hole*100),'شکل پین ۱: '+(p1==='r'?'مربع (s)':'دایره (c)')+'؛ سوراخ '+(HT==='N'?'غیرآبکاری: hn':'آبکاری: h')],
  ['نام پیشنهادی Land Pattern',M.name,body?'قرارداد جدول 4-6؛ ابعاد max ورودی؛ B سطح ساخت است، نه چگالی SMD؛ CUSTOM نام استاندارد نیست':'فقط lead span/گام/تعداد؛ طول و ارتفاع بدنه لازم است (جدول 4-6) — نام کامل نیست']],
  MP.map(function(p){return [p.n,fq(p.x),fq(p.y),fq(p.w),fq(p.hole||0),(p.sh==='r'?'rect':'circle'),(p.pl?'plated':'non-plated')].join(',')}),
  'Pin,X('+U+'),Y('+U+'),PadDia,HoleDia,Shape,Plating',wr);
@@ -1155,6 +1166,7 @@ function validateFootprint(k){
   }
   if($('fam').value==='qfn'&&!(rd('Hl')>0))error('Hl','ارتفاع سطح لحیم‌پذیر QFN باید مثبت باشد.');
  }
+ if(k==='th'&&$('tHT').value==='F'&&!$('tFitSource').value.trim())error('tFitSource','مدل، سند و صفحهٔ سازنده برای Press-fit لازم است.');
  if(k==='th'&&$('tHoleShape').value==='slot'){
   ['tSlotL','tSlotW','tSlotRing'].forEach(function(id){if(!(rd(id)>0))error(id,'مقدار مثبت از دیتاشیت/سازنده لازم است؛ پیش‌فرض استاندارد برای این شیار تعیین نشده.');});
   if(rd('tSlotL')<rd('tSlotW'))error('tSlotL','طول کل شیار باید حداقل برابر عرض باشد.');
@@ -1167,10 +1179,14 @@ function validateFootprint(k){
  return errors;
 }
 function syncSlotFields(){
+ var pressfit=$('kind').value==='th'&&$('tHT').value==='F';
+ document.querySelectorAll('[data-fit-field]').forEach(function(d){d.hidden=!pressfit;d.querySelector('input').disabled=!pressfit});
+
  var active=$('kind').value==='th'&&$('tHoleShape').value==='slot';
  document.querySelectorAll('[data-slot-field]').forEach(function(d){d.hidden=!active;d.querySelector('input').disabled=!active});
  $('slotNotice').hidden=!active;
- ['tPr','tTol','tP1'].forEach(function(id){$(id).disabled=active;$(id).parentNode.hidden=active});
+ ['nameBodyL','nameBodyW'].forEach(function(id){var enabled=$('kind').value==='smd'&&$('fam').value==='chip';$(id).disabled=!enabled;$(id).parentNode.hidden=!enabled});
+ ['tPr','tTol','tP1'].forEach(function(id){var hidden=active||(pressfit&&id!=='tP1');$(id).disabled=hidden;$(id).parentNode.hidden=hidden});
 }
 function run(){
 if(libraryActive()){renderReference();save();return}
@@ -1194,7 +1210,7 @@ if(!VALID&&!$('res').innerHTML)$('res').innerHTML='<tr><td colspan="3">خروج�
 why(k);save()
 }
 function save(){try{var o={};document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(!e.id)return;o[e.id]=e.type==='checkbox'?e.checked:e.value});o._schema=2;o._u=U;o._demoPackage=demoPackage;localStorage.setItem('fp7352',JSON.stringify(o))}catch(e){}}
-function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=o._u||'mm';UOLD=U;demoPackage=o._demoPackage||'';
+function load(){try{var o=JSON.parse(localStorage.getItem('fp7352')||'null');if(!o)return;U=Object.prototype.hasOwnProperty.call(PX,o._u)?o._u:'mm';UOLD=U;demoPackage=o._demoPackage||'';
 // مهاجرت ذخیره‌های قدیمی: نمونهٔ قدیمی تمام ابعاد خانواده‌های دیگر را صفر می‌کرد.
 if(!o._schema){['bga','th'].forEach(function(k){
  var dims=FIELDS[k].filter(function(a){return a[4]===1&&a[3]>0&&!/^tBody/.test(a[0])});
@@ -1202,6 +1218,7 @@ if(!o._schema){['bga','th'].forEach(function(k){
 })}
 if(o.component&&PACKAGE_TYPES[o.component]){$('component').value=o.component;refreshPackages(o.package)}
 document.querySelectorAll('.workspace input,.workspace select,#referencePads,#referenceBody').forEach(function(e){if(o[e.id]!=null){if(e.type==='checkbox')e.checked=o[e.id];else if(e.tagName!=='SELECT'||Array.from(e.options).some(function(opt){return opt.value===String(o[e.id])}))e.value=o[e.id]}});$('unit').value=U;
+if(o.nameBodyL==null&&o.nameBodyW==null&&/^chip/.test(o.smp||'')&&SM[o.smp]){['nameBodyL','nameBodyW'].forEach(function(id){$(id).value=SM[o.smp][id]/PX[U]})}
 // تعمیر دقیق نمونهٔ 1206 ذخیره‌شده با Lmin مربوط به SOIC در نسخهٔ قدیمی.
 if(o.smp==='chip'&&o.fam==='chip'&&Math.abs(rd('Lmin')-5.8)<.001&&Math.abs(rd('Lmax')-3.4)<.001){
  $('Lmin').value=3/PX[U];$('Tmin').value=0;$('Tmax').value=0;
@@ -1221,8 +1238,9 @@ var SM={soic:{kind:'smd',fam:'gull',sides:'2',autoS:1,Lmin:5.8,Lmax:6.2,Tmin:.4,
 SM.soic8=Object.assign({},SM.soic,{n:4});
 SM.soic14=Object.assign({},SM.soic,{n:7});
 SM.tssop=Object.assign({},SM.soic,{Lmin:6.2,Lmax:6.6,Tmin:.45,Tmax:.75,W:.30,H:1.2,P:.65,n:8});
-SM.chip0805=Object.assign({},SM.chip,{Lmin:1.8,Lmax:2.2,Smax:1.0,W:1.45,H:.6});
-SM.chip0603=Object.assign({},SM.chip,{Lmin:1.45,Lmax:1.75,Smax:.75,W:.95,H:.5});
+SM.chip.nameBodyL=3.2;SM.chip.nameBodyW=1.6;
+SM.chip0805=Object.assign({},SM.chip,{Lmin:1.8,Lmax:2.2,Smax:1.0,W:1.45,H:.6,nameBodyL:2,nameBodyW:1.25});
+SM.chip0603=Object.assign({},SM.chip,{Lmin:1.45,Lmax:1.75,Smax:.75,W:.95,H:.5,nameBodyL:1.6,nameBodyW:.8});
 SM.sot23={kind:'smd',fam:'gull',layout:'sot23',sides:'2',n:2,autoS:1,Lmin:2.1,Lmax:2.5,Tmin:.3,Tmax:.5,W:.48,H:1.1,P:1.9,BW:1.4,bodyLength:3.04};
 SM['ti-db5']={kind:'smd',fam:'gull',layout:'sot23-5',sides:'2',n:3,autoS:0,Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.75,bodyLength:3.05,padBasis:'manufacturer',mfrSource:'ti-db5',mfrL:1.1,mfrW:.6,mfrSpan:2.6};
 SM['ti-db6']=Object.assign({},SM['ti-db5'],{layout:'sot23-6',mfrSource:'ti-db6'});
@@ -2049,7 +2067,7 @@ $('bsmd').parentNode.appendChild(advanced);
 refreshPackages('soic');
 function packageBlockReason(){if(libraryActive())return '';var spec=PACKAGE_CATALOG[$('package').value];
  if(!spec)return 'پکیج معتبر انتخاب کن.';
- if($('package').value==='melf'&&!libraryActive())return 'برای MELF از مدل مرجع قابل ویرایش استفاده کن؛ طبق ممیزی، مسیر محاسباتی عرض تماس مستقل هنوز به اصلاح نیاز دارد.';
+ if(($('package').value==='melf'||$('kind').value==='smd'&&$('fam').value==='melf')&&!libraryActive())return 'برای MELF از مدل مرجع قابل ویرایش استفاده کن؛ طبق ممیزی، مسیر محاسباتی عرض تماس مستقل هنوز به اصلاح نیاز دارد.';
  if(spec.state==='direct'&&!libraryActive())return 'ابعاد نهایی مس، سوراخ و بدنه را از نقشهٔ سازنده در مدل مستقیم وارد کن.';
  return spec.state==='unavailable'?'این پکیج در فهرست هست، ولی مدل هندسه/نام‌گذاری آن هنوز پیاده‌سازی نشده است؛ فوت‌پرینتِ قطعهٔ قبلی به‌جایش نمایش داده نمی‌شود.':spec.state==='blocked'?'محاسبهٔ این پکیج در ممیزی نیازمند اصلاح تشخیص داده شده است؛ فعلاً خروجی تولید نمی‌شود.':'';
 }
@@ -2265,11 +2283,12 @@ if($('rowUnit')){
 function T(v){return Math.round(v*100)}
 function nm(){var t=$('nT').value,P=+$('nP').value,L=+$('nL').value,W=+$('nW').value,H=+$('nH').value,N=$('nN').value,Th=+$('nTh').value,D=$('nD').value,pf=$('nPf').value.trim(),o,err='';
  // اعتبارسنجی: هیچ بُعد لازم صفر یا منفی نباید بی‌صدا حذف شود (ایراد ۳۳/۵۹/۴۲)
- if(!(P>0))err='گام (P) باید مثبت باشد.';
+ if(['nP','nL','nW','nH','nTh','nN'].some(function(id){return !Number.isFinite(Number($(id).value))||Number($(id).value)<0}))err='ابعاد و تعداد باید متناهی و نامنفی باشند.';
+ else if(!(P>0))err='گام (P) باید مثبت باشد.';
  else if(!(L>0))err=(t==='3'?'طول چیپ':'طول/lead span')+' باید مثبت باشد.';
- else if(t==='2'&&!(W>0))err='برای ساختار Body، عرض بدنه هم لازم است.';
+ else if((t==='2'||t==='3')&&!(W>0))err='برای ساختار Body، عرض بدنه هم لازم است.';
  else if(!(H>0))err='ارتفاع (H) لازم است.';
- else if(!(N>0)||String(N).indexOf('.')>-1&&(+N)%1!==0)err='تعداد پین باید عدد صحیح مثبت باشد.';
+ else if(!(N>0)||!Number.isInteger(+N))err='تعداد پین باید عدد صحیح مثبت باشد.';
  if(err){$('nOut').textContent='نامعتبر: '+err;$('nOut').dataset.err='1';return ''}
  $('nOut').dataset.err='';
  if(t==='1')o=pf+T(P)+'P'+T(L)+'X'+T(H)+'-'+N+D;
@@ -2280,7 +2299,8 @@ function nm(){var t=$('nT').value,P=+$('nP').value,L=+$('nL').value,W=+$('nW').v
 function ps(){var sh=$('pS').value,v1=+$('p1').value,v2=+$('p2').value,vh=+$('pH').value,
  q=function(v){return Math.round(v*100)},vh2=+$('pH2').value,err='';
  // ابعاد لازم بر اساس شکل (ایراد ۵۹)
- if(!Number.isFinite(vh2)||vh2<0||vh2>0&&(!(vh>0)||vh<vh2))err='برای شیار، طول کل باید مثبت و حداقل برابر عرض مثبت باشد.';
+ if(['p1','p2','pH','pH2','pZ','pX','pM','pP'].some(function(id){var raw=$(id).value;return raw.trim()===''||!Number.isFinite(Number(raw))||Number(raw)<0}))err='ابعاد باید عدد متناهی و نامنفی باشند؛ برای ویژگیِ غایب صفر وارد کن.';
+ else if(!Number.isFinite(vh2)||vh2<0||vh2>0&&(!(vh>0)||vh<vh2))err='برای شیار، طول کل باید مثبت و حداقل برابر عرض مثبت باشد.';
  else if(!(v1>0))err='اندازهٔ ۱ باید مثبت باشد.';
  else if('rbd'.indexOf(sh)>-1&&sh!=='s'&&!(v2>0))err='شکل «'+sh+'» به اندازهٔ دوم (ضلع دوم) نیاز دارد؛ با صفر نام کامل نمی‌شود.';
  else if((sh==='c'||sh==='s')&&v2>0)err='برای دایره/مربع اندازهٔ دوم مجاز نیست.';

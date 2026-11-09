@@ -1,0 +1,36 @@
+// Fixes must be checked against independent expected values, not only fresh snapshots.
+const assert=require('node:assert/strict'),fs=require('node:fs'),{execFileSync}=require('node:child_process'),{JSDOM}=require('jsdom');
+const result=JSON.parse(execFileSync(process.execPath,['audits/review-7352-current.cjs'],{encoding:'utf8'}));
+const by=Object.fromEntries(result.observations.map(o=>[o.id,o]));
+assert.equal(by.A1.actual_width_mm,.321);
+assert(Math.abs(Number(by.A2.actual.split(' / ')[1])-(Math.hypot(.8,.8)-.4))<.005);
+assert.equal(by.A3a.actual,'RESC3216X100N');
+assert(by.A3b.actual.includes('600X400'));
+assert.equal(by.A3c.actual.at(-1),'N');
+assert(by.A3d.actual.includes('80X60P'));
+assert(by.A4.last_Altium_pad.endsWith('0, True);'));
+assert.equal(by.A5.actual,null);assert(by.A5.validation_message.includes('سازنده'));
+assert.equal(by.A6.actual,null);assert(by.A6.validation_message.includes('ممیزی'));
+assert.deepEqual(by.A7.bad_identifiers,[]);
+assert.equal(by.A8.actual,'s143h93');
+assert(by.A9.actual.startsWith('نامعتبر:'));
+console.log('Independent expectations for 11 audit cases: PASS');
+const dom=new JSDOM(fs.readFileSync('IPC-7352/tool.html','utf8'),{runScripts:'dangerously',url:'https://audit.test/tool.html',pretendToBeVisual:true}),w=dom.window,d=w.document;
+function set(id,v){const e=d.getElementById(id);e.value=String(v);e.dispatchEvent(new w.Event('input',{bubbles:true}));e.dispatchEvent(new w.Event('change',{bubbles:true}))}
+set('component','ic');set('package','dip');set('smp','dip');set('tHT','F');d.getElementById('man').checked=true;d.getElementById('man').dispatchEvent(new w.Event('input',{bubbles:true}));set('pHole',1);set('tFitSource','Manufacturer ABC, drawing 123, p4');set('tFitTol',.03);
+assert(d.getElementById('pads').value.includes('1.0000'));
+assert(d.getElementById('res').textContent.includes('±0.03'));
+set('tTol',.1);assert(d.getElementById('res').textContent.includes('±0.03'),'generic tolerance must not overwrite manufacturer tolerance');
+set('pHole',1.005);set('tFitTol',.0005);assert(d.getElementById('pads').value.includes('1.0050'));assert(d.getElementById('res').textContent.includes('±0.0005'));
+set('tFitSource','');assert.equal(d.getElementById('pads').value,'');
+console.log('Press-fit explicit source, explicit tolerance and stale-output rejection: PASS');
+set('component','resistor');set('package','array-flat');
+for(const [id,v] of Object.entries({dmName:'<img src=x onerror=alert(1)>',dmCount:2,dmPitch:1,dmSpan:4,dmPadW:.6,dmPadH:.6,dmBodyW:3,dmBodyH:3,dmHole:0}))set(id,v);
+d.getElementById('buildDirectModel').click();
+assert.equal(d.querySelectorAll('#res img').length,0);assert(d.getElementById('res').textContent.includes('<img src=x'));
+console.log('User model identifiers are plain text, never executable HTML: PASS');
+set('component','ic');set('package','bga');set('smp','bga100');set('bC',1);set('bR',100);
+const names=d.getElementById('pads').value.trim().split('\n').slice(1).map(s=>s.split(',')[0]);assert.equal(names.length,100);assert.equal(new Set(names).size,100);assert(names.every(s=>/^[A-Z]+1$/.test(s)));
+set('bSkip','ZZZ9');assert.equal(d.getElementById('pads').value,'');set('bSkip','');assert(d.getElementById('pads').value.split('\n').length>100);
+console.log('Tall BGA array has unique names; invalid skip identifiers are rejected: PASS');
+w.close();
