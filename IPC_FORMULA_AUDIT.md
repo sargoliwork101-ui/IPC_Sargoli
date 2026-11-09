@@ -200,3 +200,12 @@ Added configurable SOT-23-5/6 equal-lead Gull-wing geometry, using table 3-1 siz
 ## Cross-family state regression repair (2026-11-09)
 
 Removed inadvertently duplicated THT body constraints from the SMD solver. They caused valid SMD geometry to be rejected after selecting non-generic THT bodies, including after local-storage restoration. This is a software state-isolation fix, not a change to IPC formulas. Added regression coverage of the previously untested family-transition order. Per-package drafts retain dimensions in mm; explicit educational geometry loading is labelled as hypothetical and not a manufacturer land pattern or fabrication approval.
+
+## Sourced land-pattern examples, separate from IPC solver (2026-11-09)
+
+Added direct editable copper dimensions for real TI package examples; selecting these examples sets manufacturer basis instead of silently fitting IPC fillet coefficients. Output provenance explicitly distinguishes the two bases. Sources consulted:
+- https://www.ti.com/lit/ds/symlink/sn74lvc1g04.pdf — DBV0005A EXAMPLE BOARD LAYOUT, 4214839/K 08/2024: 5×1.1×0.6 mm, 2.6 mm row-center spacing, .95 mm pitch.
+- https://www.ti.com/lit/ds/symlink/tlv4062-q1.pdf — DBV0006A EXAMPLE BOARD LAYOUT: 6×1.1×0.6 mm, 2.6 mm row-center spacing, .95 mm pitch.
+- https://www.ti.com/lit/ml/mpds361b/mpds361b.pdf — PW0016A EXAMPLE BOARD LAYOUT, 4220204/B 12/2023: 16×1.5×.45 mm, 5.8 mm row-center spacing, .65 mm pitch.
+
+All three drawings specify R.05 corners. Current rectangle/oblong shape choice does NOT reproduce that radius; interface states the limitation explicitly. Thus the reference reproduces copper bounding dimensions/centers, not every manufacturing detail. Mask, paste and manufacturer courtyard are not imported. Supplied component fields are starting metadata and must be verified for the ordered part. Manufacturer examples are not presented as IPC-7352-derived or certified.

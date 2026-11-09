@@ -158,3 +158,12 @@ This is **partial implementation**, not completion of all unsupported catalogue 
 - Shape selection moved out of manual formula overrides to the main settings. SMD oblong/rectangular affects drawing and Altium consistently, persists on reload, and does not change outside dimensions. BGA/THT retain their own pad models. `auto` remains an explicit family default, not an IPC requirement.
 
 Other catalogue families remain pending; this increment does not claim complete catalogue coverage.
+
+## Manufacturer-derived starting templates (2026-11-09)
+
+Added automatically selectable reference examples, not hypothetical demo dimensions:
+- TI SN74LVC1G04DBVR / DBV0005A (SOT-23-5): five lands 1.10 × 0.60 mm; row centers 2.60 mm apart; pitch 0.95 mm. Drawing 4214839/K, 08/2024.
+- TI TLV4062-Q1 / DBV0006A (SOT-23-6): six lands 1.10 × 0.60 mm; row centers 2.60 mm apart; pitch 0.95 mm.
+- TI PW0016A (TSSOP-16): sixteen lands 1.50 × 0.45 mm; row centers 5.80 mm apart; pitch 0.65 mm. Drawing 4220204/B, 12/2023.
+
+These reference copper lengths/widths/row centers are a distinct editable input mode, not values back-solved into IPC coefficients. User can switch explicitly to IPC-7352 computation. Source links are visible in the UI; operation remains offline. Source drawings specify R0.05 corners: this version instead uses the user's rectangular/oblong choice and clearly discloses that it is not exact corner reproduction. Mask/stencil are not copied. Courtyard remains tool-generated. Other configurable packages still need sourced starting examples; no claim of complete manufacturer-template coverage.

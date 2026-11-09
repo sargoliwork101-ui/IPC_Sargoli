@@ -252,8 +252,8 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 <div><label>۱. نوع قطعه</label><select id="component"><option value="resistor">مقاومت</option><option value="capacitor">خازن</option><option value="inductor">سلف</option><option value="ferrite">فریت‌بید</option><option value="diode">دیود</option><option value="led">LED</option><option value="transistor">ترانزیستور / قطعهٔ قدرت</option><option value="ic" selected>آی‌سی</option><option value="crystal">کریستال</option><option value="oscillator">اسیلاتور</option><option value="fuse">فیوز</option><option value="thermistor">ترمیستور</option><option value="varistor">واریستور</option><option value="connector">کانکتور / هدر / سوکت</option><option value="jumper">جامپر</option><option value="switch">کلید / رله</option><option value="transformer">ترانس / قطعات مغناطیسی خاص</option><option value="custom">طراحی سفارشی / سایر قطعات</option></select></div>
 <div><label>۲. نوع پکیج</label><select id="package"></select></div>
 <div id="padShapeControl"><label>شکل پد SMD — نقشه و خروجی<small>انتخاب مستقل از ویرایش دستی؛ بند 3.2 الزام شکل واحدی ندارد.</small></label><select id="pShape"><option value="auto">پیش‌فرض خانواده (نه الزام استاندارد)</option><option value="o">دو‌سرگرد (Oblong)</option><option value="r">مستطیلی (Rectangular)</option></select></div>
-<div class="note wide" id="packageStatus" role="status" aria-live="polite"></div><div class="note wide" id="methodReadout" aria-live="polite"></div>
-<div><label>۳. اندازه / نمونهٔ آماده<small>ابعاد نمونه‌ها نقطهٔ شروع‌اند؛ دیتاشیت سازنده مرجع نهایی است.</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="tssop">TSSOP-16</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48</option><option value="chip">1206 اینچی / 3216 متریک</option><option value="chip0805">0805 اینچی / 2012 متریک</option><option value="chip0603">0603 اینچی / 1608 متریک</option><option value="sot23">SOT-23-3 · نمونهٔ هندسی</option><option value="dip">DIP-14</option></select></div>
+<div class="note wide" id="manufacturerReference" hidden></div><div class="note wide" id="packageStatus" role="status" aria-live="polite"></div><div class="note wide" id="methodReadout" aria-live="polite"></div>
+<div><label>۳. اندازه / نمونهٔ آماده<small>ابعاد نمونه‌ها نقطهٔ شروع‌اند؛ دیتاشیت سازنده مرجع نهایی است.</small></label><select id="smp"><option value="">سفارشی — بدون نمونهٔ آماده</option><option value="soic">SOIC-16</option><option value="soic8">SOIC-8 / SOP-8</option><option value="soic14">SOIC-14 / SOP-14</option><option value="ti-pw16">TI PW0016A · TSSOP-16 · مرجع سازنده</option><option value="tssop">TSSOP-16 عمومی</option><option value="ti-db5">TI SN74LVC1G04DBVR · SOT-23-5</option><option value="ti-db6">TI TLV4062-Q1 · SOT-23-6</option><option value="bga100">BGA-100</option><option value="qfp">LQFP-48</option><option value="chip">1206 اینچی / 3216 متریک</option><option value="chip0805">0805 اینچی / 2012 متریک</option><option value="chip0603">0603 اینچی / 1608 متریک</option><option value="sot23">SOT-23-3 · نمونهٔ هندسی</option><option value="dip">DIP-14</option></select></div>
     </div>
   </div>
   <div class="group">
@@ -441,7 +441,7 @@ function rd(id){var v=+$(id).value;return v*PX[U]}   // همیشه mm
 function toDisp(v){return v/PX[U]}                    // mm → عدد نمایشی
 function fq(v){return U==='mm'?f(v,4):U==='mil'?f(v/0.0254,2):f(v/25.4,6)}  // دقت ساخت، نه دقت نمایش (ایراد ۲۶)
 function fld(id){return rd(id)}                        // خواندن فیلد بر حسب mm
-var FIELDS={smd:[['Lmin','Lmin','E/HE حداقل',5.8,1],['Lmax','Lmax','E/HE حداکثر',6.2,1],['Tmin','Tmin','L (Foot) حداقل',0.4,1],['Tmax','Tmax','L (Foot) حداکثر',1.27,1],['Smax','Smax','فقط اگر تیک S خاموش',4.98,1],['W','W','b (عرض پایه)',0.51,1],['H','H','A (ارتفاع)',1.75,1],['Hl','Hl','فقط QFN',0.2,1],['P','P','e (گام)',1.27,1],['Amax','A','A: عرض بدنه (فقط gull-wing؛ 0 = نادیده)',0,1],['Th','Th','پد حرارتی QFN: بُعد مربع (0 = ندارد)',0,1],
+var FIELDS={smd:[['mfrL','طول پد مرجع سازنده','قابل ویرایش؛ در حالت مرجع جایگزین طول محاسباتی IPC می‌شود',0,1],['mfrW','عرض پد مرجع سازنده','قابل ویرایش',0,1],['mfrSpan','فاصلهٔ مراکز دو ردیف پد','قابل ویرایش؛ فاصلهٔ مرکز تا مرکز، نه فاصلهٔ خالی',0,1],['Lmin','Lmin','E/HE حداقل',5.8,1],['Lmax','Lmax','E/HE حداکثر',6.2,1],['Tmin','Tmin','L (Foot) حداقل',0.4,1],['Tmax','Tmax','L (Foot) حداکثر',1.27,1],['Smax','Smax','فقط اگر تیک S خاموش',4.98,1],['W','W','b (عرض پایه)',0.51,1],['H','H','A (ارتفاع)',1.75,1],['Hl','Hl','فقط QFN',0.2,1],['P','P','e (گام)',1.27,1],['Amax','A','A: عرض بدنه (فقط gull-wing؛ 0 = نادیده)',0,1],['Th','Th','پد حرارتی QFN: بُعد مربع (0 = ندارد)',0,1],
  ['Th2','Th','پد حرارتی مستطیلی: بُعد دوم (0 = مربع)',0,1],
  ['BW','Wmax','عرض بدنه (برای Courtyard و نام QFN/چیپ؛ 0 = نامعلوم)',0,1],
  ['bodyLength','طول بدنه','طول بدنه برای Courtyard (0 = برآورد از پایه‌ها)',0,1],
@@ -453,7 +453,7 @@ var FAM=[['gull','SOIC / SOP / TSSOP / QFP · Gull-wing (3-1)'],['chip','چیپ 
 function build(){
 var h='<div><label>خانوادهٔ محاسباتی<small>شکل پایه و قواعد محاسبه؛ نه نام یک قطعهٔ مشخص</small></label><select id="fam">'+FAM.map(function(a){return '<option value="'+a[0]+'">'+a[1]+'</option>'}).join('')+'</select></div><div><label>تعداد طرف</label><select id="sides"><option value="2">2 طرف</option><option value="4">4 طرف (مربعی)</option></select></div>'+
 '<div id="cTypeWrap"><label class="kv" data-v="cType">پیشوند نام (چیپ / QFN)</label><select id="cType"><option value="RESC">RESC مقاومت</option><option value="CAPC">CAPC خازن</option><option value="INDC">INDC سلف</option><option value="BEADC">BEADC فریت</option><option value="LEDC">LEDC LED</option><option value="FUSC">FUSC فیوز</option><option value="THRMC">THRMC ترمیستور</option><option value="VARC">VARC واریستور</option><option value="DIOC">DIOC دیود</option><option value="QFN">QFN</option><option value="SON">SON</option><option value="DFN">DFN</option><option value="">— بدون نام —</option></select></div>'+
-'<div><label>آرایش پایه‌ها</label><select id="layout"><option value="symmetric">متقارن</option><option value="sot23">SOT-23-3: دو چپ، یک راست (نمای بالا)</option><option value="sot23-5">SOT-23-5: سه چپ، دو راست (نمای بالا)</option><option value="sot23-6">SOT-23-6: سه چپ، سه راست (نمای بالا)</option></select></div><div><label>S از L و T</label><input type="checkbox" id="autoS" checked> با RMS</div>';
+'<div><label>مبنای ابعاد پد</label><select id="padBasis"><option value="ipc">محاسبه با IPC-7352</option><option value="manufacturer">الگوی سازنده / ابعاد مستقیم قابل ویرایش</option></select></div><div><label>مرجع نمونه</label><select id="mfrSource"><option value="">بدون مرجع نمونه</option><option value="ti-db5">TI SN74LVC1G04DBVR · DBV0005A</option><option value="ti-db6">TI TLV4062-Q1 · DBV0006A</option><option value="ti-pw16">TI PW0016A · TSSOP-16</option></select></div><div><label>آرایش پایه‌ها</label><select id="layout"><option value="symmetric">متقارن</option><option value="sot23">SOT-23-3: دو چپ، یک راست (نمای بالا)</option><option value="sot23-5">SOT-23-5: سه چپ، دو راست (نمای بالا)</option><option value="sot23-6">SOT-23-6: سه چپ، سه راست (نمای بالا)</option></select></div><div><label>S از L و T</label><input type="checkbox" id="autoS" checked> با RMS</div>';
 FIELDS.smd.forEach(function(a){h+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});$('bsmd').innerHTML=h;
 ['bga','th'].forEach(function(k){var s='';FIELDS[k].forEach(function(a){s+='<div><label data-v="'+a[1]+'" class="kv">'+a[1]+'<small>'+a[2]+'</small></label><input id="'+a[0]+'" type="number" step="any" value="'+a[3]+'" data-d="'+a[4]+'"></div>'});
 if(k==='bga')s+='<div><label>نوع توپ</label><select id="bT"><option value="C">C: فروپاشنده</option><option value="N">N: بدون فروپاشی</option></select></div>';
@@ -640,6 +640,7 @@ function invalidate(clear){if(clear)clearOut()}
 function out(rows,pads,hdr,warn){
 try{var kd=$('kind').value;PITCH_TXT=kd==='smd'?fu(rd('P')):kd==='bga'?fu(rd('bP')):fu(rd('tP'))}catch(e){PITCH_TXT=''} // گام برای کارت متریک
 M.pads=MP;                        // همان داده‌ای که در فهرست و اسکریپت می‌رود
+if($('kind').value==='smd'&&$('padBasis').value==='manufacturer'){rows=rows.map(function(row){return [row[0],row[1],'حالت ابعاد مستقیم سازنده / ویرایش کاربر؛ ابعاد پد از ورودی‌های مرجع گرفته شده، نه فرمول IPC. توضیح محدودیت گوشه‌ها در وضعیت پکیج آمده است.']})}
 R=rows;
 $('res').innerHTML='<tr><th>پارامتر</th><th>مقدار</th><th>منبع / دلیل</th></tr>'+
  rows.map(function(r){return '<tr><td>'+r[0]+'</td><td class="v">'+r[1]+'</td><td>'+(r[2]||'')+'</td></tr>'}).join('');
@@ -732,6 +733,7 @@ r=[ov('pZJ',r[0],1),ov('pGJ',r[1],1),ov('pSJ',r[2],1),ov('pCE',r[3],1)];
 // ---------- Z، G، X (گردکردن جدول 3-1) ----------
 var d3=Pt<0.4?3:2,Z=+(Lm+2*r[0]).toFixed(d3),G=+Math.max(S-2*r[1],0).toFixed(d3),X=+(W+2*r[2]).toFixed(d3),
  pl=(Z-G)/2,ce=(Z+G)/4,pads=[],no=1;
+if($('padBasis').value==='manufacturer'){pl=rd('mfrL');X=rd('mfrW');ce=rd('mfrSpan')/2;Z=2*ce+pl;G=2*ce-pl}
 if($('layout').value==='sot23'){
  pads=[{n:1,x:-ce,y:Pt/2,w:pl,h:X},{n:2,x:-ce,y:-Pt/2,w:pl,h:X},{n:3,x:ce,y:0,w:pl,h:X}];
 }else if($('layout').value==='sot23-5'){
@@ -1098,6 +1100,7 @@ function validateFootprint(k){
  var counts={n:100,bC:100,bR:100,tK:200};
  Object.keys(counts).forEach(function(id){if(inputs.indexOf($(id))>=0){var v=+$(id).value;if(!Number.isInteger(v)||v<1||v>counts[id])error(id,'عدد صحیح بین ۱ و '+counts[id]+' لازم است.')}});
  if(k==='smd'){
+  if($('padBasis').value==='manufacturer'){['mfrL','mfrW','mfrSpan'].forEach(function(id){if(!(rd(id)>0))error(id,'بُعد مثبت برای الگوی مستقیم سازنده لازم است.')});if(rd('mfrSpan')<=rd('mfrL'))error('mfrSpan','دو ردیف پد نباید روی هم بیفتند.')}
   if(/^sot23-/.test($('layout').value)&&($('fam').value!=='gull'||$('sides').value!=='2'||+$('n').value!==3))error('layout','SOT-23-5/6 به Gull-wing، دو طرف و سه موقعیت در ردیف نیاز دارد.');
   if($('layout').value==='sot23'&&($('fam').value!=='gull'||$('sides').value!=='2'||+$('n').value!==2))error('layout','آرایش SOT-23-3 فقط با Gull-wing، دو طرف و دو موقعیت در طرف چپ پشتیبانی می‌شود.');
   if(rd('Lmin')>rd('Lmax'))error('Lmin','طول حداقل نباید از طول حداکثر بیشتر باشد.');
@@ -1135,6 +1138,7 @@ syncSlotFields();
 $('padShapeControl').hidden=k!=='smd';$('pShape').disabled=k!=='smd';
 var bodyMode=k==='th'&&$('tModel').value!=='generic';
 ['tBodyL','tBodyD','tBodyH','tPolar'].forEach(function(id){$(id).disabled=!bodyMode;$(id).parentNode.hidden=!bodyMode});
+['mfrL','mfrW','mfrSpan'].forEach(function(id){var active=k==='smd'&&$('padBasis').value==='manufacturer';$(id).disabled=!active;$(id).parentNode.hidden=!active});
 filterParams();updateMethod();
 if(k==='th'){var shv=$('tS').value;var lab=$('tW').previousElementSibling;lab.firstChild.nodeValue=shv==='0'?'قطر max پایه':shv==='1'?'ضلع max مربع':'ضلع اول max مستطیل';lab.querySelector('small').textContent='بُعد واقعی پایه؛ نه قطر سوراخ';$('tW2').parentNode.hidden=shv!=='2'}
 clearOut('');                       // هرگز خروجی کهنه نمایش داده نمی‌شود (ایراد ۲۲/۳۱)
@@ -1175,16 +1179,19 @@ SM.tssop=Object.assign({},SM.soic,{Lmin:6.2,Lmax:6.6,Tmin:.45,Tmax:.75,W:.30,H:1
 SM.chip0805=Object.assign({},SM.chip,{Lmin:1.8,Lmax:2.2,Smax:1.0,W:1.45,H:.6});
 SM.chip0603=Object.assign({},SM.chip,{Lmin:1.45,Lmax:1.75,Smax:.75,W:.95,H:.5});
 SM.sot23={kind:'smd',fam:'gull',layout:'sot23',sides:'2',n:2,autoS:1,Lmin:2.1,Lmax:2.5,Tmin:.3,Tmax:.5,W:.48,H:1.1,P:1.9,BW:1.4,bodyLength:3.04};
+SM['ti-db5']={kind:'smd',fam:'gull',layout:'sot23-5',sides:'2',n:3,autoS:0,Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.75,bodyLength:3.05,padBasis:'manufacturer',mfrSource:'ti-db5',mfrL:1.1,mfrW:.6,mfrSpan:2.6};
+SM['ti-db6']=Object.assign({},SM['ti-db5'],{layout:'sot23-6',mfrSource:'ti-db6'});
+SM['ti-pw16']={kind:'smd',fam:'gull',layout:'symmetric',sides:'2',n:8,autoS:0,Lmin:6.2,Lmax:6.6,Tmin:.5,Tmax:.75,Smax:5.2,W:.3,H:1.2,P:.65,BW:4.5,bodyLength:5.1,padBasis:'manufacturer',mfrSource:'ti-pw16',mfrL:1.5,mfrW:.45,mfrSpan:5.8};
 SM.bga100={kind:'bga',bB:.5,bP:.8,bPX:0,bPY:0,bC:10,bR:10,bL:9,bW:9,bH:1.5,bT:'C'};
 $('smp').onchange=function(){var s=SM[$('smp').value];if(!s)return;
- showTab('t1');
+ showTab('t1');demoPackage='';
  // نمونه‌ها بر حسب mm تعریف شده‌اند؛ فیلدهای دیگر هم به همان واحد بازنویسی می‌شوند (ایراد ۲۱/۳۷)
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value!=='')e.value=+(Number(e.value)*PX[UOLD]).toFixed(6)});
  U='mm';UOLD='mm';$('unit').value='mm';
  // نمونه فقط خانوادهٔ خودش را بازنشانی می‌کند؛ سایر خانواده‌ها دست‌نخورده می‌مانند.
  FIELDS[s.kind].forEach(function(a){var e=$(a[0]);if(e)e.value=a[3]});
  if(s.kind==='th'){$('tHoleShape').value='round';$('tModel').value='generic'};
- if(s.kind==='smd'){$('layout').value='symmetric';$('cType').value=s.fam==='chip'?'RESC':s.fam==='qfn'?'QFN':''}
+ if(s.kind==='smd'){$('padBasis').value='ipc';$('mfrSource').value='';$('layout').value='symmetric';$('cType').value=s.fam==='chip'?'RESC':s.fam==='qfn'?'QFN':''}
  window.CAM=null;
  for(var k in s){var e=$(k);if(!e)continue;if(e.type==='checkbox')e.checked=!!s[k];else e.value=s[k]}
  document.querySelectorAll('.workspace input[data-d="1"]').forEach(function(e){if(e.value==='')e.value=0});
@@ -1755,7 +1762,7 @@ var PACKAGE_TYPES={
  ]
 };
 var CHIP_PREFIX={resistor:"RESC",capacitor:"CAPC",inductor:"INDC",ferrite:"BEADC",diode:"DIOC",led:"LEDC",fuse:"FUSC",thermistor:"THRMC",varistor:"VARC",jumper:"RESC"};
-function presetPackage(id){return /^chip/.test(id)?'chip':/^soic/.test(id)?'soic':id==='bga100'?'bga':id}
+function presetPackage(id){if(id==='ti-db5')return 'sot23-5';if(id==='ti-db6')return 'sot23-6';if(id==='ti-pw16')return 'tssop';return /^chip/.test(id)?'chip':/^soic/.test(id)?'soic':id==='bga100'?'bga':id}
 function refreshPackages(selected){
  $('package').innerHTML=PACKAGE_TYPES[$('component').value].map(function(id){var p=PACKAGE_CATALOG[id],status={sample:'نمونه دارد',configure:'ابعاد دیتاشیت لازم',unavailable:'هنوز پشتیبانی نمی‌شود',blocked:'نیازمند اصلاح محاسبه',custom:'پیشرفته'}[p.state];return '<option value="'+id+'">'+p.label+' — '+status+'</option>'}).join('');
  if(selected&&PACKAGE_TYPES[$('component').value].indexOf(selected)>=0)$('package').value=selected;
@@ -1765,7 +1772,7 @@ function filterSamples(){var pk=$('package').value;
  Array.from($('smp').options).forEach(function(o){o.hidden=!!o.value&&presetPackage(o.value)!==pk});
 }
 function syncHierarchyFromSample(id){if(!id)return;var pk=presetPackage(id),comp=$('component').value;
- if(!PACKAGE_TYPES[comp]||PACKAGE_TYPES[comp].indexOf(pk)<0)comp=pk==='chip'?'resistor':pk==='sot23'?'transistor':'ic';
+ if(!PACKAGE_TYPES[comp]||PACKAGE_TYPES[comp].indexOf(pk)<0)comp=pk==='chip'?'resistor':/^sot23/.test(pk)?'transistor':'ic';
  $('component').value=comp;refreshPackages(pk);
 }
 var activePackage='',packageDrafts={},demoPackage='';
@@ -1792,7 +1799,7 @@ function choosePackage(){rememberPackage();activePackage=$('component').value+':
  if(spec.state==='configure'&&spec.config.kind==='th'){
   window.CAM=null;$('kind').value='th';$('tModel').value=spec.config.model;$('tK').value=spec.config.model==='cdip'?14:spec.config.model==='sip'?8:2;$('tR').value=spec.config.model==='cdip'?'':0;$('tS').value='0';$('tHoleShape').value='round';$('tP').value='';$('tW').value='';['tBodyL','tBodyD','tBodyH'].forEach(function(id){$(id).value=''});$('tExample').value='';$('man').checked=false;
  }else if(spec.state==='configure'){
-  window.CAM=null;$('kind').value=spec.config.kind;$('fam').value=spec.config.fam;$('sides').value=spec.config.sides;$('layout').value=spec.config.layout||'symmetric';$('autoS').checked=false;
+  window.CAM=null;$('padBasis').value='ipc';$('mfrSource').value='';$('kind').value=spec.config.kind;$('fam').value=spec.config.fam;$('sides').value=spec.config.sides;$('layout').value=spec.config.layout||'symmetric';$('autoS').checked=false;
   FIELDS.smd.forEach(function(a){$(a[0]).value=0});
   ['Lmax','W','H','P','n','Smax'].forEach(function(id){$(id).value=''});
   if(spec.config.n) $('n').value=spec.config.n;
@@ -1816,11 +1823,20 @@ function packageBlockReason(){var spec=PACKAGE_CATALOG[$('package').value];
  if(!spec)return 'پکیج معتبر انتخاب کن.';
  return spec.state==='unavailable'?'این پکیج در فهرست هست، ولی مدل هندسه/نام‌گذاری آن هنوز پیاده‌سازی نشده است؛ فوت‌پرینتِ قطعهٔ قبلی به‌جایش نمایش داده نمی‌شود.':spec.state==='blocked'?'محاسبهٔ این پکیج در ممیزی نیازمند اصلاح تشخیص داده شده است؛ فعلاً خروجی تولید نمی‌شود.':'';
 }
+var MANUFACTURER_REFS={
+ 'ti-db5':['TI SN74LVC1G04DBVR · DBV0005A · 4214839/K 08/2024','https://www.ti.com/lit/ds/symlink/sn74lvc1g04.pdf'],
+ 'ti-db6':['TI TLV4062-Q1 · DBV0006A','https://www.ti.com/lit/ds/symlink/tlv4062-q1.pdf'],
+ 'ti-pw16':['TI PW0016A · 4220204/B 12/2023','https://www.ti.com/lit/ml/mpds361b/mpds361b.pdf']
+};
 function updateMethod(){var k=$('kind').value,spec=PACKAGE_CATALOG[$('package').value];
+ var reference=k==='smd'&&$('padBasis').value==='manufacturer'?MANUFACTURER_REFS[$('mfrSource').value]:null;
+ $('manufacturerReference').hidden=!reference;$('manufacturerReference').textContent='';
+ if(reference){var link=document.createElement('a');link.href=reference[1];link.target='_blank';link.rel='noopener';link.textContent='دیتاشیت / نقشهٔ اصلی: '+reference[0];$('manufacturerReference').appendChild(link);$('manufacturerReference').appendChild(document.createTextNode(' — ابعاد ورودی قابل اصلاح‌اند؛ پس از ویرایش، خروجی دیگر لزوماً برابر نمونهٔ اصلی نیست. شکل گوشه‌ها، ماسک و استنسیل را جداگانه کنترل کن.'))}
  $('previewPackage').hidden=!(spec&&spec.state==='configure');$('previewDisclaimer').hidden=$('previewPackage').hidden;
  $('packageStatus').textContent=spec?(spec.label+' · مبنای اصلی: IPC-7352:2023 · مرجع '+spec.ref+' · '+(packageBlockReason()||(spec.state==='configure'?'نمونهٔ آماده ندارد؛ خانه‌های خالی را از دیتاشیت پر کن.':spec.state==='sample'?'ابعاد نمونه عمومی‌اند؛ با دیتاشیت تطبیق بده.':'انتخاب مدل به عهدهٔ کاربر است.'))):'';
 
  $('methodReadout').textContent='روش محاسبه: '+(k==='smd'?$('fam').selectedOptions[0].textContent:k==='bga'?'BGA · جدول 3-11':'سوراخ‌دار · بخش 4')+($('smp').value?'':' · ابعاد سفارشی');
+ if(k==='smd'&&$('padBasis').value==='manufacturer')$('packageStatus').textContent+=' ابعاد مس مستقیم از الگوی سازنده/ویرایش کاربر است، نه نتیجهٔ فرمول IPC. مرجع '+$('mfrSource').selectedOptions[0].textContent+'. نقشه‌های TI گوشهٔ R0.05 دارند؛ این ابزار شکل انتخابی مستطیل یا دوسرگرد را جایگزین می‌کند، پس کپی دقیق گوشه‌ها نیست. ماسک و استنسیل کپی نمی‌شوند.';
  if(demoPackage===$('component').value+':'+$('package').value)$('packageStatus').textContent+=' نمونهٔ آموزشی با ابعاد فرضی است؛ دیتاشیت یا تأیید ساخت نیست. پیش از ساخت همهٔ ابعاد را تطبیق بده.';
  if(k==='th'&&$('tModel').value!=='generic')$('packageStatus').textContent+=' مدل بدنه: جدول 4-6؛ سوراخ: بخش 4. نمونه CFR-25: YAGEO CFR، ویرایش 3، 2024-04-03، ص 3: L=6.3±0.5، D=2.4±0.2، d=0.55±0.05 mm. نمونه 1N4148: Vishay سند 81857، 2024-11-07: Lmax=3.4، Dmax=1.75، dmax=0.55 mm. گام نمونه‌های 10.16 و 7.62 mm انتخاب طراحی است، نه دادهٔ الزام‌آور دیتاشیت.';
  if(k==='th'&&$('tHoleShape').value==='slot')$('packageStatus').textContent+=' شیار: نام‌گذاری طبق 5.2.3؛ ابعاد و حلقهٔ مسی از کاربر، بدون فرمول سایزبندی خودکار استاندارد.';
@@ -1834,6 +1850,7 @@ $('previewPackage').onclick=function(){
  FIELDS[kind].forEach(function(a){$(a[0]).value=a[4]===1?a[3]/PX[U]:a[3]});
  function mm(id,v){$(id).value=v/PX[U]}
  if(kind==='smd'){
+  $('padBasis').value='ipc';$('mfrSource').value='';
   $('fam').value=config.fam;$('sides').value=config.sides;$('layout').value=config.layout||'symmetric';$('n').value=config.n||4;$('autoS').checked=false;
   mm('Lmin',5.8);mm('Lmax',6.2);mm('Tmin',.4);mm('Tmax',.8);mm('Smax',4.6);mm('W',.5);mm('H',1.5);mm('Hl',.2);mm('P',1.27);mm('BW',4);mm('bodyLength',5);mm('Th',0);mm('Th2',0);
   if(config.layout){mm('Lmin',2.6);mm('Lmax',3);mm('Smax',1.8);mm('P',.95);mm('BW',1.7);mm('bodyLength',3);mm('Tmin',.3);mm('Tmax',.6)}

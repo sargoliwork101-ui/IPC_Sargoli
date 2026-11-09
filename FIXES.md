@@ -257,3 +257,8 @@ node tests/run-tests.js
 - Previous tests passed because they largely exercised SMD before body-model THT, rather than returning to SMD with non-generic `tModel`. Added regression tests for that exact order and persisted-state recovery.
 - Package switching now retains geometry drafts separately by component + package, in mm; a first-time incomplete model explicitly explains why no drawing is generated. An explicit button loads a clearly labelled illustrative geometry for the selected configurable model instead of jumping to unrelated SOIC. It is not manufacturer data. Demo provenance persists in stored state/drafts.
 - Verified all 18 configurable package models through the sample button: each produces a drawing. Existing unsupported models remain blocked. **256 jsdom checks pass; extended Chromium smoke passes**, including THT→SMD, reload and draft recovery.
+
+### Real manufacturer starting examples (2026-11-09)
+- Added TI DBV0005A / SN74LVC1G04DBVR, DBV0006A / TLV4062-Q1 and PW0016A reference copper dimensions/positions, loaded through normal sample selection.
+- Editable manufacturer length/width/row-center spacing mode kept separate from IPC formulas. Explicit source links, corner-shape/mask/stencil limitations, unit conversion and persisted edits.
+- 270 jsdom checks pass; Chromium manufacturer-edit/reload smoke passes. Remaining families are not claimed to have sourced templates yet.

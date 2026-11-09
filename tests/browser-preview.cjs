@@ -69,6 +69,14 @@ const engine = chromiumPackage.default || chromiumPackage;
   await page.selectOption('#package','sot23-5');assert.equal(await page.locator('#W').inputValue(),'0.47');
   assert.equal(await page.locator('#mCount').textContent(),'5');
   console.log('THT to SMD isolation, persisted stale THT model and per-package input recovery: PASS');
+  await page.selectOption('#smp','ti-db5');
+  assert.equal(await page.locator('#mfrL').inputValue(),'1.1');assert.equal(await page.locator('#mfrW').inputValue(),'0.6');
+  await page.locator('#mfrL').fill('1.2');await page.reload();
+  assert.equal(await page.locator('#padBasis').inputValue(),'manufacturer');assert.equal(await page.locator('#mfrL').inputValue(),'1.2');
+  assert((await page.locator('#pads').inputValue()).includes('1.2000'));
+  assert(await page.locator('#manufacturerReference').isVisible());
+  console.log('Official manufacturer template, direct editing and reload: PASS');
+
 
 
   await page.selectOption('#component','ic');await page.selectOption('#package','qfn');

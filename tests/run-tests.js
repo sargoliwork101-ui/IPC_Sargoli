@@ -484,7 +484,7 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
    if(/هنوز پشتیبانی نمی‌شود|نیازمند اصلاح محاسبه/.test(label)){
     blockedSafe=blockedSafe&&!d.getElementById('pads').value&&!d.getElementById('stageEmpty').hidden;
    }
-   if(/ابعاد دیتاشیت لازم/.test(label))configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
+   if(/ابعاد دیتاشیت لازم/.test(label)&&!d.getElementById('smp').value)configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
   }
  }
  ok(packages.size===66&&combos===131,'۶۶ تعریف پکیج و ۱۳۱ ترکیب مرتبط قابل انتخاب است');
@@ -611,7 +611,7 @@ console.log('\n۱۹) انتخاب شکل و پکیج‌های جدید');
  ok(JSON.stringify(dimensions)===JSON.stringify(padsOf(d).map(p=>p.slice(1,5).join(','))),'انتخاب شکل ابعاد بیرونی و مرکز پد را عوض نمی‌کند');
  setV(d,'component','transistor');
  for(const [pkg,count] of [['sot23-5',5],['sot23-6',6]]){
-  setV(d,'package',pkg);ok(!valid()&&d.getElementById('Lmax').value==='','پکیج '+pkg+' بدون دیتاشیت خروجی نمی‌دهد');
+  setV(d,'package',pkg);ok(valid()&&d.getElementById('padBasis').value==='manufacturer','پکیج '+pkg+' با نمونهٔ واقعی سازنده باز می‌شود');
   for(const [id,v] of Object.entries({Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.7,bodyLength:3}))setV(d,id,v);
   const pads=padsOf(d);ok(valid()&&pads.length===count&&d.getElementById('insName').textContent.endsWith('-'+count+'N'),'پکیج '+pkg+' تعداد واقعی و نام SOT دارد');
   ok(pads.filter(p=>p[1]<0).length===3&&pads.filter(p=>p[1]>0).length===count-3,'آرایش مستقل '+pkg);
@@ -675,6 +675,26 @@ console.log('\n۲۱) جداسازی اعتبارسنجی THT و SMD');
  const src=fs.readFileSync(TOOL,'utf8').split('function smd(){')[1].split('function bga(){')[0];
  ok(!/tModel|tBodyL|tBodyD|tBodyH/.test(src),'محاسبه SMD هیچ وابستگی به ورودی بدنهٔ THT ندارد');
  recovered.window.close();w.close();
+}
+
+
+console.log('\n۲۲) الگوهای واقعی سازنده و ویرایش مستقیم');
+{
+ const {d,w}=load(TOOL);
+ for(const [id,count,L,W,span,P] of [['ti-db5',5,1.1,.6,2.6,.95],['ti-db6',6,1.1,.6,2.6,.95],['ti-pw16',16,1.5,.45,5.8,.65]]){
+  setV(d,'smp',id);const pads=padsOf(d);
+  ok(pads.length===count&&pads.every(p=>p[3]===L&&p[4]===W),'نمونهٔ '+id+' اندازهٔ مس مرجع را دارد');
+  ok(pads.every(p=>Math.abs(p[1])===span/2)&&+d.getElementById('P').value===P,'مراکز و گام '+id+' مطابق نقشهٔ سازنده');
+  ok(!d.getElementById('manufacturerReference').hidden&&!!d.querySelector('#manufacturerReference a[href^="https://www.ti.com/"]'),'مرجع رسمی '+id+' در رابط قابل مشاهده است');
+ }
+ setV(d,'smp','ti-db5');setV(d,'mfrL',1.2);setV(d,'mfrW',.65);setV(d,'mfrSpan',2.8);
+ ok(padsOf(d).every(p=>p[3]===1.2&&p[4]===.65&&Math.abs(p[1])===1.4),'کاربر طول، عرض و فاصلهٔ پد مرجع را مستقیماً اصلاح می‌کند');
+ ok(/نه فرمول IPC/.test(d.getElementById('res').textContent),'نتیجهٔ سازنده به اشتباه محاسبهٔ IPC معرفی نمی‌شود');
+ setV(d,'pShape','r');ok([...d.querySelectorAll('#svg rect[fill="#d4a017"]')].every(e=>!e.hasAttribute('rx')),'شکل مستطیلی برای نمونهٔ سازنده هم انتخابی است');
+ setV(d,'unit','mil');ok(Math.abs(padsOf(d)[0][3]*.0254-1.2)<.0002,'ابعاد مستقیم مرجع با تبدیل واحد حفظ می‌شوند');
+ setV(d,'unit','mm');setV(d,'padBasis','ipc');
+ ok(!!d.getElementById('pads').value&&d.getElementById('mfrL').disabled,'بازگشت آگاهانه از مرجع سازنده به محاسبه IPC ممکن است');
+ w.close();
 }
 
 console.log('\n─────────────────────────────');
