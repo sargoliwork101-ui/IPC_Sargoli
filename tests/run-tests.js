@@ -484,7 +484,7 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
    if(/هنوز پشتیبانی نمی‌شود|نیازمند اصلاح محاسبه/.test(label)){
     blockedSafe=blockedSafe&&!d.getElementById('pads').value&&!d.getElementById('stageEmpty').hidden;
    }
-   if(/ابعاد دیتاشیت لازم/.test(label))configSafe=configSafe&&!d.getElementById('pads').value&&d.getElementById('Lmax').value==='';
+   if(/ابعاد دیتاشیت لازم/.test(label))configSafe=configSafe&&!d.getElementById('pads').value&&(d.getElementById('kind').value==='th'?d.getElementById('tW').value==='':d.getElementById('Lmax').value==='');
   }
  }
  ok(packages.size===66&&combos===131,'۶۶ تعریف پکیج و ۱۳۱ ترکیب مرتبط قابل انتخاب است');
@@ -567,6 +567,69 @@ console.log('\n۱۷) شیار: نام‌گذاری صریح استاندارد �
  ok(/شیار آبکاری‌شده/.test(d.getElementById('dOut').textContent),'رمزگشا دو بُعد h را شیار معرفی می‌کند، نه قطر گرد');
  setV(d,'tHoleShape','round');
  ok(d.getElementById('tSlotL').disabled&&!!d.getElementById('pads').value,'بازگشت به سوراخ گرد، ورودی‌های شیار را غیرفعال می‌کند');
+ w.close();
+}
+
+
+console.log('\n۱۸) مدل بدنهٔ THT');
+{
+ const {d,w}=load(TOOL);const valid=()=>!!d.getElementById('pads').value;const name=()=>val(d,'نام پیشنهادی Land Pattern');const ps=()=>padsOf(d);const court=()=>val(d,'Courtyard').match(/[\d.]+/g).map(Number);
+ setV(d,'component','resistor');setV(d,'package','axial');
+ ok(!d.getElementById('pads').value&&d.getElementById('tW').value==='','محوری بدون دیتاشیت خروجی قبلی نمی‌دهد');
+ setV(d,'tExample','cfr25');
+ ok(valid()&&ps().length===2,'نمونه رسمی CFR-25 دو پد دارد');
+ ok(Math.abs(ps()[0][4]-1)<1e-9&&Math.abs(ps()[0][3]-1.5)<1e-9,'CFR-25: پایه max 0.60 + 0.40 = سوراخ 1؛ پد 1.5');
+ ok(name()==='RESAD1016W60L680D260B','نام محوری از طول، قطر، فاصله و پایه max ساخته می‌شود');
+ ok(!!d.querySelector('[data-th-body="axial-h"]')&&court()[1]>=2.6,'بدنهٔ افقی و courtyard شامل بدنه');
+ setV(d,'tModel','axial-v');setV(d,'tP',5.08);
+ ok(valid()&&!!d.querySelector('[data-th-body="axial-v"]')&&/^RESADV508/.test(name()),'مدل عمودی دایره روی پین ۱ و نام مستقل دارد');
+ setV(d,'tK',3);ok(!d.getElementById('pads').value,'مدل دوپایه تعداد دیگر را رد می‌کند');
+ setV(d,'tExample','1n4148');
+ ok(valid()&&name()==='DIOAD762W55L340D175B'&&Math.abs(ps()[0][4]-.95)<1e-9,'دیود رسمی با max پایه و نام DIOAD');
+ setV(d,'component','capacitor');setV(d,'package','radial');
+ setV(d,'tP',5);setV(d,'tW',.65);setV(d,'tBodyL',10.5);setV(d,'tBodyD',10.5);setV(d,'tBodyH',13);setV(d,'tPolar','yes');
+ ok(valid()&&name()==='CAPPRD500W65D1050H1300B'&&court()[0]>=10.5&&court()[1]>=10.5,'خازن شعاعی قطبی بدنه و نام و courtyard مستقل دارد');
+ for(const [model,prefix] of [['radial-r','CAPRR'],['radial-disc','CAPRB']]){setV(d,'tModel',model);setV(d,'tPolar','no');ok(valid()&&name().startsWith(prefix)&&!!d.querySelector('[data-th-body="'+model+'"]'),'مدل '+model+' رسم و نام دارد')}
+ setV(d,'unit','mil');ok(valid()&&Math.abs(ps()[1][1]*.0254-2.5)<.0002,'تبدیل واحد موقعیت واقعی پد THT را حفظ می‌کند');
+ setV(d,'tHoleShape','slot');ok(!d.getElementById('pads').value,'ترکیب شیار و بدنه بدون مدل کامل جعل نمی‌شود');
+ w.close();
+}
+
+
+console.log('\n۱۹) انتخاب شکل و پکیج‌های جدید');
+{
+ const {d,w}=load(TOOL);const valid=()=>!!d.getElementById('pads').value;const name=()=>val(d,'نام پیشنهادی Land Pattern');
+ setV(d,'smp','sot23');
+ ok(!d.getElementById('man').checked&&!d.getElementById('pShape').disabled&&!d.getElementById('padShapeControl').hidden,'انتخاب شکل مستقل از ویرایش دستی در دسترس است');
+ setV(d,'pShape','r');
+ let gold=()=>[...d.querySelectorAll('#svg rect')].filter(e=>e.getAttribute('fill')==='#d4a017');
+ ok(gold().length===3&&gold().every(e=>!e.hasAttribute('rx')),'SOT-23 مستطیلی در نقشه');
+ const dimensions=padsOf(d).map(p=>p.slice(1,5).join(','));
+ d.getElementById('mkA').click();ok(/AddPad\([^\n]*, 0, True/.test(d.getElementById('alt').value),'Altium شکل مستطیل انتخابی را دریافت می‌کند');
+ setV(d,'pShape','o');
+ ok(gold().length===3&&gold().every(e=>+e.getAttribute('rx')>0),'SOT-23 دوسرگرد در نقشه');
+ ok(JSON.stringify(dimensions)===JSON.stringify(padsOf(d).map(p=>p.slice(1,5).join(','))),'انتخاب شکل ابعاد بیرونی و مرکز پد را عوض نمی‌کند');
+ setV(d,'component','transistor');
+ for(const [pkg,count] of [['sot23-5',5],['sot23-6',6]]){
+  setV(d,'package',pkg);ok(!valid()&&d.getElementById('Lmax').value==='','پکیج '+pkg+' بدون دیتاشیت خروجی نمی‌دهد');
+  for(const [id,v] of Object.entries({Lmin:2.6,Lmax:3,Tmin:.3,Tmax:.6,Smax:1.8,W:.5,H:1.45,P:.95,BW:1.7,bodyLength:3}))setV(d,id,v);
+  const pads=padsOf(d);ok(valid()&&pads.length===count&&d.getElementById('insName').textContent.endsWith('-'+count+'N'),'پکیج '+pkg+' تعداد واقعی و نام SOT دارد');
+  ok(pads.filter(p=>p[1]<0).length===3&&pads.filter(p=>p[1]>0).length===count-3,'آرایش مستقل '+pkg);
+  if(count===5)ok(pads[3][2]===-pads[4][2]&&Math.abs(pads[3][2])===.95,'سمت دوپایهٔ SOT-23-5 مرکز خالی و فاصلهٔ 2P دارد');
+ }
+ setV(d,'component','jumper');setV(d,'package','jump-th');
+ for(const [id,v] of Object.entries({tP:5,tW:.6,tBodyL:4,tBodyD:.6,tBodyH:2}))setV(d,id,v);
+ ok(valid()&&name()==='JUMP500W60B'&&padsOf(d).length===2,'جامپر سیمی با نام جدول 4-6');
+ setV(d,'component','ic');setV(d,'package','sip');
+ for(const [id,v] of Object.entries({tP:2.54,tW:.6,tBodyL:20,tBodyD:3,tBodyH:5}))setV(d,id,v);
+ ok(valid()&&padsOf(d).length===8&&name()==='SIP300W60P254L2000H500Q8B','SIP مستقیم با ابعاد کامل بدنه و نام');
+ setV(d,'tR',2);ok(!valid(),'SIP غیرمستقیم تصادفاً رسم نمی‌شود');
+ setV(d,'package','cdip');
+ for(const [id,v] of Object.entries({tP:2.54,tR:7.62,tW:.6,tBodyL:20,tBodyD:6.5,tBodyH:5}))setV(d,id,v);
+ ok(valid()&&padsOf(d).length===14&&name()==='CDIP762W60P254L2000H500Q14B','CDIP دارای بدنه و نام کامل');
+ setV(d,'tModel','dipc');ok(valid()&&name().startsWith('DIPC762'),'DIPC قرارداد نام مستقل دارد');
+ setV(d,'tK',13);ok(!valid(),'CDIP/DIPC فرد پذیرفته نمی‌شود');
+ ok(d.getElementById('padShapeControl').hidden&&d.getElementById('pShape').disabled,'شکل SMD بر سوراخ‌های THT اثر نمی‌گذارد');
  w.close();
 }
 

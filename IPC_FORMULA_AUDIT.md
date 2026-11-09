@@ -180,3 +180,19 @@ node tests/run-tests.js
 ```
 
 اسکریپت اول فقط می‌خواند و نتایج واقعی مثال‌های این گزارش را چاپ می‌کند؛ intentionally یک آزمون انطباقِ سبز نیست و وجود ایراد را پنهان نمی‌کند. اسکریپت دوم ۱۵۵ تست قبلی را اجرا می‌کند؛ موفق‌شدن آن با وجود ایرادهای این گزارش امکان‌پذیر است. فرمول‌های اجرایی و پیش‌نمایش در این دور تغییر نکرده‌اند.
+
+## THT body models — 2026-11-09
+
+Added cylindrical axial horizontal/vertical and radial cylindrical/rectangular/disc bodies with two-pin validation and combined body/copper courtyard bounds. IPC-7352 table 4-6 naming is applied to implemented family conventions; unmatched combinations explicitly use CUSTOM. Hole/pad calculations retain §4 logic and prior limitations. Drawing body dimensions use user-entered maxima. Lead bend radius, mounting standoff, creepage, positional tolerance and worst-case insertion fit are not automatically qualified.
+
+Authoritative sample references:
+- YAGEO, CFR series, product specification 2024-04-03 V.3, dimensions p.3: CFR-25 L=6.3±0.5, D=2.4±0.2, d=0.55±0.05 mm. Input maxima 6.8/2.6/0.60 mm. https://yageogroup.com/content/Resource%20Library/Datasheet/YAGEO-CFR_DATASHEET.pdf
+- Vishay, 1N4148, document 81857, rev.1.6 (2024-11-07): body max 3.4 × Ø1.75, lead max Ø0.55 mm. https://www.vishay.com/docs/81857/1n4148.pdf
+
+Sample mounting pitches 10.16/7.62 mm are explicit design choices. Neither raw axial free-lead length nor nominal-only lead data is interpreted as a guaranteed maximum. Nichicon UVR/Panasonic radial references were researched but not promoted to automatic samples because complete toleranced maximum geometry was not verified. Full catalogue implementation remains outstanding.
+
+## Additional package models and exposed shape choice (2026-11-09)
+
+IPC-7352 §3.2 (printed p9/PDF19) describes oblong/rounded pads as advantageous for Pb-free processing and prefers rectangular pads for the two specified heel-trimming exceptions. It does not mandate oblong SOT-23 pads. User shape choice is now accessible without manual formula overrides. This is separate from hole shape and from §4 THT sizing.
+
+Added configurable SOT-23-5/6 equal-lead Gull-wing geometry, using table 3-1 sizing and table 3-16 names. Inputs must come from the actual manufacturer drawing; these are not universal verified land-pattern presets. Unequal lead widths/tab packages and flat-lead packages remain separate, unsupported models. Added straight SIP, even-count CDIP/DIPC and wire-jumper body/pin models with table 4-6 nomenclature. DIPC cavity is not detailed in the top-view envelope. Assembly/fabrication checks described above still apply. No unsupported catalogue-wide guard was removed.

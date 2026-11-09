@@ -241,3 +241,13 @@ node tests/run-tests.js
 - نام‌ساز Padstack عرض دوم سوراخ را می‌پذیرد و رمزگشا h/hn دوعددی را شیار می‌نامد. خروجی Altium شیار هنوز پیاده‌سازی نشده و صریحاً متوقف می‌شود؛ سوراخ گرد جایگزین تولید نمی‌شود.
 - ۱۹۴ تست jsdom موفق؛ Chromium نمایش شیار، ابعاد CSV، قفل Altium، حفظ حالت پس از reload و رد برخورد گوشه‌ها را تأیید کرد. تبدیل واحد با دقت ورودی فعلی (mil دو اعشار) بررسی شد، نه ادعای بی‌اتلاف‌بودن تبدیل.
 - پیش‌نمایش 8080 نسخهٔ جاری را بدون کش سرو می‌کند. این تغییر، سایر ایرادهای باز ممیزی را حل‌شده اعلام نمی‌کند.
+
+### THT body increment (2026-11-09)
+- Enabled operational axial and radial package models, body-aware courtyard, table 4-6 family names and two official manufacturer examples.
+- Added 13 regression checks; suite now 207 passing. Existing Chromium smoke passes.
+- Complex unsupported catalogue entries remain explicitly unsupported; see PACKAGE_COVERAGE.md for scope and IPC_FORMULA_AUDIT.md for sources/limitations.
+
+### User-selected pad shape and further packages (2026-11-09)
+- Main-settings shape choice: oblong vs rectangular vs family default; independent of manual formula editing; matching SVG/Altium, persisted on reload.
+- Configurable SOT-23-5/6, straight SIP, CDIP/DIPC and wire-jumper models implemented with geometry validation and standard-table naming.
+- 226 jsdom checks pass, extended Chromium smoke passes; SOT-23-5 screenshot visually checked. No complete-catalogue conformity claim.

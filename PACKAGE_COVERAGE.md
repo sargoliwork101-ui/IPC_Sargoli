@@ -137,3 +137,24 @@
 | طراحی سفارشی / سایر قطعات | پایهٔ L رو به داخل | مدل پایه؛ ابعاد دیتاشیت لازم | 3-8 |
 | طراحی سفارشی / سایر قطعات | Butt / I-lead دوطرفه | مدل پایه؛ ابعاد دیتاشیت لازم | 3-7 |
 | طراحی سفارشی / سایر قطعات | Flat Lug دوطرفه | مدل پایه؛ ابعاد دیتاشیت لازم | 3-9 |
+
+## Operational THT increment (2026-11-09)
+
+`axial` and `radial` are now configurable, not unsupported placeholders.
+- Axial cylindrical horizontal / vertical: resistor, capacitor, diode, inductor; two pins on X, upright body centered on pin 1.
+- Radial cylindrical, rectangular and disc: two pins, separately entered body dimensions/height. Capacitors use CAPRD/CAPPRD/CAPRR/CAPRB conventions; other radial combinations use explicit CUSTOM names rather than fabricated IPC names.
+- Round-hole sizing still uses IPC-7352 §4 and maximum pin cross section. Body and pad envelopes both enter courtyard. Body drawing is top-view envelope, not a manufacturer-specific 3D model.
+- New samples: YAGEO CFR-25 and Vishay 1N4148. These are maximum-dimension examples; board pitches 10.16/7.62 mm are design choices, not manufacturer-recommended land patterns.
+- Slot + these body models is explicitly blocked until their combined drawing/export is implemented; general custom slot mode remains available.
+
+This is **partial implementation**, not completion of all unsupported catalogue entries. MELF audit, SMD arrays, specialty terminals, connector-specific, power/transistor and other complex models remain pending. Existing guards remain. No blanket conformity/certification claim is made.
+
+## Further operational models and shape choice (2026-11-09)
+
+- SOT-23-5: independently generated 3+2 Gull-wing layout; adjacent pitch P on the 3-pin side, 2P separation on the 2-pin side. SOT-23-6: 3+3 counter-clockwise layout. Both require datasheet input (no unsourced automatic dimensions); table 3-1 sizing and table 3-16 SOT naming. They do not cover unequal-tab or flat-lead SOT variants.
+- SIP: straight single-row only, explicit body width/length/height; full table 4-6 name. Staggered SIP is not claimed.
+- CDIP/DIPC: equal even pin count on two rows, body length in Y, width in X, complete table 4-6 name. Cavity detail is not drawn; the outer body envelope is drawn. These are not PLCC sockets.
+- Wire jumper: two pins and JUMP spacing/W naming; entered envelope includes the formed wire. Bend mechanics are not inferred.
+- Shape selection moved out of manual formula overrides to the main settings. SMD oblong/rectangular affects drawing and Altium consistently, persists on reload, and does not change outside dimensions. BGA/THT retain their own pad models. `auto` remains an explicit family default, not an IPC requirement.
+
+Other catalogue families remain pending; this increment does not claim complete catalogue coverage.
