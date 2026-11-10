@@ -1,0 +1,205 @@
+{
+  "standard": "IPC-7352 May 2023",
+  "coefficientCases": 27,
+  "rms": 4.976877113523117,
+  "samples": [
+    {
+      "level": "A",
+      "Z": "4.50 mm",
+      "G": "1.90 mm",
+      "X": "1.90 mm",
+      "pad": [
+        "1",
+        "-1.6000",
+        "0.0000",
+        "1.3000",
+        "1.9000"
+      ],
+      "courtyard": "5.50 mm × 2.90 mm",
+      "name": "RESC3216X100M"
+    },
+    {
+      "level": "B",
+      "Z": "3.90 mm",
+      "G": "1.90 mm",
+      "X": "1.80 mm",
+      "pad": [
+        "1",
+        "-1.4500",
+        "0.0000",
+        "1.0000",
+        "1.8000"
+      ],
+      "courtyard": "4.40 mm × 2.30 mm",
+      "name": "RESC3216X100N"
+    },
+    {
+      "level": "C",
+      "Z": "3.70 mm",
+      "G": "1.90 mm",
+      "X": "1.80 mm",
+      "pad": [
+        "1",
+        "-1.4000",
+        "0.0000",
+        "0.9000",
+        "1.8000"
+      ],
+      "courtyard": "3.90 mm × 2.00 mm",
+      "name": "RESC3216X100L"
+    }
+  ],
+  "rounding": {
+    "inputs": {
+      "Lmax": 1.031,
+      "Smax": 0.51,
+      "W": 0.5134,
+      "H": 0.24,
+      "level": "B"
+    },
+    "JT": 0.06,
+    "expected_table_3_3": {
+      "Z": 1.15,
+      "G": 0.51,
+      "X": 0.51,
+      "padLength": 0.32
+    },
+    "P_0_5_pad": [
+      "1",
+      "-0.4150",
+      "0.0000",
+      "0.3200",
+      "0.5100"
+    ],
+    "P_0_3_pad": [
+      "1",
+      "-0.4153",
+      "0.0000",
+      "0.3205",
+      "0.5130"
+    ]
+  },
+  "small": {
+    "pad": [
+      "1",
+      "-0.4750",
+      "0.0000",
+      "0.3500",
+      "0.3210"
+    ],
+    "Z": "1.30 mm",
+    "G": "0.60 mm",
+    "X": "0.32 mm"
+  },
+  "axial": {
+    "hole": "Ø 1.00 mm (±0.08)",
+    "pad": "Ø 1.50 mm (پین ۱ مربع)",
+    "pads": [
+      [
+        "1",
+        "-5.0800",
+        "0.0000",
+        "1.5000",
+        "1.0000",
+        "rect",
+        "plated"
+      ],
+      [
+        "2",
+        "5.0800",
+        "0.0000",
+        "1.5000",
+        "1.0000",
+        "circle",
+        "plated"
+      ]
+    ],
+    "name": "RESAD1016W60L680D260B",
+    "pitch": "10.16",
+    "warning": "بدنه از ابعاد max ورودی؛ Courtyard شامل بدنه و پدهاست. فاصلهٔ پایه و خم‌کاری انتخاب طراحی است، نه مقدار اجباری IPC. پین ۱ دیود کاتد؛ خازن قطبی مثبت است. کنترل تلرانس مکان پایه، فاصلهٔ بدنه از برد و خم‌کاری با دیتاشیت لازم است. نام CUSTOM برای ترکیب فاقد قرارداد پیاده‌شده است. "
+  },
+  "thickness": [
+    {
+      "board_mm": 0.7,
+      "hole": "Ø 0.80 mm (±0.08)",
+      "pad": "Ø 1.30 mm (پین ۱ مربع)"
+    },
+    {
+      "board_mm": 0.8,
+      "hole": "Ø 0.90 mm (±0.08)",
+      "pad": "Ø 1.40 mm (پین ۱ مربع)"
+    },
+    {
+      "board_mm": 1,
+      "hole": "Ø 1.00 mm (±0.08)",
+      "pad": "Ø 1.50 mm (پین ۱ مربع)"
+    },
+    {
+      "board_mm": 2.35,
+      "hole": "Ø 1.00 mm (±0.08)",
+      "pad": "Ø 1.50 mm (پین ۱ مربع)"
+    },
+    {
+      "board_mm": 3,
+      "hole": "Ø 1.10 mm (±0.08)",
+      "pad": "Ø 1.85 mm (پین ۱ مربع)"
+    },
+    {
+      "board_mm": 4,
+      "hole": "Ø 1.10 mm (±0.08)",
+      "pad": "Ø 1.85 mm (پین ۱ مربع)"
+    },
+    {
+      "board_mm": 4.5,
+      "hole": "Ø 1.20 mm (±0.08)",
+      "pad": "Ø 1.95 mm (پین ۱ مربع)"
+    }
+  ],
+  "finite": {
+    "hole": "Ø 0.75 mm (±0.08)",
+    "pad": "Ø 1.25 mm (پین ۱ مربع)"
+  },
+  "square": {
+    "hole": "Ø 1.25 mm (±0.08)",
+    "pad": "Ø 2.00 mm (پین ۱ مربع)",
+    "diagonal": 0.848528137423857
+  },
+  "rectangle": {
+    "hole": "Ø 1.02 mm (±0.08)",
+    "pad": "Ø 1.77 mm (پین ۱ مربع)",
+    "diagonal": 0.6708203932499369
+  },
+  "references": {
+    "chip": {
+      "name": "R_1206_3216Metric",
+      "path": "Resistor_SMD.pretty/R_1206_3216Metric.kicad_mod",
+      "description": "Resistor SMD 1206 (3216 Metric), square (rectangular) end terminal, IPC_7351 nominal, (Body size source: IPC-SM-782 page 72, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf), generated with kicad-footprint-generator",
+      "pads": 2
+    },
+    "array-conc": {
+      "name": "R_Array_Concave_4x0603",
+      "path": "Resistor_SMD.pretty/R_Array_Concave_4x0603.kicad_mod",
+      "description": "Thick Film Chip Resistor Array, Wave soldering, Vishay CRA06P (see cra06p.pdf)",
+      "pads": 8
+    },
+    "array-convex": {
+      "name": "R_Array_Convex_4x0603",
+      "path": "Resistor_SMD.pretty/R_Array_Convex_4x0603.kicad_mod",
+      "description": "Chip Resistor Network, ROHM MNR14 (see mnr_g.pdf)",
+      "pads": 8
+    },
+    "axial": {
+      "name": "R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal",
+      "path": "Resistor_THT.pretty/R_Axial_DIN0207_L6.3mm_D2.5mm_P10.16mm_Horizontal.kicad_mod",
+      "description": "Resistor, Axial_DIN0207 series, Axial, Horizontal, pin pitch=10.16mm, 0.25W = 1/4W, length*diameter=6.3*2.5mm^2, http://cdn-reichelt.de/documents/datenblatt/B400/1_4W%23YAG.pdf",
+      "pads": 2
+    }
+  },
+  "scope_resistor_packages": [
+    "chip",
+    "array-conc",
+    "array-convex",
+    "array-flat",
+    "axial"
+  ]
+}
