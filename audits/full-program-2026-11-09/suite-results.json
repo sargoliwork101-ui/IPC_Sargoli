@@ -1,0 +1,230 @@
+[
+  {
+    "suite": "audit-regressions.cjs",
+    "exit": 1,
+    "seconds": 7.69,
+    "tail": "Independent expectations for 11 audit cases: PASS\nnode:internal/assert/utils:77\n    throw err;\n    ^\n\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(d.getElementById('pads').value.includes('1.0000'))\n\n    at Object.<anonymous> (/home/user/IPC_Sargoli/tests/audit-regressions.cjs:21:1)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+  },
+  {
+    "suite": "browser-preview.cjs",
+    "exit": 1,
+    "seconds": 39.0,
+    "tail": " PASS\nlocator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#Smax')\n    - locator resolved to <input disabled id=\"Smax\" step=\"any\" data-d=\"1\" value=\"4.98\" type=\"number\"/>\n    - fill(\"1.8\")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n      - waiting 100ms\n    53 × waiting for element to be visible, enabled and editable\n       - element is not visible\n     - retrying fill action\n       - waiting 500ms\n\n    at /home/user/IPC_Sargoli/tests/browser-preview.cjs:63:147 {\n  log: [\n    \"  - waiting for locator('#Smax')\",\n    '    - locator resolved to <input disabled id=\"Smax\" step=\"any\" data-d=\"1\" value=\"4.98\" type=\"number\"/>',\n    '    - fill(\"1.8\")',\n    '  - attempting fill action',\n    '    2 × waiting for element to be visible, enabled and editable',\n    '      - element is not visible',\n    '    - retrying fill action',\n    '    - waiting 20ms',\n    '    2 × waiting for element to be visible, enabled and editable',\n    '      - element is not visible',\n    '    - retrying fill action',\n    '      - waiting 100ms',\n    '    53 × waiting for element to be visible, enabled and editable',\n    '       - element is not visible',\n    '     - retrying fill action',\n    '       - waiting 500ms'\n  ],\n  name: 'TimeoutError'\n}\n"
+  },
+  {
+    "suite": "capacitor-inductor-ipc7352.cjs",
+    "exit": 0,
+    "seconds": 29.15,
+    "tail": ".5\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 9.999999,\n      \"level\": \"C\",\n      \"Z\": 6.8999999999999995,\n      \"G\": 3.8,\n      \"X\": 1.2,\n      \"CE\": 0.25\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 10,\n      \"level\": \"A\",\n      \"Z\": 8.3,\n      \"G\": 3.8,\n      \"X\": 1.7999999999999998,\n      \"CE\": 1\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 10,\n      \"level\": \"B\",\n      \"Z\": 7.699999999999999,\n      \"G\": 3.8,\n      \"X\": 1.6,\n      \"CE\": 0.5\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 10,\n      \"level\": \"C\",\n      \"Z\": 7.1,\n      \"G\": 3.8,\n      \"X\": 1.4,\n      \"CE\": 0.25\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 10.000001,\n      \"level\": \"A\",\n      \"Z\": 8.3,\n      \"G\": 3.8,\n      \"X\": 1.7999999999999998,\n      \"CE\": 1\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 10.000001,\n      \"level\": \"B\",\n      \"Z\": 7.699999999999999,\n      \"G\": 3.8,\n      \"X\": 1.6,\n      \"CE\": 0.5\n    },\n    {\n      \"case\": \"table 3-14\",\n      \"H\": 10.000001,\n      \"level\": \"C\",\n      \"Z\": 7.1,\n      \"G\": 3.8,\n      \"X\": 1.4,\n      \"CE\": 0.25\n    },\n    \"electrolytic Altium CAPAE name\",\n    \"name input never changes copper\",\n    \"unknown base never guessed for CAPAE\",\n    \"multi-terminal alc rejected\",\n    \"all pads of capacitor/radial\",\n    \"all pads of capacitor/electrolytic\",\n    \"all pads of capacitor/chip-polar\",\n    \"all pads of capacitor/molded-polar\",\n    \"all pads of inductor/precision-molded\",\n    \"CAPPDFN direct geometry, no IPC claim\"\n  ]\n}\n"
+  },
+  {
+    "suite": "capacitor-inductor-preview.cjs",
+    "exit": 1,
+    "seconds": 30.93,
+    "tail": "locator.fill: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator('#nameBase')\n    - locator resolved to <input value=\"0\" step=\"any\" data-d=\"1\" id=\"nameBase\" type=\"number\"/>\n    - fill(\"7.3\")\n  - attempting fill action\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n    - waiting 20ms\n    2 × waiting for element to be visible, enabled and editable\n      - element is not visible\n    - retrying fill action\n      - waiting 100ms\n    59 × waiting for element to be visible, enabled and editable\n       - element is not visible\n     - retrying fill action\n       - waiting 500ms\n\n    at /home/user/IPC_Sargoli/tests/capacitor-inductor-preview.cjs:4:244 {\n  log: [\n    \"  - waiting for locator('#nameBase')\",\n    '    - locator resolved to <input value=\"0\" step=\"any\" data-d=\"1\" id=\"nameBase\" type=\"number\"/>',\n    '    - fill(\"7.3\")',\n    '  - attempting fill action',\n    '    2 × waiting for element to be visible, enabled and editable',\n    '      - element is not visible',\n    '    - retrying fill action',\n    '    - waiting 20ms',\n    '    2 × waiting for element to be visible, enabled and editable',\n    '      - element is not visible',\n    '    - retrying fill action',\n    '      - waiting 100ms',\n    '    59 × waiting for element to be visible, enabled and editable',\n    '       - element is not visible',\n    '     - retrying fill action',\n    '       - waiting 500ms'\n  ],\n  name: 'TimeoutError'\n}\n"
+  },
+  {
+    "suite": "component-dimensions-preview.cjs",
+    "exit": 1,
+    "seconds": 1.59,
+    "tail": "Resistor packages, named examples, prefixes exclude foreign models; search is global: PASS\nAssertionError [ERR_ASSERTION]: soic: C-C X = 5.59 mm C-C X = 5.590 mm,Courtyard X = 7.400 mm,C-C Y = 8.890 mm,Courtyard Y = 9.990 mm\n    at /home/user/IPC_Sargoli/tests/component-dimensions-preview.cjs:29:17 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "courtyard-search-preview.cjs",
+    "exit": 1,
+    "seconds": 1.09,
+    "tail": "AssertionError [ERR_ASSERTION]: radial: X\n    at check (/home/user/IPC_Sargoli/tests/courtyard-search-preview.cjs:10:4)\n    at async /home/user/IPC_Sargoli/tests/courtyard-search-preview.cjs:11:1 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "crystal-models-preview.cjs",
+    "exit": 1,
+    "seconds": 2.77,
+    "tail": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(texts.every(t=>t===w.toFixed(2)+'×'+h.toFixed(2)))\n\n    at /home/user/IPC_Sargoli/tests/crystal-models-preview.cjs:4:1001 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "datasheet-illustrations-preview.cjs",
+    "exit": 0,
+    "seconds": 7.33,
+    "tail": "soic: family-specific Lmax endpoints, min/max example and bottom-panel diagram — PASS\nchip0603: family-specific Lmax endpoints, min/max example and bottom-panel diagram — PASS\nRound/square/rectangular lead cross-sections and mobile illustrations: PASS\n"
+  },
+  {
+    "suite": "dimension-help-preview.cjs",
+    "exit": 0,
+    "seconds": 4.84,
+    "tail": "Actual clicks and keyboard show correct bottom help; all external fonts stay uniform across zoom/mobile; vertical labels reversed: PASS\n"
+  },
+  {
+    "suite": "dimension-witness-preview.cjs",
+    "exit": 1,
+    "seconds": 6.73,
+    "tail": "soic: all witness endpoints, vertical labels and explicit values — PASS\nbga100: all witness endpoints, vertical labels and explicit values — PASS\ndip: all witness endpoints, vertical labels and explicit values — PASS\nlib-axial: all witness endpoints, vertical labels and explicit values — PASS\nlib-radial: all witness endpoints, vertical labels and explicit values — PASS\nlib-sot89: all witness endpoints, vertical labels and explicit values — PASS\nlib-connector-smd: all witness endpoints, vertical labels and explicit values — PASS\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert((await page.locator('#dimG').textContent()).includes('Slot length = 3.00 mm'))\n\n    at /home/user/IPC_Sargoli/tests/dimension-witness-preview.cjs:10:1 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "direct-models-preview.cjs",
+    "exit": 0,
+    "seconds": 22.92,
+    "tail": "array-flat: generated, persisted, invalid input guarded — PASS\nlcc: generated, persisted, invalid input guarded — PASS\ncga: generated, persisted, invalid input guarded — PASS\ncfp: generated, persisted, invalid input guarded — PASS\nsol: generated, persisted, invalid input guarded — PASS\npressfit: generated, persisted, invalid input guarded — PASS\nosc-l: generated, persisted, invalid input guarded — PASS\ncorner: generated, persisted, invalid input guarded — PASS\ndiode-nonpolar: generated, persisted, invalid input guarded — PASS\ndfn-polar: generated, persisted, invalid input guarded — PASS\nSOT-383FL real source: PASS\n"
+  },
+  {
+    "suite": "display-precision-preview.cjs",
+    "exit": 0,
+    "seconds": 2.98,
+    "tail": "PASS: mobile settings, live decimals, reload persistence, invariant geometry/export, drawing visible, no horizontal page overflow.\n"
+  },
+  {
+    "suite": "display-precision.cjs",
+    "exit": 0,
+    "seconds": 2.03,
+    "tail": "PASS: IPC-rounded SMD/BGA and unrounded TH geometry; pitch independence; 0–8 display decimals; units; precise CSV invariant.\n"
+  },
+  {
+    "suite": "embedded-usage-preview.cjs",
+    "exit": 0,
+    "seconds": 4.05,
+    "tail": "Embedded guide works with external guide request blocked, no popups, exact anchors, mobile close and Escape: PASS\n"
+  },
+  {
+    "suite": "fifth-review-browser.cjs",
+    "exit": 0,
+    "seconds": 3.53,
+    "tail": "Real browser: immediate naming persistence, zero-encoding rejection and typed checkbox restoration — PASS\n"
+  },
+  {
+    "suite": "fifth-review-regressions.cjs",
+    "exit": 0,
+    "seconds": 1.56,
+    "tail": "Naming and decoder edits persist immediately without unrelated footprint edits: PASS\nInvalid prefixes and zero/unsafe encoded dimensions cannot produce misleading names: PASS\nSaved string booleans cannot silently enable manual/library modes: PASS\n"
+  },
+  {
+    "suite": "font-fit-preview.cjs",
+    "exit": 0,
+    "seconds": 5.92,
+    "tail": "soic: PASS\nchip0603: PASS\nti-db5: PASS\ndip: PASS\nlib-sot223: PASS\nlib-sot89: PASS\nlib-connector-smd: PASS\nrotated 45 degrees and long pin name: PASS\nmobile: PASS\n"
+  },
+  {
+    "suite": "fourth-review-browser.cjs",
+    "exit": 0,
+    "seconds": 3.91,
+    "tail": "Real browser: null storage recovery, literal errors, invalid pad export rejection and complete reset — PASS\n"
+  },
+  {
+    "suite": "fourth-review-regressions.cjs",
+    "exit": 0,
+    "seconds": 2.76,
+    "tail": "Malformed or null sidebar settings cannot stop application startup: PASS\nError messages render malformed user JSON as text, not HTML: PASS\nManual coefficients cannot produce zero/negative pad geometry in CSV or Altium: PASS\nReset clears stale package drafts while preserving promised naming/decoder inputs: PASS\n"
+  },
+  {
+    "suite": "inspector-position-preview.cjs",
+    "exit": 1,
+    "seconds": 3.27,
+    "tail": "1440: compact summary inside drawing sheet, no separate inspector column or drawer — PASS\n900: compact summary inside drawing sheet, no separate inspector column or drawer — PASS\n360: compact summary inside drawing sheet, no separate inspector column or drawer — PASS\nAssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(z.includes('Z = 6.90 mm'))\n\n    at /home/user/IPC_Sargoli/tests/inspector-position-preview.cjs:4:289 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "ipc-rounding-policy.cjs",
+    "exit": 0,
+    "seconds": 0.05,
+    "tail": "{\n  \"result\": \"PASS\",\n  \"cases\": 151,\n  \"scope\": \"All 15 SMD table policies; explicit TH/direct/courtyard policies; missing policy rejection; decimal ties; independent naming codes; exact diagonal clearance\"\n}\n"
+  },
+  {
+    "suite": "ipc7352-rounding.cjs",
+    "exit": 0,
+    "seconds": 2.97,
+    "tail": ",\n        \"G\": 0.60123,\n        \"X\": 0.32147\n      },\n      \"pad\": [\n        0.359385,\n        0.32147\n      ]\n    },\n    {\n      \"component\": \"inductor\",\n      \"table\": \"3-3\",\n      \"raw\": {\n        \"Z\": 1.1516,\n        \"G\": 0.51017,\n        \"X\": 0.5134\n      },\n      \"IPC\": {\n        \"Z\": 1.15,\n        \"G\": 0.51,\n        \"X\": 0.51\n      },\n      \"pad\": [\n        0.31999999999999995,\n        0.51\n      ]\n    },\n    {\n      \"component\": \"inductor\",\n      \"table\": \"3-4 note 1\",\n      \"raw\": {\n        \"Z\": 1.31674,\n        \"G\": 0.60123,\n        \"X\": 0.32147\n      },\n      \"IPC\": {\n        \"Z\": 1.32,\n        \"G\": 0.60123,\n        \"X\": 0.32147\n      },\n      \"pad\": [\n        0.359385,\n        0.32147\n      ]\n    },\n    {\n      \"component\": \"capacitor\",\n      \"table\": \"3-14 below 10\",\n      \"IPC\": {\n        \"Z\": 7.3,\n        \"G\": 3.8,\n        \"X\": 1.41\n      },\n      \"pad\": [\n        1.75,\n        1.41\n      ]\n    },\n    {\n      \"component\": \"capacitor\",\n      \"table\": \"3-14 at 10\",\n      \"IPC\": {\n        \"Z\": 7.7,\n        \"G\": 3.8,\n        \"X\": 1.61\n      },\n      \"pad\": [\n        1.9500000000000002,\n        1.61\n      ]\n    },\n    {\n      \"component\": \"IC control\",\n      \"table\": \"3-1 note 4\",\n      \"IPC\": {\n        \"Z\": 6.903,\n        \"G\": 4.282,\n        \"X\": 0.573\n      }\n    }\n  ],\n  \"extraChecks\": [\n    \"display precision cannot change IPC geometry\",\n    \"table 3-1 exception not applied to chip\",\n    \"direct dimensions preserved\",\n    \"TH no invented generic rounding\"\n  ]\n}\n"
+  },
+  {
+    "suite": "layout-scroll-preview.cjs",
+    "exit": 1,
+    "seconds": 4.08,
+    "tail": "Sorted dimension lanes and stable sample/input sidebar scrolling: PASS\nlocator.evaluate: Error: strict mode violation: locator('#t1 details') resolved to 2 elements:\n    1) <details class=\"box\" id=\"calculatedResults\">…</details> aka getByText('نتیجهٔ محاسبات — فقط‌خواندنیاندازهٔ هر پد (طول × عرض)Z (طول کل پدها)G')\n    2) <details class=\"box\">…</details> aka getByText('دادهٔ خروجی (فهرست پدها و اسکریپت Altium) فهرست پدها (برای وارد کردن در ابزار')\n\nCall log:\n  - waiting for locator('#t1 details')\n\n    at /home/user/IPC_Sargoli/tests/layout-scroll-preview.cjs:9:1113 {\n  log: [ \"  - waiting for locator('#t1 details')\" ]\n}\n"
+  },
+  {
+    "suite": "number-wheel-preview.cjs",
+    "exit": 0,
+    "seconds": 3.26,
+    "tail": "PASS: real wheel cannot change focused numeric inputs or geometry; typing still works; dynamic reference inputs protected; distinct Th/Th2 labels.\n"
+  },
+  {
+    "suite": "resistor-ipc7352-numerical.cjs",
+    "exit": 0,
+    "seconds": 4.08,
+    "tail": "     2.25,\n        \"rect\",\n        \"plated\"\n      ]\n    },\n    {\n      \"case\": \"TH tier 2.25, delta 1e-10\",\n      \"expected\": {\n        \"hole\": 2.2500000001,\n        \"pad\": 3.7500000001\n      },\n      \"actual\": [\n        \"1\",\n        -5.08,\n        \"0\",\n        3.7500000001,\n        2.2500000001,\n        \"rect\",\n        \"plated\"\n      ]\n    },\n    {\n      \"case\": \"decimal boundary lead 0.8, clearance .4-.2\",\n      \"expected\": {\n        \"hole\": 1,\n        \"pad\": 1.5\n      },\n      \"actual\": [\n        \"1\",\n        -5.08,\n        \"0\",\n        1.5000000000000002,\n        1.0000000000000002,\n        \"rect\",\n        \"plated\"\n      ]\n    },\n    {\n      \"case\": \"decimal boundary lead 1.05, clearance .4-.2\",\n      \"expected\": {\n        \"hole\": 1.25,\n        \"pad\": 2\n      },\n      \"actual\": [\n        \"1\",\n        -5.08,\n        \"0\",\n        2,\n        1.2500000000000002,\n        \"rect\",\n        \"plated\"\n      ]\n    },\n    {\n      \"case\": \"decimal boundary lead 1.55, clearance .4-.2\",\n      \"expected\": {\n        \"hole\": 1.75,\n        \"pad\": 2.75\n      },\n      \"actual\": [\n        \"1\",\n        -5.08,\n        \"0\",\n        2.75,\n        1.7500000000000002,\n        \"rect\",\n        \"plated\"\n      ]\n    },\n    {\n      \"case\": \"NPTH rectangular maximum diagonal\",\n      \"expected\": {\n        \"hole\": 1.070820393249937\n      },\n      \"actual\": [\n        \"1\",\n        -5.08,\n        \"0\",\n        1.820820393249937,\n        1.070820393249937,\n        \"rect\",\n        \"non-plated\"\n      ]\n    }\n  ]\n}\n"
+  },
+  {
+    "suite": "resistor-ipc7352-preview.cjs",
+    "exit": 0,
+    "seconds": 1.27,
+    "tail": "PASS: real-browser chip courtyard, inclusive TH tier, empty override fallback, visible drawing, mobile overflow.\n"
+  },
+  {
+    "suite": "resistor-second-pass.cjs",
+    "exit": 0,
+    "seconds": 13.13,
+    "tail": "{\n  \"standard\": \"IPC-7352 May 2023\",\n  \"references\": [\n    \"3.1.1 equations 3-1 to 3-3\",\n    \"3.1.4 equations 3-5 to 3-7, JH=0 for chip\",\n    \"Tables 3-3/3-4\",\n    \"Tables 4-1/4-2/4-3/4-4\"\n  ],\n  \"policy\": \"Final SMD dimensions rounded by IPC table; display precision is independent; TH remains unrounded because section 4 specifies no generic rounding factor.\",\n  \"cases\": 176,\n  \"maxNumericalError_mm\": 2.220446049250313e-16,\n  \"result\": \"PASS\",\n  \"new_defects\": []\n}\n"
+  },
+  {
+    "suite": "responsive-help-preview.cjs",
+    "exit": 1,
+    "seconds": 0.93,
+    "tail": "AssertionError [ERR_ASSERTION]: usage.html#field-computed-pZJ has a real offline target\n    at /home/user/IPC_Sargoli/tests/responsive-help-preview.cjs:3:162 {\n  generatedMessage: false,\n  code: 'ERR_ASSERTION',\n  actual: false,\n  expected: true,\n  operator: '==',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "s-mode-preview.cjs",
+    "exit": 0,
+    "seconds": 4.1,
+    "tail": "PASS: zoom capped at 40; zoom out works;  visible automatic/manual control; exact Yageo 1206 UI workflow; ignored Smax hidden/disabled; manual .340 vs automatic .440; persistence; reference route explicit and exit available; no mobile overflow.\n"
+  },
+  {
+    "suite": "second-review-browser.cjs",
+    "exit": 1,
+    "seconds": 8.4,
+    "tail": "Real browser repeated unit conversion and reload preserve exported dimensions: PASS\nReal browser rejects dirty/invalid direct model without resurrecting old geometry: PASS\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.200 mm × 0.600 mm'\n- '1.20 mm × 0.60 mm'\n       ^\n\n    at /home/user/IPC_Sargoli/tests/second-review-browser.cjs:12:211 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.200 mm × 0.600 mm',\n  expected: '1.20 mm × 0.60 mm',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n"
+  },
+  {
+    "suite": "second-review-regressions.cjs",
+    "exit": 1,
+    "seconds": 2.44,
+    "tail": "Repeated unit round trips, reload and per-package drafts preserve physical geometry: PASS\nStandalone chip names retain leading digits; unused chip pitch/count do not block names: PASS\nnode:assert:150\n  throw new AssertionError(obj);\n  ^\n\nAssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ '1.200 mm × 0.600 mm'\n- '1.20 mm × 0.60 mm'\n       ^\n\n    at Object.<anonymous> (/home/user/IPC_Sargoli/tests/second-review-regressions.cjs:18:100)\n    at Module._compile (node:internal/modules/cjs/loader:1781:14)\n    at Object..js (node:internal/modules/cjs/loader:1913:10)\n    at Module.load (node:internal/modules/cjs/loader:1505:32)\n    at Function._load (node:internal/modules/cjs/loader:1309:12)\n    at wrapModuleLoad (node:internal/modules/cjs/loader:254:19)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5)\n    at node:internal/main/run_main_module:36:49 {\n  generatedMessage: true,\n  code: 'ERR_ASSERTION',\n  actual: '1.200 mm × 0.600 mm',\n  expected: '1.20 mm × 0.60 mm',\n  operator: 'strictEqual',\n  diff: 'simple'\n}\n\nNode.js v22.22.3\n"
+  },
+  {
+    "suite": "sot23-ipc7352-preview.cjs",
+    "exit": 0,
+    "seconds": 2.24,
+    "tail": "PASS: SOT 3/5/6 IPC paths in mobile browser, source table retained, display independence, diagonal clearance, pitch explanation, reload, no page overflow.\n"
+  },
+  {
+    "suite": "sot23-ipc7352.cjs",
+    "exit": 0,
+    "seconds": 16.96,
+    "tail": "{\n  \"standard\": \"IPC-7352 May 2023\",\n  \"cases\": 100,\n  \"result\": \"PASS\",\n  \"examples\": [\n    {\n      \"pins\": 3,\n      \"pitch\": 0.4,\n      \"conditional\": false,\n      \"Z\": 3.7,\n      \"G\": 1.1,\n      \"X\": 0.53,\n      \"padLength\": 1.3\n    },\n    {\n      \"pins\": 3,\n      \"pitch\": 0.4,\n      \"conditional\": true,\n      \"Z\": 3.7,\n      \"G\": 1.5,\n      \"X\": 0.53,\n      \"padLength\": 1.1\n    },\n    {\n      \"pins\": 5,\n      \"pitch\": 0.4,\n      \"conditional\": false,\n      \"Z\": 3.7,\n      \"G\": 1.1,\n      \"X\": 0.53,\n      \"padLength\": 1.3\n    },\n    {\n      \"pins\": 5,\n      \"pitch\": 0.4,\n      \"conditional\": true,\n      \"Z\": 3.7,\n      \"G\": 1.5,\n      \"X\": 0.53,\n      \"padLength\": 1.1\n    },\n    {\n      \"pins\": 6,\n      \"pitch\": 0.4,\n      \"conditional\": false,\n      \"Z\": 3.7,\n      \"G\": 1.1,\n      \"X\": 0.53,\n      \"padLength\": 1.3\n    },\n    {\n      \"pins\": 6,\n      \"pitch\": 0.4,\n      \"conditional\": true,\n      \"Z\": 3.7,\n      \"G\": 1.5,\n      \"X\": 0.53,\n      \"padLength\": 1.1\n    }\n  ],\n  \"notes\": [\n    \"G minus follows the explicit inner-dimension prose; PDF printed plus remains contradictory\",\n    \"pin topology checked against selected 3/5/6 layout, not a universal manufacturer pinout\",\n    \"P in three-pin layout is spacing of the left pair; P in 5/6 is adjacent pitch\"\n  ]\n}\n"
+  },
+  {
+    "suite": "third-review-browser.cjs",
+    "exit": 0,
+    "seconds": 3.25,
+    "tail": "Real browser: exact curved-pad envelope, matching CSV radius and invalid metadata rejection — PASS\n"
+  },
+  {
+    "suite": "third-review-regressions.cjs",
+    "exit": 0,
+    "seconds": 1.46,
+    "tail": "Circle, capsule and roundrect bounds match their actual rendered geometry: PASS\nMissing pad ID, ambiguous plating, unknown hole types, inconsistent slots and zero-area polygons are rejected: PASS\nStandalone via requires a hole; impossible hole/pad dimensions are rejected: PASS\n"
+  },
+  {
+    "suite": "unit-display-preview.cjs",
+    "exit": 0,
+    "seconds": 1.26,
+    "tail": "Numeric units stay together and left-to-right in narrow RTL help and results; expanded package explanation; export unchanged: PASS\n"
+  },
+  {
+    "suite": "usage-guide-review.cjs",
+    "exit": 0,
+    "seconds": 1.27,
+    "tail": "PASS: 128 unique help topics; every static workspace control covered; offline guide identical; key field-specific examples and corrected semantics.\n"
+  },
+  {
+    "suite": "run-tests.js",
+    "exit": 0,
+    "seconds": 56.29,
+    "tail": "مشخص است\n  ✓ precision-molded: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ precision-molded: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ custom: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ custom: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ unique: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ unique: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ sotfl: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ sotfl: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ sot23-5: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ sot23-5: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ sot23-6: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ sot23-6: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ xtal-abm3: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ xtal-abm3: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ xtal-mc405: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ xtal-mc405: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ xtal-txc9ht11: نقشه و تعداد پد و اولین ابعاد مطابق فایل اصلی\n  ✓ xtal-txc9ht11: مدل و هشدار و منبع نسخه‌دار مشخص است\n  ✓ ابعاد پد نامساوی مرجع قابل ویرایش و صادرات CSV است\n  ✓ ویرایش عددی ساده بدون نیاز به دستکاری JSON کار می‌کند\n  ✓ ابعاد بدنه نیز قابل اصلاح و در کادر لحاظ می‌شوند\n  ✓ مرجع چندجزئی به خروجی Altium ساده‌شده و ناقص تبدیل نمی‌شود\n  ✓ ویرایش نامعتبر، نقشه و خروجی کهنه نمی‌گذارد\n  ✓ پلیگون واقعی SOT-89 حفظ می‌شود\n  ✓ شیارهای USB در داده و CSV با ابعاد محلی صریح حفظ می‌شوند\n  ✓ بازگشت به محاسبهٔ عادی پس از مرجع مستقل است\n\n─────────────────────────────\nنتیجه: 458 موفق، 0 ناموفق\n"
+  }
+]

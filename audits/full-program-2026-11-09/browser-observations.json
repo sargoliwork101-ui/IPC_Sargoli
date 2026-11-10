@@ -1,0 +1,21 @@
+{
+  "missingHelp": [
+    "field-computed-pZJ",
+    "field-computed-pGJ",
+    "field-computed-pSJ",
+    "field-computed-pCE"
+  ],
+  "manualS_T_fields": [
+    {
+      "id": "Tmin",
+      "disabled": false,
+      "hidden": false
+    },
+    {
+      "id": "Tmax",
+      "disabled": false,
+      "hidden": false
+    }
+  ],
+  "overflow": false
+}
