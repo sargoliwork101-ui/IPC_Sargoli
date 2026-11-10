@@ -921,7 +921,8 @@ if(sd===2&&!(bw>0))bodyW2=Math.min(bodyW2,Math.max(padInner-.05,.4));         //
 var bodyH2=(F==='chip')?Math.max(bw>0?bw:rd('W'),.3)                 // چیپ: بدنه = عرض قطعه
           :(sd===4?bodyW2:Math.max((n-1)*Pt+.6,.4));                  // دوطرفه: طول بدنه از گام
 if(rd('bodyLength')>0)bodyH2=rd('bodyLength');
-if(F==='chip')bodyW2=Math.max(rd('W'),.3);
+// Chip envelope: termination-to-termination span is along X, not terminal width.
+if(F==='chip'){bodyW2=Math.max(Lm,rd('bodyLength')||0);bodyH2=Math.max(W,bw||0)}
 
 // ---------- Courtyard = بزرگ‌ترین حدود بدنه و همهٔ پدها + excess ----------
 var exX=0,exY=0;
@@ -1169,7 +1170,10 @@ if(HT==='F'){
 var raw=hole;
 if(!(raw>0))return bad('قطر سوراخ معتبر نیست.');
 // ردیف جدول 4-4 با مقدار واقعی (بدون گردکردن) انتخاب می‌شود (ایراد ۲۷/۶۴)
-var stdPad=raw<=1?.5:raw<=1.25?.75:raw<=1.75?1:raw<=2.25?1.25:1.5;
+// Tolerate only binary arithmetic noise at inclusive table boundaries.
+// This is a comparison tolerance, NOT rounding/snapping the hole dimension.
+function atMostHole(edge){return raw<=edge||raw-edge<=8*Number.EPSILON*Math.max(1,Math.abs(raw),edge)}
+var stdPad=atMostHole(1)?.5:atMostHole(1.25)?.75:atMostHole(1.75)?1:atMostHole(2.25)?1.25:1.5;
 hole=raw;
 var pa=ov('pPadd',stdPad,1),pad=hole+pa;
 if(!(pad>hole))return bad('قطر پد مسی باید از سوراخ بزرگ‌تر باشد تا حلقهٔ مسی باقی بماند؛ افزودهٔ پد را اصلاح کن.');
@@ -1267,6 +1271,8 @@ function validateFootprint(k){
  var inputs=[].slice.call($('b'+k).querySelectorAll('input[type="number"]:not(:disabled)'));
  if($('man').checked)inputs=inputs.concat([].slice.call($('paramGrid').querySelectorAll('input[type="number"]:not(:disabled)')));
  inputs.forEach(function(e){var raw=e.value,v=Number(raw);
+  // Empty optional overrides mean use the table value, as ov() specifies.
+  if(raw.trim()===''&&e.closest('#paramGrid'))return;
   if(raw.trim()===''||!Number.isFinite(v)){error(e.id,'یک عدد معتبر و متناهی وارد کن.');return}
   if(required.indexOf(e.id)>=0&&v<=0)error(e.id,'این مقدار باید بزرگ‌تر از صفر باشد.');
   else if(v<0&&['pZJ','pGJ','pSJ','pHadj','pBR'].indexOf(e.id)<0)error(e.id,'مقدار منفی برای این پارامتر مجاز نیست.');

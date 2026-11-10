@@ -31,3 +31,9 @@ node tests/run-tests.js
 `node tests/display-precision.cjs`: محاسبات بدون گردکردن SMD/BGA/TH، مستقل‌بودن ابعاد چیپ از P، نمایش ۰ تا ۸ رقم و تبدیل واحد بدون تغییر CSV.
 `LD_LIBRARY_PATH=/tmp/chromlibs/lib node tests/display-precision-preview.cjs`: منوی تنظیمات در موبایل، اعمال زنده، ماندگاری پس از reload و نبود overflow افقی.
 مجموعهٔ عمومی پس از به‌روزرسانی انتظارهای گردکردن طبق دستور جدید: **۴۵۸ موفق، صفر ناموفق**. گردکردن کدگذاری نام و تعداد پایه با گردکردن ابعاد محاسباتی متفاوت است.
+
+### بازآزمایی مستقل مقاومت طبق IPC‑7352
+
+`node tests/resistor-ipc7352-numerical.cjs`: ۳۹ حالت عددی با روابط مستقل، شامل ۱۵ حالت چیپ A/B/C، RMS، کادر مبتنی بر حد قطعه/مس، شش ترکیب TH، مرزهای چهار ردیف پد و نویز ممیز شناور، و قطر قطری NPTH. نتیجهٔ ثبت‌شده: `audits/resistor-ipc7352-retest.json`.
+`LD_LIBRARY_PATH=/tmp/chromlibs/lib node tests/resistor-ipc7352-preview.cjs`: کادر چیپ، مرز بستهٔ جدول 4‑4، fallback خانهٔ خالی override و نمایش موبایل در مرورگر واقعی.
+گزارش و مرجع صفحه‌های PDF: `RESISTOR_IPC7352_RETEST.md`.
