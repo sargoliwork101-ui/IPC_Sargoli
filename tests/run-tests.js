@@ -512,7 +512,7 @@ console.log('\n۱۵) فهرست گستردهٔ پکیج‌ها و عدم ادع�
   }
  }
  ok(modelsAvailable,'همهٔ گروه‌ها مسیر مدل دارند و برچسب پکیج پشتیبانی‌نشده باقی نمانده است');
- ok(packages.size===66&&combos>66,'۶۶ تعریف پکیج با گروه‌بندی بر اساس نوع واقعی قطعه در دسترس است');
+ ok(packages.size===69&&combos>69,'۶۹ تعریف پکیج با گروه‌بندی بر اساس نوع واقعی قطعه در دسترس است');
  ok(blockedSafe,'بسته‌های پشتیبانی‌نشده یا مسدود، نقشه/خروجی قطعهٔ قبلی را نشان نمی‌دهند');
  ok(configSafe,'بستهٔ بدون نمونه، ابعاد قبلی را به جای دیتاشیت استفاده نمی‌کند');
  change('component','led');
@@ -770,7 +770,7 @@ console.log('\nفیلتر سخت نوع قطعه و پکیج');
 console.log('\n۲۴) مرجع‌های واقعی KiCad و پیام مدل');
 {
  const {d,w}=load(TOOL);const refs=JSON.parse(d.getElementById('referenceFootprintData').textContent);
- ok(Object.keys(refs).length===49,'۴۹ الگوی واقعی با دادهٔ آفلاین موجود است');
+ ok(Object.keys(refs).length===52,'۵۲ الگوی واقعی با دادهٔ آفلاین موجود است');
  for(const [key,ref] of Object.entries(refs)){
   setV(d,'smp','lib-'+key);
   const raw=fs.readFileSync(path.join(ROOT,'reference-footprints',key+'.kicad_mod'),'utf8');

@@ -16,7 +16,7 @@ From the repository root: `python audits/import-reference-footprints.py`. This r
 
 ## Coverage
 
-49 library references and 3 direct TI templates cover **50 distinct package groups out of 66** (SOT-23-5 and SOT-23-6 have both KiCad and TI examples). The remaining 16 groups have formula/configuration paths (6) or explicit user-dimension geometry builders (10), not sourced ready-made references. This does **not** mean 50 IPC formula solvers. All reference examples have an explicit model name, provenance and a warning requiring the user to adapt values to their own part datasheet.
+52 library references and 3 direct TI templates cover **53 distinct package groups out of 69** (SOT-23-5 and SOT-23-6 have both KiCad and TI examples). The remaining 16 groups have formula/configuration paths (6) or explicit user-dimension geometry builders (10), not sourced ready-made references. This does **not** mean 53 IPC formula solvers. All reference examples have an explicit model name, provenance and a warning requiring the user to adapt values to their own part datasheet.
 
 | Group | Specific reference | Original file |
 |---|---|---|
@@ -96,3 +96,15 @@ These groups retain explicit unsupported/configuration status as applicable. No 
 The ten direct geometry builders intentionally start without made-up dimensions. Users must supply their exact manufacturer land pattern. These are application code, not derived library examples or IPC formula solvers.
 
 SOT-23-5 and SOT-23-6 now also have unmodified KiCad references at the same pinned commit: `Package_TO_SOT_SMD.pretty/SOT-23-5.kicad_mod` and `Package_TO_SOT_SMD.pretty/SOT-23-6.kicad_mod`. They allow immediate display in the transistor group without presenting the TI logic-IC examples as transistors.
+
+## Named two-terminal crystals
+
+Three additional two-pad SMD crystals are supplied as exact, editable KiCad library references. Manufacturer links below are the links recorded in those source footprints; they were not independently revalidated as current datasheet revisions. These are crystal resonators, not powered oscillator modules. Check the exact orderable part datasheet before manufacture.
+
+| Group | Manufacturer/model | Body (mm) | Copper pads (mm) | Centre spacing (mm) | Datasheet link recorded by source |
+|---|---|---|---|---|---|
+| `xtal-abm3` | Abracon ABM3 | 5.0 × 3.2 | 2 × 1.9 × 2.4 | 4.10 | http://www.abracon.com/Resonators/abm3.pdf |
+| `xtal-mc405` | Seiko Epson MC-405 | 9.6 × 4.1 | 2 × 4.1 × 4.1 | 8.00 | https://support.epson.biz/td/api/doc_check.php?dl=brief_MC-306_en.pdf |
+| `xtal-txc9ht11` | TXC 9HT11 | 2.0 × 1.2 | 2 × 0.6 × 1.1 | 1.40 | http://txccrystal.com/images/pdf/9ht11.pdf |
+
+The Epson source description refers to MC-405 but its recorded datasheet filename says MC-306; do not treat that inherited link as independent manufacturer verification. Original files, pinned source paths and commit are recorded in `manifest.json`.
