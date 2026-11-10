@@ -1,0 +1,66 @@
+{
+  "standard": "IPC-7352 May 2023",
+  "cases": 100,
+  "result": "PASS",
+  "examples": [
+    {
+      "pins": 3,
+      "pitch": 0.4,
+      "conditional": false,
+      "Z": 3.7,
+      "G": 1.1,
+      "X": 0.53,
+      "padLength": 1.3
+    },
+    {
+      "pins": 3,
+      "pitch": 0.4,
+      "conditional": true,
+      "Z": 3.7,
+      "G": 1.5,
+      "X": 0.53,
+      "padLength": 1.1
+    },
+    {
+      "pins": 5,
+      "pitch": 0.4,
+      "conditional": false,
+      "Z": 3.7,
+      "G": 1.1,
+      "X": 0.53,
+      "padLength": 1.3
+    },
+    {
+      "pins": 5,
+      "pitch": 0.4,
+      "conditional": true,
+      "Z": 3.7,
+      "G": 1.5,
+      "X": 0.53,
+      "padLength": 1.1
+    },
+    {
+      "pins": 6,
+      "pitch": 0.4,
+      "conditional": false,
+      "Z": 3.7,
+      "G": 1.1,
+      "X": 0.53,
+      "padLength": 1.3
+    },
+    {
+      "pins": 6,
+      "pitch": 0.4,
+      "conditional": true,
+      "Z": 3.7,
+      "G": 1.5,
+      "X": 0.53,
+      "padLength": 1.1
+    }
+  ],
+  "notes": [
+    "G minus follows the explicit inner-dimension prose; PDF printed plus remains contradictory",
+    "pin topology checked against selected 3/5/6 layout, not a universal manufacturer pinout",
+    "P in three-pin layout is spacing of the left pair; P in 5/6 is adjacent pitch"
+  ]
+}

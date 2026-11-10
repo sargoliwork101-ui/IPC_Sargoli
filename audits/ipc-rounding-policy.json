@@ -1,0 +1,5 @@
+{
+  "result": "PASS",
+  "cases": 151,
+  "scope": "All 15 SMD table policies; explicit TH/direct/courtyard policies; missing policy rejection; decimal ties; independent naming codes; exact diagonal clearance"
+}
