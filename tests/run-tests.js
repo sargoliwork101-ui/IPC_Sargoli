@@ -93,7 +93,7 @@ console.log('\n۲) Courtyard، بدنه و پد حرارتی (ایراد ۲، ۶
   const { d } = load(TOOL);
   setV(d, 'fam', 'gull'); setV(d, 'pCR', 1);
   const t = val(d, 'Courtyard').split('×').map(parseFloat);
-  ok(t.every(v => Math.abs(v - Math.round(v)) < 1e-9), 'گردکردن Courtyard در جدول اعمال می‌شود', t.join('×'));
+  ok(t[0]===7.4&&t[1]===9.99, 'Courtyard بدون snap محاسبه می‌شود', t.join('×'));
   const rect = d.querySelector('#svg rect');
   const wUnits = parseFloat(rect.getAttribute('width'));
   ok(wUnits > 0, 'نقشه با همان محدودهٔ Courtyard رسم می‌شود');
@@ -140,9 +140,9 @@ console.log('\n۴) BGA (ایراد ۱۳، ۱۷، ۲۸، ۳۵، ۶۸، ۷۵)');
   setV(d, 'bB', 0.45); setV(d, 'lv', 'A'); setV(d, 'bR', 2); setV(d, 'bC', 2);
   setV(d, 'pCR', 1); setV(d, 'bL', 9.1); setV(d, 'bW', 9.1);
   const cy = val(d, 'Courtyard').split('×').map(parseFloat);
-  ok(cy.every(v => Math.abs(v - Math.round(v)) < 1e-9), 'گردکردن Courtyard برای BGA هم اجرا می‌شود', cy.join('×'));
+  ok(cy.every(v => Math.abs(v-13.1)<1e-9), 'Courtyard BGA بدون گردکردن میانی است', cy.join('×'));
   d.getElementById('mkA').click();
-  ok(/0\.3800/.test(d.getElementById('alt').value), 'قطر پد BGA گردشده به خروجی Altium می‌رود');
+  ok(/0\.3825/.test(d.getElementById('alt').value), 'قطر پد BGA بدون گردکردن به خروجی Altium می‌رود');
   setV(d, 'bC', 4); setV(d, 'bR', 4); setV(d, 'bSkip', 'A1,B2');
   ok(padsOf(d).length === 14, 'توپ‌های حذف‌شده با نقشهٔ کاربر ساخته نمی‌شوند', String(padsOf(d).length));
 }
@@ -184,7 +184,7 @@ console.log('\n۶) نام‌گذاری و رمزگشایی (ایراد ۱۸، ۲
   const cases = {
     'QFP50P900X700X160-48N': 'Lead Span',
     'XTAL300X250X100N': '',
-    'RESC0402X20N': '0.4 × 0.2',
+    'RESC0402X20N': '0.400 × 0.200',
     'r200_100r50': 'گرد',
     'c150m0': 'm0',
   };
@@ -233,18 +233,18 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
 
   setV(d, 'kind', 'smd');
   const t1 = svgTexts();
-  ok(/1\.31×0\.57/.test(t1), 'اندازهٔ طول و عرض پد روی خود پد نوشته می‌شود', t1.slice(0, 120));
-  ok(/Z = 6\.90 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
+  ok(/1\.312×0\.570/.test(t1), 'اندازهٔ طول و عرض پد روی خود پد نوشته می‌شود', t1.slice(0, 120));
+  ok(/Z = 6\.900 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
   ok(/Courtyard/.test(t1), 'Courtyard روی نقشه با اندازه نوشته می‌شود', t1);
   const [vx, vy, vw, vh] = vb();
   ok(vw > 0 && vh > 0 && vw < 1100 && vh < 1100, 'نمای نقشه به اندازهٔ محتوا بریده می‌شود (بدون فضای خالی)', vb().join(','));
 
   setV(d, 'kind', 'bga');
   const t2 = svgTexts();
-  ok(/Ø = 0\.40 mm/.test(t2) && /P = 0\.80 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
+  ok(/Ø = 0\.400 mm/.test(t2) && /P = 0\.800 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
   setV(d, 'kind', 'th');
   const t3 = svgTexts();
-  ok(/Hole = Ø 0\.92 mm/.test(t3) && /C-C X = 7\.62 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
+  ok(/Hole = Ø 0\.920 mm/.test(t3) && /C-C X = 7\.620 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
   setV(d, 'unit', 'mil');
   ok(/mm|mil/.test(svgTexts()), 'برچسب اندازه‌ها واحد فعال را نشان می‌دهد', svgTexts().slice(0, 60));
 }
@@ -260,7 +260,7 @@ console.log('\n۹ب) اعداد روی نقشه با هندسهٔ واقعی پ�
   const z = parseFloat((res['Z (طول کل پدها)'] || '').replace(' mm', ''));
   const labels = texts().join(' | ');
   ok(Math.abs(z - 6.90) < 0.005, 'Z در جدول = 6.90 mm', res['Z (طول کل پدها)']);
-  ok(new RegExp('Z = ' + z.toFixed(2) + ' mm').test(labels),
+  ok(new RegExp('Z = ' + z.toFixed(3) + ' mm').test(labels),
      'همان عدد Z روی نقشه نوشته می‌شود', labels);
   // پدها باید با نسبت درست رسم شوند: نسبت ارتفاع پد به گام = 0.57/1.27
   const pRect = [...svg.querySelectorAll('rect')].filter(r => r.getAttribute('fill') === '#d4a017');
@@ -532,31 +532,32 @@ console.log('\n۱۶) مرجع مستقل سوراخ و پد طبق IPC-7352');
  const {d,w}=load(TOOL);
  function sample(){prepareSample(d,'dip');d.getElementById('smp').value='dip';d.getElementById('smp').onchange()}
  function pair(){const p=padsOf(d)[0];return p?[p[3],p[4]]:[]}
+ const near=(a,b)=>Math.abs(a-b)<1e-12, squareFinite=Math.hypot(.5,.5)+.15;
  for(const shape of [0,1,2])for(const process of [0,1]){
   sample();setV(d,'tS',shape);setV(d,'tW',.5);setV(d,'tW2',.3);setV(d,'tPr',process);
   const diagonal=shape===0?.5:shape===1?Math.hypot(.5,.5):Math.hypot(.5,.3);
   const raw=diagonal+([.15,.15,.1][shape])*(process===0?1:0)+(process===1?[.4,.4,.35][shape]:0);
-  const hole=Math.round(raw*100)/100,allowance=raw<=1?.5:raw<=1.25?.75:raw<=1.75?1:raw<=2.25?1.25:1.5;
-  const pad=Math.round((hole+allowance)*100)/100,[actualPad,actualHole]=pair();
+  const hole=raw,allowance=raw<=1?.5:raw<=1.25?.75:raw<=1.75?1:raw<=2.25?1.25:1.5;
+  const pad=hole+allowance,[actualPad,actualHole]=pair();
   ok(Math.abs(actualHole-hole)<1e-8&&Math.abs(actualPad-pad)<1e-8,'شکل '+shape+' / فرایند '+process+': سوراخ و پد از مرجع مستقل محاسبه می‌شوند',pair().join('/'));
  }
  sample();setV(d,'tS',1);setV(d,'tW',.5);setV(d,'tPr',0);
- ok(pair()[0]===1.36&&pair()[1]===.86&&/0.25/.test(val(d,'حلقهٔ مسی')),'مثال مربع 0.5: سوراخ 0.86، پد 1.36 و حلقهٔ اسمی 0.25');
+ ok(near(pair()[0],squareFinite+.5)&&near(pair()[1],squareFinite)&&/0.25/.test(val(d,'حلقهٔ مسی')),'مثال مربع 0.5: سوراخ و پد بدون گردکردن، حلقهٔ اسمی 0.25');
  setV(d,'tPr',1);
- ok(pair()[0]===1.86&&pair()[1]===1.11,'همان مربع در لحیم دستی/موجی: سوراخ 1.11 و پد 1.86');
+ ok(near(pair()[0],Math.hypot(.5,.5)+.4+.75)&&near(pair()[1],Math.hypot(.5,.5)+.4),'همان مربع در لحیم دستی/موجی: قطر قطری کامل حفظ می‌شود');
  setV(d,'tS',2);setV(d,'tW2',.3);setV(d,'tPr',0);const h1=pair()[1];setV(d,'tW2',.8);
- ok(h1===.68&&pair()[1]===1.04,'تغییر ضلع دوم مستطیل واقعاً سوراخ را تغییر می‌دهد');
+ ok(near(h1,Math.hypot(.5,.3)+.1)&&near(pair()[1],Math.hypot(.5,.8)+.1),'تغییر ضلع دوم مستطیل واقعاً سوراخ را تغییر می‌دهد');
  setV(d,'tHT','N');
- ok(pair()[1]===1.34,'NPTH نیز از قطر قطری مستطیل استفاده می‌کند');
+ ok(near(pair()[1],Math.hypot(.5,.8)+.4),'NPTH نیز از قطر قطری مستطیل استفاده می‌کند');
  setV(d,'tHT','P');setV(d,'tS',1);setV(d,'tW',.5);setV(d,'man',true);setV(d,'pHole',1.2);
  ok(pair()[1]===1.2,'override روشن قطر دستی را اعمال می‌کند');
  setV(d,'man',false);
- ok(pair()[1]===.86&&pair()[0]===1.36,'override خاموش به سوراخ و پد خودکار برمی‌گردد');
+ ok(near(pair()[1],squareFinite)&&near(pair()[0],squareFinite+.5),'override خاموش به سوراخ و پد خودکار برمی‌گردد');
  for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const factor={mm:1,mil:.0254,in:25.4}[unit];const p=pair();
-  ok(Math.abs(p[1]*factor-.86)<.0001&&Math.abs(p[0]*factor-1.36)<.0001,'تبدیل واحد '+unit+' هندسهٔ سوراخ و پد را حفظ می‌کند');
+  ok(Math.abs(p[1]*factor-squareFinite)<.0001&&Math.abs(p[0]*factor-(squareFinite+.5))<.0001,'تبدیل واحد '+unit+' هندسهٔ سوراخ و پد را حفظ می‌کند');
  }
  d.getElementById('mkA').click();
- ok(/1\.3600, 1\.3600, 0\.8600/.test(d.getElementById('alt').value),'Altium قطر پد و سوراخ اصلاح‌شده را می‌گیرد');
+ ok(d.getElementById('alt').value.includes(String(squareFinite+.5)+', '+String(squareFinite+.5)+', '+String(squareFinite)),'Altium قطر پد و سوراخ اصلاح‌شده را می‌گیرد');
  setV(d,'man',true);setV(d,'pPadd',0);
  ok(!d.getElementById('pads').value&&/حلقهٔ مسی/.test(d.getElementById('warn').textContent),'پد بدون مس دور سوراخ رد می‌شود');
  w.close();
@@ -574,7 +575,7 @@ console.log('\n۱۷) شیار: نام‌گذاری صریح استاندارد �
  let p=csv()[1]?.split(',');
  ok(p&&+p[3]===4&&+p[4]===2&&+p[5]===3&&+p[6]===1&&p[7]==='slot','شیار 3×1 و حلقهٔ ورودی 0.5 → پد 4×2 و CSV صریح شیار');
  ok(val(d,'نام Padstack')==='b400_200h300_100','مثال شیار آبکاری‌شدهٔ 5.2.3 دقیقاً تولید می‌شود');
- ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/Slot length = 3.00 mm/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
+ ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/Slot length = 3.000 mm/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
  d.getElementById('mkA').click();
  ok(/شیار/.test(d.getElementById('alt').value)&&!/  AddPad\('/.test(d.getElementById('alt').value),'Altium فاقد پشتیبانی شیار، سوراخ گرد جایگزین نمی‌کند');
  setV(d,'tHT','N');
@@ -728,8 +729,8 @@ console.log('\n۲۳) جستجو و فاصلهٔ افقی مراکز');
  const {d,w}=load(TOOL);
  setV(d,'smp','ti-db5');
  const labels=()=>[...d.querySelectorAll('#dimG text')].map(t=>t.textContent);
- ok(labels().some(t=>/^C-C X = 2.60 mm$/.test(t)),'فاصله افقی مراکز نمونهٔ TI پنج‌پایه 2.60 mm است، نه Z');
- setV(d,'mfrSpan',2.8);ok(labels().includes('C-C X = 2.80 mm'),'اندازهٔ افقی با ویرایش فاصلهٔ مراکز به‌روز می‌شود');
+ ok(labels().some(t=>/^C-C X = 2.600 mm$/.test(t)),'فاصله افقی مراکز نمونهٔ TI پنج‌پایه 2.60 mm است، نه Z');
+ setV(d,'mfrSpan',2.8);ok(labels().includes('C-C X = 2.800 mm'),'اندازهٔ افقی با ویرایش فاصلهٔ مراکز به‌روز می‌شود');
  for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const factor={mil:.0254,in:25.4,mm:1}[unit];const text=labels().find(t=>t.startsWith('C-C X '));ok(text&&text.endsWith(' '+unit)&&Math.abs(Number(text.split(' ')[3])*factor-2.8)<.01,'فاصلهٔ افقی با واحد '+unit+' درست نمایش داده می‌شود')}
  const before=d.getElementById('pads').value;
  setV(d,'footprintSearch','sOt23');
@@ -780,9 +781,9 @@ console.log('\n۲۴) مرجع‌های واقعی KiCad و پیام مدل');
   ok(d.getElementById('referenceComment').textContent.includes(ref.name)&&/دیتاشیت/.test(d.getElementById('referenceComment').textContent)&&d.getElementById('referenceSourceLink').href.includes(ref.sha),key+': مدل و هشدار و منبع نسخه‌دار مشخص است');
  }
  setV(d,'smp','lib-sot223');let data=JSON.parse(d.getElementById('referencePads').value);data[0].w+=.1;setV(d,'referencePads',JSON.stringify(data));
- ok(!!d.getElementById('pads').value&&d.getElementById('pads').value.includes(data[0].w.toFixed(4)),'ابعاد پد نامساوی مرجع قابل ویرایش و صادرات CSV است');
+ ok(!!d.getElementById('pads').value&&d.getElementById('pads').value.includes(String(data[0].w)),'ابعاد پد نامساوی مرجع قابل ویرایش و صادرات CSV است');
  const numeric=d.querySelector('#referenceTable input[data-row="0"][data-key="w"]');numeric.value='1.75';numeric.dispatchEvent(new w.Event('input',{bubbles:true}));
- ok(JSON.parse(d.getElementById('referencePads').value)[0].w===1.75&&d.getElementById('pads').value.includes('1.7500'),'ویرایش عددی ساده بدون نیاز به دستکاری JSON کار می‌کند');
+ ok(JSON.parse(d.getElementById('referencePads').value)[0].w===1.75&&d.getElementById('pads').value.includes('1.75'),'ویرایش عددی ساده بدون نیاز به دستکاری JSON کار می‌کند');
  const body=JSON.parse(d.getElementById('referenceBody').value);body.lines.push([-20,0,20,0]);setV(d,'referenceBody',JSON.stringify(body));
  ok(!!d.getElementById('pads').value&&d.getElementById('res').textContent.includes('40.50'),'ابعاد بدنه نیز قابل اصلاح و در کادر لحاظ می‌شوند');
 
