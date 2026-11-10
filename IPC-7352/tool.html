@@ -197,7 +197,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 #tipP{color:#c3d2e2;font-size:12.5px;margin:5px 0 9px;line-height:1.85}
 
 /* ---------- responsive ---------- */
-@media(max-width:1240px){
+@media(max-width:999px){
   .workspace{grid-template-columns:var(--in) minmax(360px,1fr)}
   .inspector{grid-column:1/-1;border-inline-start:0;border-top:1px solid var(--line);
     position:static;max-height:none;overflow:visible}
@@ -225,13 +225,19 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
 #usageWindow{display:flex;flex-direction:column;width:min(1100px,100%);height:100%;min-height:0;background:#0b1018;border:1px solid #426479;border-radius:12px;overflow:hidden}
 .usage-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;padding:10px 14px;border-bottom:1px solid var(--line)}
 #usageFrame{width:100%;min-height:0;flex:1;border:0;background:#0b1018}
+/* Keep the inspector beside the canvas on desktop and compact laptops. */
+@media(min-width:1000px){
+ .workspace[data-mode="t1"]{grid-template-columns:clamp(210px,20vw,250px) minmax(0,1fr) clamp(220px,23vw,300px)}
+ .workspace[data-mode="t1"]>.inspector{grid-column:auto;border-top:0;border-inline-start:1px solid var(--line)}
+ .inspector .stick{display:block}
+}
 /* Bounded desktop panes; ordinary document scrolling on tablet/mobile. */
 .workspace>*{min-width:0;min-height:0}
 .sidebar,.inspector{scroll-padding-block:12px;padding-bottom:28px;scrollbar-gutter:stable}
 .help-link{display:inline-grid;place-items:center;flex:none;min-width:22px;min-height:22px;margin-inline-start:5px;border:1px solid #426479;border-radius:50%;font:700 13px/1 Tahoma,sans-serif;color:var(--accent);vertical-align:middle;cursor:pointer}
 .help-link:hover,.help-link:focus-visible{background:#203948;outline:2px solid var(--accent)}
 .menu-explanation{display:none!important}
-@media(min-width:1241px){
+@media(min-width:1000px){
  html,body{height:100%;overflow:hidden}
  .workspace{height:calc(100dvh - var(--top));overflow:hidden;align-items:stretch}
  .workspace>.sidebar,.workspace>.inspector,.workspace>.stage{position:relative;top:auto;align-self:stretch;height:100%;max-height:none;overflow-y:auto;overscroll-behavior-y:contain}
@@ -239,7 +245,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
  .workspace:not([data-mode="t1"]){grid-template-rows:auto minmax(0,1fr)}
  .stage-inner{flex:none}.canvas-wrap{flex:none}#svg{height:clamp(300px,58dvh,700px)}
 }
-@media(max-width:1240px){
+@media(max-width:999px){
  html,body{height:auto;min-height:100%;overflow-y:auto}
  .workspace{height:auto;overflow:visible}
  .sidebar,.inspector{position:static;top:auto;height:auto;max-height:none;overflow:visible}
