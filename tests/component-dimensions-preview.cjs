@@ -28,7 +28,7 @@ for(const [component,key,sample] of cases){
   const expected='C-C '+axis+' = '+delta.toFixed(2)+' mm';assert.equal(result.labels.filter(s=>s.startsWith('C-C '+axis+' ')).length,delta>1e-7?1:0,sample);
   if(delta>1e-7)assert(result.labels.includes(expected),sample+': '+expected+' '+result.labels);
  }
- const extensions=await page.locator('[data-center-extension]').evaluateAll(es=>es.map(e=>({x1:+e.getAttribute('x1'),y1:+e.getAttribute('y1'),x2:+e.getAttribute('x2'),y2:+e.getAttribute('y2')})));
+ const extensions=await page.locator('[data-center-extension="true"]').evaluateAll(es=>es.map(e=>({x1:+e.getAttribute('x1'),y1:+e.getAttribute('y1'),x2:+e.getAttribute('x2'),y2:+e.getAttribute('y2')})));
  assert.equal(extensions.length,(result.dx>1e-7?2:0)+(result.dy>1e-7?2:0),sample+': two extension lines per centre span');
  for(const e of extensions){assert(Object.values(e).every(Number.isFinite));assert((e.x1===e.x2)!==(e.y1===e.y2),sample+': nonzero orthogonal extension');}
  assert(result.all.some(s=>s.startsWith('Courtyard X ')),sample+': common X envelope');assert(result.all.some(s=>s.startsWith('Courtyard Y ')),sample+': common Y envelope');
