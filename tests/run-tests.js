@@ -234,17 +234,17 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
   setV(d, 'kind', 'smd');
   const t1 = svgTexts();
   ok(/1\.31×0\.57/.test(t1), 'اندازهٔ طول و عرض پد روی خود پد نوشته می‌شود', t1.slice(0, 120));
-  ok(/Z 6\.90 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
+  ok(/Z = 6\.90 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
   ok(/Courtyard/.test(t1), 'Courtyard روی نقشه با اندازه نوشته می‌شود', t1);
   const [vx, vy, vw, vh] = vb();
   ok(vw > 0 && vh > 0 && vw < 1100 && vh < 1100, 'نمای نقشه به اندازهٔ محتوا بریده می‌شود (بدون فضای خالی)', vb().join(','));
 
   setV(d, 'kind', 'bga');
   const t2 = svgTexts();
-  ok(/Ø 0\.40 mm/.test(t2) && /P 0\.80 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
+  ok(/Ø = 0\.40 mm/.test(t2) && /P = 0\.80 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
   setV(d, 'kind', 'th');
   const t3 = svgTexts();
-  ok(/Hole Ø0\.92 mm/.test(t3) && /C-C X 7\.62 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
+  ok(/Hole = Ø 0\.92 mm/.test(t3) && /C-C X = 7\.62 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
   setV(d, 'unit', 'mil');
   ok(/mm|mil/.test(svgTexts()), 'برچسب اندازه‌ها واحد فعال را نشان می‌دهد', svgTexts().slice(0, 60));
 }
@@ -260,7 +260,7 @@ console.log('\n۹ب) اعداد روی نقشه با هندسهٔ واقعی پ�
   const z = parseFloat((res['Z (طول کل پدها)'] || '').replace(' mm', ''));
   const labels = texts().join(' | ');
   ok(Math.abs(z - 6.90) < 0.005, 'Z در جدول = 6.90 mm', res['Z (طول کل پدها)']);
-  ok(new RegExp('Z ' + z.toFixed(2) + ' mm').test(labels),
+  ok(new RegExp('Z = ' + z.toFixed(2) + ' mm').test(labels),
      'همان عدد Z روی نقشه نوشته می‌شود', labels);
   // پدها باید با نسبت درست رسم شوند: نسبت ارتفاع پد به گام = 0.57/1.27
   const pRect = [...svg.querySelectorAll('rect')].filter(r => r.getAttribute('fill') === '#d4a017');
@@ -574,7 +574,7 @@ console.log('\n۱۷) شیار: نام‌گذاری صریح استاندارد �
  let p=csv()[1]?.split(',');
  ok(p&&+p[3]===4&&+p[4]===2&&+p[5]===3&&+p[6]===1&&p[7]==='slot','شیار 3×1 و حلقهٔ ورودی 0.5 → پد 4×2 و CSV صریح شیار');
  ok(val(d,'نام Padstack')==='b400_200h300_100','مثال شیار آبکاری‌شدهٔ 5.2.3 دقیقاً تولید می‌شود');
- ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/Slot 3.00×1.00 mm/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
+ ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/Slot length = 3.00 mm/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
  d.getElementById('mkA').click();
  ok(/شیار/.test(d.getElementById('alt').value)&&!/  AddPad\('/.test(d.getElementById('alt').value),'Altium فاقد پشتیبانی شیار، سوراخ گرد جایگزین نمی‌کند');
  setV(d,'tHT','N');
@@ -728,9 +728,9 @@ console.log('\n۲۳) جستجو و فاصلهٔ افقی مراکز');
  const {d,w}=load(TOOL);
  setV(d,'smp','ti-db5');
  const labels=()=>[...d.querySelectorAll('#dimG text')].map(t=>t.textContent);
- ok(labels().some(t=>/^C-C X 2.60 mm$/.test(t)),'فاصله افقی مراکز نمونهٔ TI پنج‌پایه 2.60 mm است، نه Z');
- setV(d,'mfrSpan',2.8);ok(labels().includes('C-C X 2.80 mm'),'اندازهٔ افقی با ویرایش فاصلهٔ مراکز به‌روز می‌شود');
- for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const factor={mil:.0254,in:25.4,mm:1}[unit];const text=labels().find(t=>t.startsWith('C-C X '));ok(text&&text.endsWith(' '+unit)&&Math.abs(Number(text.split(' ')[2])*factor-2.8)<.01,'فاصلهٔ افقی با واحد '+unit+' درست نمایش داده می‌شود')}
+ ok(labels().some(t=>/^C-C X = 2.60 mm$/.test(t)),'فاصله افقی مراکز نمونهٔ TI پنج‌پایه 2.60 mm است، نه Z');
+ setV(d,'mfrSpan',2.8);ok(labels().includes('C-C X = 2.80 mm'),'اندازهٔ افقی با ویرایش فاصلهٔ مراکز به‌روز می‌شود');
+ for(const unit of ['mil','in','mm']){setV(d,'unit',unit);const factor={mil:.0254,in:25.4,mm:1}[unit];const text=labels().find(t=>t.startsWith('C-C X '));ok(text&&text.endsWith(' '+unit)&&Math.abs(Number(text.split(' ')[3])*factor-2.8)<.01,'فاصلهٔ افقی با واحد '+unit+' درست نمایش داده می‌شود')}
  const before=d.getElementById('pads').value;
  setV(d,'footprintSearch','sOt23');
  ok(d.querySelectorAll('#footprintSearchResults button').length>=3,'جستجوی بدون حساسیت به حروف و خط تیره');

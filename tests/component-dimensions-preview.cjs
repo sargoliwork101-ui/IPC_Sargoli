@@ -20,12 +20,12 @@ for(const [component,key,sample] of cases){
   const rows=document.querySelector('#pads').value.trim().split('\n').slice(1).map(s=>s.split(','));
   const xs=rows.map(p=>+p[1]),ys=rows.map(p=>+p[2]);const labels=Array.from(document.querySelectorAll('[data-common-dimensions] text')).map(t=>t.textContent);
   const all=Array.from(document.querySelectorAll('#dimG text')).map(t=>t.textContent);
-  const plates=Array.from(document.querySelectorAll('#dimG rect')).map(r=>{const b=r.getBBox();return {x:b.x,y:b.y,w:b.width,h:b.height}});
+  const plates=Array.from(document.querySelectorAll('#dimG rect')).map(r=>{const b=r.getBoundingClientRect();return {x:b.x,y:b.y,w:b.width,h:b.height}});
   const overlaps=[];for(let i=0;i<plates.length;i++)for(let j=i+1;j<plates.length;j++){let a=plates[i],b=plates[j];if(Math.min(a.x+a.w,b.x+b.w)-Math.max(a.x,b.x)>1&&Math.min(a.y+a.h,b.y+b.h)-Math.max(a.y,b.y)>1)overlaps.push([i,j])}
   return {dx:Math.max(...xs)-Math.min(...xs),dy:Math.max(...ys)-Math.min(...ys),labels,all,overlaps};
  });
  for(const [axis,delta] of [['X',result.dx],['Y',result.dy]]){
-  const expected='C-C '+axis+' '+delta.toFixed(2)+' mm';assert.equal(result.labels.filter(s=>s.startsWith('C-C '+axis+' ')).length,delta>1e-7?1:0,sample);
+  const expected='C-C '+axis+' = '+delta.toFixed(2)+' mm';assert.equal(result.labels.filter(s=>s.startsWith('C-C '+axis+' ')).length,delta>1e-7?1:0,sample);
   if(delta>1e-7)assert(result.labels.includes(expected),sample+': '+expected+' '+result.labels);
  }
  const extensions=await page.locator('[data-center-extension]').evaluateAll(es=>es.map(e=>({x1:+e.getAttribute('x1'),y1:+e.getAttribute('y1'),x2:+e.getAttribute('x2'),y2:+e.getAttribute('y2')})));

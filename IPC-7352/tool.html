@@ -389,7 +389,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
   <div class="section-title">بازرس فوت‌پرینت</div>
   <div class="head"><b id="insName">—</b><span class="pill">IPC-7352</span></div>
   <div class="readout">
-    <div class="readout-row"><span>اندازهٔ پد</span><b id="insPad">—</b></div>
+    <div class="readout-row"><span>پد (عرض × ارتفاع)</span><b id="insPad" title="عرض × ارتفاع؛ دو بُعد مستقل‌اند، نه مساحت">—</b></div>
     <div class="readout-row"><span>فاصلهٔ داخلی (G)</span><b id="insG">—</b></div>
     <div class="readout-row"><span>طول کل پدها (Z)</span><b id="insZ">—</b></div>
     <div class="readout-row"><span>کمینه فاصلهٔ خالی</span><b id="insGap">—</b></div>
@@ -407,7 +407,7 @@ section:not(.on) input,section:not(.on) select{pointer-events:none}
     <span><i style="background:#d6a34e"></i>پد مسی</span>
     <span><i style="background:#6b8199"></i>بدنه</span>
     <span><i style="background:#d3a75f"></i>Courtyard</span>
-    <span><i style="background:#4a90e2"></i>اندازه‌گذاری</span>
+    <span><i style="background:#75bdff"></i>ابعاد پد و سوراخ</span><span><i style="background:#65d5c3"></i>C-C: مرکز تا مرکز</span><span><i style="background:#c1a4ff"></i>P: گام پایه‌ها</span><span><i style="background:#f0a27b"></i>اندازهٔ کادر</span><span>روی پد: عرض × ارتفاع؛ × جداکنندهٔ دو بُعد است، نه مساحت.</span>
   </div>
 
   <div class="section-title" style="margin-top:20px">خروجی</div>
@@ -493,7 +493,7 @@ inl:[[m(.25*H,.8),m(.25*H,.5),.2][i],[.25,.15,.07][i],[.01,0,0][i],[.5,.25,.1][i
 butt:[[1,.8,.6][i],[1,.8,.6][i],[1,.8,.6][i],[1.5,.8,.2][i],'3-7'],lug:[[.05,.03,.01][i],[.05,.03,.01][i],[.05,.03,.01][i],[.5,.25,.1][i],'3-9']};return t[F]}
 function kit(sc,oy){var svg=$('svg');svg.innerHTML='';var d=el('defs',{}),m=el('marker',{id:'ar',viewBox:'0 0 10 10',refX:'5',refY:'5',markerWidth:'7',markerHeight:'7',orient:'auto-start-reverse'});m.appendChild(el('path',{d:'M0 0L10 5L0 10z',fill:'#4a90e2'}));d.appendChild(m);
 var m2=el('marker',{id:'dm',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto-start-reverse'});
-m2.appendChild(el('path',{d:'M1 1L9 5L1 9z',fill:'#5fb0ff'}));d.appendChild(m2);svg.appendChild(d);
+m2.appendChild(el('path',{d:'M1 1L9 5L1 9z',fill:'context-stroke'}));d.appendChild(m2);svg.appendChild(d);
 // مبدأ در مرکز نقشه؛ قاب (viewBox) خودکار از روی ابعاد واقعی ساخته می‌شود
 var K={svg:svg,sc:sc,PX:function(v){return v*sc},PY:function(v){return -v*sc}};
 K.frame=function(extX,extY){                       // extX/extY: نیم‌عرض و نیم‌ارتفاع محتوا (پیکسل نقشه)
@@ -556,14 +556,14 @@ K.commonDimensions=function(){
  // Use actual endpoint pad centres, not an unrelated bounding rectangle.
  var dimensionTop=Math.min(top,K.bb.y0)-FS*1.2;
  var dimensionRight=Math.max(right,K.bb.x1)+FS*1.2;
- function extension(x1,y1,x2,y2){var line=el('line',{'data-center-extension':'true',x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#79a9ca','stroke-width':.8,'stroke-dasharray':'3 3'});group.appendChild(line);K.grow(Math.min(x1,x2),Math.min(y1,y2),Math.max(x1,x2),Math.max(y1,y2));}
+ function extension(x1,y1,x2,y2){var line=el('line',{'data-center-extension':'true',x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),stroke:'#65d5c3','stroke-width':.8,'stroke-dasharray':'3 3'});group.appendChild(line);K.grow(Math.min(x1,x2),Math.min(y1,y2),Math.max(x1,x2),Math.max(y1,y2));}
  if(xs.length>1){
   [xs[0],xs[xs.length-1]].forEach(function(x){var p=pads.filter(function(p){return Math.abs(p.x-x)<1e-7}).sort(function(a,b){return b.y-a.y})[0];extension(K.PX(p.x),K.PY(p.y),K.PX(p.x),dimensionTop);});
-  K.hDim(K.PX(xs[0]),K.PX(xs[xs.length-1]),dimensionTop,'C-C X '+fm(xs[xs.length-1]-xs[0])+K.u());
+  K.hDim(K.PX(xs[0]),K.PX(xs[xs.length-1]),dimensionTop,'C-C X '+fm(xs[xs.length-1]-xs[0])+K.u(),false);
  }
  if(ys.length>1){
   [ys[0],ys[ys.length-1]].forEach(function(y){var p=pads.filter(function(p){return Math.abs(p.y-y)<1e-7}).sort(function(a,b){return b.x-a.x})[0];extension(K.PX(p.x),K.PY(p.y),dimensionRight,K.PY(p.y));});
-  K.vDim(K.PY(ys[ys.length-1]),K.PY(ys[0]),dimensionRight,'C-C Y '+fm(ys[ys.length-1]-ys[0])+K.u(),'right');
+  K.vDim(K.PY(ys[ys.length-1]),K.PY(ys[0]),dimensionRight,'C-C Y '+fm(ys[ys.length-1]-ys[0])+K.u(),'right',false);
  }
  K.dim=old;old.appendChild(group);
 };
@@ -609,15 +609,29 @@ K.txt=function(x,y,t,a,cls){
  e.textContent=str;label.appendChild(e);
  var fit=K.fitText(e,w-2*padX,h-2*padY,fs);if(fit.box.real)e.setAttribute('y',(+e.getAttribute('y')+(y-fs*.92-padY+h/2)-(fit.box.y+fit.box.height/2)).toFixed(4));
  e.setAttribute('data-fit-width',(w-2*padX).toFixed(4));e.setAttribute('data-fit-height',(h-2*padY).toFixed(4));return e};
-K.hDim=function(x1,x2,y,label){     // اندازهٔ افقی با خط رابط و برچسب بالای خط
+// All dimensions share labelled values, coloured dashed witness lines and compact vertical text.
+K.dimensionLabel=function(label){return String(label).replace(/^(.+?)\s+(?=[Ø\d−-])/, '$1 = ')};
+K.dimensionColor=function(label){return /^Courtyard/.test(label)?'#f0a27b':/^C-C/.test(label)?'#65d5c3':/^P\s/.test(label)?'#c1a4ff':'#75bdff'};
+K.witness=function(x1,y1,x2,y2,color){K.dim.appendChild(el('line',{'data-dimension-extension':'true',x1:x1,y1:y1,x2:x2,y2:y2,stroke:color,'stroke-width':.75,'stroke-dasharray':'3 3','stroke-opacity':.8}));K.grow(Math.min(x1,x2),Math.min(y1,y2),Math.max(x1,x2),Math.max(y1,y2))};
+K.hDim=function(x1,x2,y,label,origins){
  if(!(Math.abs(x2-x1)>1e-9))return;
- K.dim.appendChild(el('line',{x1:x1.toFixed(1),y1:(y-1.2).toFixed(1),x2:x2.toFixed(1),y2:y.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
- K.txt((x1+x2)/2,y-FS*1.1,label)};
-K.vDim=function(y1,y2,x,label,side){  // side='left' (پیش‌فرض) یا 'right'؛ متن افقی و خوانا
+ var color=K.dimensionColor(label),box=K.courtyard;
+ if(origins!==false){var fallback=box?K.PY(y<0?box.y+box.h:box.y):0;var ends=origins||[fallback,fallback];K.witness(x1,ends[0],x1,y,color);K.witness(x2,ends[1],x2,y,color)}
+ K.dim.appendChild(el('line',{'data-dimension-axis':'horizontal',x1:x1,y1:y,x2:x2,y2:y,stroke:color,'stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
+ var text=K.txt((x1+x2)/2,y-FS*1.1,K.dimensionLabel(label));text.setAttribute('fill',color);
+};
+K.vDim=function(y1,y2,x,label,side,origins){
  if(!(Math.abs(y2-y1)>1e-9))return;
- K.dim.appendChild(el('line',{x1:(x-1.2).toFixed(1),y1:y1.toFixed(1),x2:x.toFixed(1),y2:y2.toFixed(1),stroke:'#5fb0ff','stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
- if(side==='right')K.txt(x+FS*.4,(y1+y2)/2+FS*.4,label,'start');
- else K.txt(x-FS*.4,(y1+y2)/2+FS*.4,label,'end')};
+ var color=K.dimensionColor(label),box=K.courtyard;
+ if(origins!==false){var fallback=box?K.PX(x<0?box.x:box.x+box.w):0;var ends=origins||[fallback,fallback];K.witness(ends[0],y1,x,y1,color);K.witness(ends[1],y2,x,y2,color)}
+ K.dim.appendChild(el('line',{'data-dimension-axis':'vertical',x1:x,y1:y1,x2:x,y2:y2,stroke:color,'stroke-width':.9,'marker-start':'url(#dm)','marker-end':'url(#dm)'}));
+ var cx=x+(side==='right'?1:-1)*FS*1.1,cy=(y1+y2)/2;
+ var previous={x0:K.bb.x0,y0:K.bb.y0,x1:K.bb.x1,y1:K.bb.y1};
+ var text=K.txt(cx,cy,K.dimensionLabel(label)),plate=text.parentNode; text.setAttribute('fill',color);
+ var wrapper=el('g',{'data-vertical-dimension-label':'true',transform:'rotate(-90 '+cx+' '+cy+')'});K.dim.appendChild(wrapper);wrapper.appendChild(plate);
+ var rect=plate.querySelector('rect'),rx=+rect.getAttribute('x'),ry=+rect.getAttribute('y'),rw=+rect.getAttribute('width'),rh=+rect.getAttribute('height');
+ K.bb=previous;K.grow(cx+ry-cy,cy-(rx+rw-cx),cx+ry+rh-cy,cy-(rx-cx));
+};
 // برچسب اندازهٔ خود پد (روی پد). وقتی این برچسب روشن است، اندازهٔ پد دیگر
 // با رنگ سفید کنار نقشه تکرار نمی‌شود.
 K.tagged=false;
@@ -629,7 +643,7 @@ K.padTag=function(cx,cy,w,h,txt,opt){if(txt===null||txt==='')return null;
  var maxW=pw*.80,maxH=ph*.50;
  if(!(maxW>0&&maxH>0))return null;
  var e=el('text',{x:cx.toFixed(4),y:cy.toFixed(4),'text-anchor':'middle',direction:'ltr','unicode-bidi':'isolate',fill:opt.light?'#fff4cf':'#241a04','font-weight':'800','letter-spacing':'-0.02em'});
- e.textContent=str;(K.padLbl||K.svg).appendChild(e);
+ e.textContent=str;var help=el('title',{});help.textContent='ابعاد پد: عرض × ارتفاع، بر حسب '+U+'؛ × جداکنندهٔ دو بُعد است، نه مساحت. شمارهٔ پیش از · شناسهٔ پد است.';e.appendChild(help);(K.padLbl||K.svg).appendChild(e);
  var fit=K.fitText(e,maxW*.80,maxH*.80,maxH),fs=fit.fs;
  if(opt.light){e.setAttribute('stroke','#1c1503');e.setAttribute('stroke-width',(fs*.08).toFixed(6));e.setAttribute('paint-order','stroke')}
  e.setAttribute('y',(fit.box.real?cy-(fit.box.y+fit.box.height/2)+cy:cy+fs*.23).toFixed(6));
@@ -856,19 +870,17 @@ K.circle(K.PX(-Z/2-.25),K.PY((n-1)*Pt/2),4,{fill:'#000'});
  var X0=K.PX(-cw/2),X1=K.PX(cw/2),Y0=K.PY(ch/2),Y1=K.PY(-ch/2);      // کادر Courtyard
                         // عرض Courtyard (پایین)
                          // ارتفاع Courtyard (راست)
- K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-FS*3.4,'Z '+fm(Z)+K.u());
+ K.hDim(K.PX(-Z/2),K.PX(Z/2),Y0-FS*3.4,'Z '+fm(Z)+K.u(),[K.PY(pads.reduce(function(a,b){return a.x-a.w/2<=b.x-b.w/2?a:b}).y),K.PY(pads.reduce(function(a,b){return a.x+a.w/2>=b.x+b.w/2?a:b}).y)]);
  // فاصلهٔ افقی مراکز دو ردیف، مستقل از طول کل و فاصلهٔ خالی
  // Centre spans are generated by the shared dimension layer.                   // طول کل پدها (بالا)
  if(!K.tagged){                                    // اندازهٔ پد روی خود پد نوشته شده؛ تکرار لازم نیست
-  K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-FS*1.5,'L '+fm(p0.w)+K.u());
-  K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-FS*1.4,'X '+fm(p0.h)+K.u());
+  K.hDim(K.PX(p0.x-p0.w/2),K.PX(p0.x+p0.w/2),Y0-FS*1.5,'L '+fm(p0.w)+K.u(),[K.PY(p0.y),K.PY(p0.y)]);
+  K.vDim(K.PY(p0.y+p0.h/2),K.PY(p0.y-p0.h/2),X0-FS*1.4,'X '+fm(p0.h)+K.u(),'left',[K.PX(p0.x),K.PX(p0.x)]);
  }
  // گام بین دو پد هم‌ستون
  if(pads.length>1&&Math.abs(pads[1].y-p0.y)>1e-9){
    var yA=K.PY(p0.y),yB=K.PY(pads[1].y),xp=X0-FS*.7;
-   [yA,yB].forEach(function(yy){K.svg.appendChild(el('line',{x1:K.PX(p0.x-p0.w/2),y1:yy,x2:xp,y2:yy,stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}))});
-   K.vDim(yA,yB,xp,'P '+fm(Pt)+K.u());
-   K.svg.appendChild(el('line',{x1:xp,y1:(yA+yB)/2,x2:X0,y2:(yA+yB)/2,stroke:'#31465c','stroke-width':.7,'stroke-dasharray':'2 2'}));
+   K.vDim(yA,yB,xp,'P '+fm(Pt)+K.u(),'left',[K.PX(p0.x),K.PX(pads[1].x)]);
  }
 })();
 // ---------- نام (جدول 3-16) ----------
@@ -966,8 +978,8 @@ var x0=-(c-1)/2*PtX,top=(rw-1)/2*PtY+pd/2;
  var b0=padsR[0];
 
 
- K.hDim(K.PX(-x0-pd/2),K.PX(-x0+pd/2),Y0-FS*3.4,'Ø '+fm(pd)+K.u());
- if(c>1)K.hDim(K.PX(x0),K.PX(x0+PtX),Y0-FS*1.5,'P '+fm(PtX)+K.u());
+ K.hDim(K.PX(-x0-pd/2),K.PX(-x0+pd/2),Y0-FS*3.4,'Ø '+fm(pd)+K.u(),[K.PY(b0.y),K.PY(b0.y)]);
+ if(c>1)K.hDim(K.PX(x0),K.PX(x0+PtX),Y0-FS*1.5,'P '+fm(PtX)+K.u(),[K.PY(b0.y),K.PY(b0.y)]);
 })();
 M.cw=cw;M.ch=ch;
 M.name='BGA'+count+ty+(Math.round(PtX*100)+(PtX!==PtY?'X'+Math.round(PtY*100):''))+'P'+c+'X'+rw+'_'+Math.round(BL*100)+'X'+Math.round(BW*100)+'X'+Math.round(BH*100)+'D'+Math.round(b*100)+'N';
@@ -1009,7 +1021,8 @@ function thSlot(){
   MP.push({n:p.n,x:p.x,y:p.y,w:padL,h:padW,sh:'o',hole:W,holeL:L,holeW:W,holeType:'slot',rotation:0,pl:HT!=='N'});
  });
  var Y0=K.PY(M.ch/2),Y1=K.PY(-M.ch/2),X0=K.PX(-M.cw/2),X1=K.PX(M.cw/2);
- var first=pads[0];K.hDim(K.PX(first.x-L/2),K.PX(first.x+L/2),Y0-FS*1.8,'Slot '+fm(L)+'×'+fm(W)+K.u());
+ var first=pads[0];K.hDim(K.PX(first.x-L/2),K.PX(first.x+L/2),Y0-FS*1.8,'Slot length '+fm(L)+K.u(),[K.PY(first.y),K.PY(first.y)]);
+ K.vDim(K.PY(first.y+W/2),K.PY(first.y-W/2),X0-FS*1.4,'Slot width '+fm(W)+K.u(),'left',[K.PX(first.x),K.PX(first.x)]);
 
  K.raise();K.fitContent();VALID=true;
  var name='b'+Math.round(padL*100)+'_'+Math.round(padW*100)+(HT==='N'?'hn':'h')+Math.round(L*100)+'_'+Math.round(W*100);
@@ -1110,13 +1123,13 @@ var x0=two?-R2/2:-(k-1)/2*Pt,y0=two?(m-1)/2*Pt:0;
 
 
  if(!K.tagged)                                      // قطر پد روی خود پد نوشته شده؛ تکرار لازم نیست
-  K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*2.6,'Pad '+fm(pad)+K.u());
- K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-FS*1.25,'Hole Ø'+fm(hole)+K.u());
+  K.hDim(K.PX(x0-pad/2),K.PX(x0+pad/2),Y0-FS*2.6,'Pad Ø '+fm(pad)+K.u(),[K.PY(y0),K.PY(y0)]);
+ K.hDim(K.PX(x0-hole/2),K.PX(x0+hole/2),Y0-FS*1.25,'Hole Ø '+fm(hole)+K.u(),[K.PY(y0),K.PY(y0)]);
  if(two){
    // Row span is generated by the shared centre-to-centre layer.
-   K.vDim(K.PY(p0.y),K.PY(MP.length>1?MP[1].y:p0.y-Pt),K.PX(-M.cw/2)-FS*1.4,'P '+fm(Pt)+K.u());
+   K.vDim(K.PY(p0.y),K.PY(MP.length>1?MP[1].y:p0.y-Pt),K.PX(-M.cw/2)-FS*1.4,'P '+fm(Pt)+K.u(),'left',[K.PX(p0.x),K.PX(MP[1].x)]);
  } else if(k>1){
-   K.hDim(K.PX(x0),K.PX(x0+Pt),Y1+FS*5.2,'P '+fm(Pt)+K.u());
+   K.hDim(K.PX(x0),K.PX(x0+Pt),Y1+FS*3,'P '+fm(Pt)+K.u(),[K.PY(y0),K.PY(y0)]);
  }
 })();
 var pfx=p1==='r'?'s':'c';

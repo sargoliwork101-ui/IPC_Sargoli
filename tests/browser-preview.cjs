@@ -92,7 +92,7 @@ const engine = chromiumPackage.default || chromiumPackage;
   await page.locator('#footprintSearch').fill('SN74LVC1G04');
   await page.locator('#footprintSearchResults button').first().click();
   assert.equal(await page.locator('#smp').inputValue(),'ti-db5');
-  assert((await page.locator('#dimG').textContent()).includes('C-C X 2.60 mm'));
+  assert((await page.locator('#dimG').textContent()).includes('C-C X = 2.60 mm'));
   await page.locator('#fitBtn').click();await page.locator('#svg').screenshot({path:'/tmp/ipc-horizontal-centers.png'});
   await page.selectOption('#component','resistor');await page.locator('#footprintSearch').fill('CFR-25');await page.locator('#footprintSearchResults button').first().click();
   assert.equal(await page.locator('#tExample').inputValue(),'cfr25');assert.equal(await page.locator('#mCount').textContent(),'2');

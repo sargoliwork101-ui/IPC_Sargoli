@@ -7,7 +7,7 @@ const rect=document.querySelector('#svg rect[stroke="#c0392b"]');const scale=win
 const rows=document.querySelector('#pads').value.split('\n').slice(1).map(s=>s.split(','));
 const texts=Array.from(document.querySelectorAll('#dimG text')).map(t=>t.textContent);
 return {width:+rect.getAttribute('width'),height:+rect.getAttribute('height'),mmW:+rect.dataset.mmWidth,mmH:+rect.dataset.mmHeight,texts};
-});assert(info.texts.includes('Courtyard X '+info.mmW.toFixed(2)+' mm'),label+': X');assert(info.texts.includes('Courtyard Y '+info.mmH.toFixed(2)+' mm'),label+': Y');assert(Math.abs(info.width/info.height-info.mmW/info.mmH)<1e-7,label+': actual rectangle aspect ratio');console.log(label+': red rectangle and numeric dimensions agree — PASS')};
+});assert(info.texts.includes('Courtyard X = '+info.mmW.toFixed(2)+' mm'),label+': X');assert(info.texts.includes('Courtyard Y = '+info.mmH.toFixed(2)+' mm'),label+': Y');assert(Math.abs(info.width/info.height-info.mmW/info.mmH)<1e-7,label+': actual rectangle aspect ratio');console.log(label+': red rectangle and numeric dimensions agree — PASS')};
 await check('radial');
 for(const key of ['sot23-5','sot23-6']){await page.selectOption('#component','transistor');await page.selectOption('#package',key);assert(await page.locator('#stageEmpty').isHidden());assert.equal(await page.locator('#mCount').textContent(),key.endsWith('5')?'5':'6');await check(key)}
 await page.selectOption('#component','switch');await page.selectOption('#package','unique');await check('off-origin switch');
