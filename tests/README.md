@@ -37,3 +37,7 @@ node tests/run-tests.js
 `node tests/resistor-ipc7352-numerical.cjs`: ۳۹ حالت عددی با روابط مستقل، شامل ۱۵ حالت چیپ A/B/C، RMS، کادر مبتنی بر حد قطعه/مس، شش ترکیب TH، مرزهای چهار ردیف پد و نویز ممیز شناور، و قطر قطری NPTH. نتیجهٔ ثبت‌شده: `audits/resistor-ipc7352-retest.json`.
 `LD_LIBRARY_PATH=/tmp/chromlibs/lib node tests/resistor-ipc7352-preview.cjs`: کادر چیپ، مرز بستهٔ جدول 4‑4، fallback خانهٔ خالی override و نمایش موبایل در مرورگر واقعی.
 گزارش و مرجع صفحه‌های PDF: `RESISTOR_IPC7352_RETEST.md`.
+
+### بازبینی دوم مقاومت
+
+`node tests/resistor-second-pass.cjs`: ۱۷۶ حالت تازهٔ مستقل برای مرز جدول چیپ، سقف Toe، سه نمونهٔ آموزشی، واحدها، دقت نمایش، هشت ضخامت، override و حفظ هندسه پس از تعویض پکیج. خروجی ثبت‌شده: `audits/resistor-second-pass.json`. همه موفق؛ ایراد تازه پیدا نشد و کد محاسبات در این دور تغییر نکرد.

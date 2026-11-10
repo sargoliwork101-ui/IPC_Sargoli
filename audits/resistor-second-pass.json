@@ -1,0 +1,14 @@
+{
+  "standard": "IPC-7352 May 2023",
+  "references": [
+    "3.1.1 equations 3-1 to 3-3",
+    "3.1.4 equations 3-5 to 3-7, JH=0 for chip",
+    "Tables 3-3/3-4",
+    "Tables 4-1/4-2/4-3/4-4"
+  ],
+  "policy": "No intermediate rounding, per user instruction; thickness extreme adjustment uses disclosed maximum.",
+  "cases": 176,
+  "maxNumericalError_mm": 2.220446049250313e-16,
+  "result": "PASS",
+  "new_defects": []
+}
