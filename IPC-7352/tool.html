@@ -547,6 +547,10 @@ if($('bSkip')){$('bSkip').type='text';$('bSkip').placeholder='مثل A1,B2,B3';$
 }
 build();
 // Visible calculation controls, separate from advanced geometry and numeric inputs.
+var footprintNaming=document.createElement('details');footprintNaming.id='footprintNaming';footprintNaming.className='box';
+footprintNaming.innerHTML='<summary>نام‌گذاری فوت‌پرینت — مستقل از محاسبهٔ پد</summary><p>طول و عرض اسمی زیر فقط نام پیشنهادی را تغییر می‌دهند؛ در Z، G، X، ابعاد مس و Courtyard استفاده نمی‌شوند.</p><div class="grid"></div>';
+$('bsmd').closest('.group').after(footprintNaming);
+['nameBodyL','nameBodyW','nameBase'].forEach(function(id){footprintNaming.querySelector('.grid').appendChild($(id).parentNode)});
 var calculationSettings=document.createElement('div');calculationSettings.id='calculationSettings';calculationSettings.className='box';
 calculationSettings.innerHTML='<div class="section-title">روش محاسبه</div><div class="grid" id="calculationModeFields"></div><div id="sCalculationStatus" role="status" style="margin-top:8px;overflow-wrap:anywhere"></div><button type="button" class="btn" id="useIpcCalculation" hidden>خروج از مدل مرجع و محاسبه با IPC</button>';
 $('bsmd').closest('.group').before(calculationSettings);
@@ -1375,6 +1379,10 @@ function validateFootprint(k){
  return errors;
 }
 function syncSlotFields(){
+ var smdActive=$('kind').value==='smd',family=$('fam').value;
+ [['Hl',family==='qfn'],['Th',family==='qfn'],['Th2',family==='qfn'],['Amax',family==='gull']].forEach(function(pair){var input=$(pair[0]),enabled=smdActive&&pair[1];input.disabled=!enabled;input.parentNode.hidden=!enabled});
+ footprintNaming.hidden=!smdActive||!['chip','alc'].includes(family);
+
  var pressfit=$('kind').value==='th'&&$('tHT').value==='F';
  document.querySelectorAll('[data-fit-field]').forEach(function(d){d.hidden=!pressfit;d.querySelector('input').disabled=!pressfit});
 
@@ -2243,7 +2251,7 @@ var activePackage='',packageDrafts={},demoPackage='';
 function rememberPackage(){
  if(!activePackage)return;
  var draft={_demo:demoPackage===activePackage,libraryMode:$('libraryMode').checked,libraryKey:$('libraryKey').value,referencePads:$('referencePads').value,referenceBody:$('referenceBody').value};
- document.querySelectorAll('#bsmd input,#bsmd select,#bth input,#bth select,#bbga input,#bbga select,#advancedGeometry input,#advancedGeometry select,#calculationSettings input,#calculationSettings select,#directModelEditor input').forEach(function(e){
+ document.querySelectorAll('#bsmd input,#bsmd select,#bth input,#bth select,#bbga input,#bbga select,#advancedGeometry input,#advancedGeometry select,#calculationSettings input,#calculationSettings select,#footprintNaming input,#directModelEditor input').forEach(function(e){
   draft[e.id]=e.type==='checkbox'?e.checked:e.dataset.d==='1'&&e.value!==''?rd(e.id):e.value;
  });
  packageDrafts[activePackage]=draft;

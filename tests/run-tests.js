@@ -335,7 +335,7 @@ console.log('\n۹د) جابه‌جایی (pan)، سقف زوم ۲۰× و کاد�
   // سقف زوم ۲۰ برابر
   for (let i = 0; i < 60; i++) w.SCAM.zoom(1.12);
   const zTxt = d.getElementById('zoomInfo').textContent;
-  ok(zTxt === '×20', 'سقف بزرگ‌نمایی ۲ برابر بیست است', zTxt);
+  ok(zTxt === '×40', 'سقف بزرگ‌نمایی ۴۰ برابر است', zTxt);
   ok(vb()[2] > 0 && vb()[2] < before[2] / 10, 'در ۲۰× قاب به‌درستی کوچک شده است');
   w.SCAM.fit();
   ok(Math.abs(vb()[2] - before[2]) < 1, 'پس از زوم ۲۰×، تناسب نما برمی‌گردد');
