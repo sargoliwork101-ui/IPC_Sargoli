@@ -592,7 +592,7 @@ K.txt=function(x,y,t,a,cls){
  var anchor=a||'middle',str=String(t);
  // اندازهٔ واقعی متن: در مرورگر با getComputedTextLength (دقیق)، در آزمون با تخمین
  // محافظه‌کارانه (۱em به ازای هر نویسه + حاشیه) تا متن هیچ‌وقت از کادر بیرون نزند
- var fs=FS, tw=0, tmp=el('text',{'font-size':fs.toFixed(2),fill:'#e2eefa','font-weight':'600'});
+ var fs=FS*.9, tw=0, tmp=el('text',{'font-size':fs.toFixed(2),fill:'#e2eefa','font-weight':'600'});
  tmp.textContent=str;K.svg.appendChild(tmp);
  try{tw=tmp.getComputedTextLength?tmp.getComputedTextLength():0}catch(e){tw=0}
  K.svg.removeChild(tmp);
@@ -607,9 +607,29 @@ K.txt=function(x,y,t,a,cls){
  var e=el('text',{x:textX.toFixed(1),y:y.toFixed(1),direction:'ltr','unicode-bidi':'isolate','text-anchor':anchor,'font-size':fs.toFixed(2),
    fill:'#e6f1fb','font-weight':'600','dominant-baseline':'auto','class':cls||'dimt'});
  e.textContent=str;label.appendChild(e);
- var fit=K.fitText(e,w-2*padX,h-2*padY,fs);if(fit.box.real)e.setAttribute('y',(+e.getAttribute('y')+(y-fs*.92-padY+h/2)-(fit.box.y+fit.box.height/2)).toFixed(4));
+ try{var textBox=e.getBBox();if(textBox.height>0)e.setAttribute('y',(+e.getAttribute('y')+(y-fs*.92-padY+h/2)-(textBox.y+textBox.height/2)).toFixed(4))}catch(ignore){}
+ K.bindDimensionHelp(label,str);
  e.setAttribute('data-fit-width',(w-2*padX).toFixed(4));e.setAttribute('data-fit-height',(h-2*padY).toFixed(4));return e};
 // All dimensions share labelled values, coloured dashed witness lines and compact vertical text.
+K.bindDimensionHelp=function(plate,label){
+ var key=label.split(' = ')[0],description;
+ if(/^C-C X/.test(key))description='فاصلهٔ افقی مرکز تا مرکزِ چپ‌ترین و راست‌ترین پدهاست؛ طول پد و فاصلهٔ خالی بین لبه‌ها نیست. خط‌چین‌ها مرکز پدهای اندازه‌گیری‌شده را نشان می‌دهند.';
+ else if(/^C-C Y/.test(key))description='فاصلهٔ عمودی مرکز تا مرکزِ بالاترین و پایین‌ترین پدهاست؛ ارتفاع بدنه یا فاصلهٔ لبه‌ها نیست.';
+ else if(/^Courtyard/.test(key))description=(/X$/.test(key)?'عرض افقی':'ارتفاع عمودی')+' کادر قرمز دور بدنه و پدهاست. کادر مدل مرجع پوشش هندسیِ تقریبی است، نه الزام تأییدشدهٔ سازنده.';
+ else if(/^Slot length/.test(key))description='طول کل شیار از انتهای یک سرِ گرد تا انتهای سر دیگر است؛ فاصلهٔ مرکز دو قوس نیست.';
+ else if(/^Slot width/.test(key))description='عرض شیار، عمود بر طول آن است؛ برابر قطر دو سر گرد شیار.';
+ else if(/^Hole/.test(key))description='قطر سوراخ گرد است، نه قطر پد مسی اطراف آن. نماد Ø یعنی قطر.';
+ else if(/^Pad/.test(key))description='قطر بیرونی پد مسی است، نه قطر سوراخ. نماد Ø یعنی قطر.';
+ else if(key==='Ø')description='قطر پد مسی دایره‌ای BGA است، نه قطر توپ لحیم اولیه.';
+ else if(key==='Z')description='فاصلهٔ دورترین لبهٔ مسی سمت چپ تا دورترین لبهٔ مسی سمت راست است؛ با فاصلهٔ مرکز تا مرکز فرق دارد.';
+ else if(key==='L')description='طول همین پد مسی از یک لبه تا لبهٔ مقابل است؛ طول بدنهٔ قطعه نیست.';
+ else if(key==='X')description='عرض همین پد مسی، عمود بر جهت طول پایه است.';
+ else if(key==='P')description='گام: فاصلهٔ مرکز تا مرکز دو پد مجاورِ مشخص‌شده با خطوط امتداد است؛ فاصلهٔ خالی بین لبه‌های پدها نیست.';
+ else description='این اندازه بین دو محل مشخص‌شده با خطوط امتداد اندازه‌گیری می‌شود.';
+ var show=function(){ $('tipT').textContent=label;$('tipP').textContent=description+' مقدار با واحد فعلی نمایش داده می‌شود؛ تغییر واحد، هندسهٔ واقعی را تغییر نمی‌دهد.';$('tip').hidden=false;};
+ plate.setAttribute('data-dimension-help',key);plate.setAttribute('role','button');plate.setAttribute('tabindex','0');plate.setAttribute('aria-label','توضیح '+label);plate.style.cursor='pointer';
+ plate.addEventListener('click',function(e){e.stopPropagation();show()});plate.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();show()}});
+};
 K.dimensionLabel=function(label){return String(label).replace(/^(.+?)\s+(?=[Ø\d−-])/, '$1 = ')};
 K.dimensionColor=function(label){return /^Courtyard/.test(label)?'#f0a27b':/^C-C/.test(label)?'#65d5c3':/^P\s/.test(label)?'#c1a4ff':'#75bdff'};
 K.witness=function(x1,y1,x2,y2,color){K.dim.appendChild(el('line',{'data-dimension-extension':'true',x1:x1,y1:y1,x2:x2,y2:y2,stroke:color,'stroke-width':.75,'stroke-dasharray':'3 3','stroke-opacity':.8}));K.grow(Math.min(x1,x2),Math.min(y1,y2),Math.max(x1,x2),Math.max(y1,y2))};
@@ -628,9 +648,9 @@ K.vDim=function(y1,y2,x,label,side,origins){
  var cx=x+(side==='right'?1:-1)*FS*1.1,cy=(y1+y2)/2;
  var previous={x0:K.bb.x0,y0:K.bb.y0,x1:K.bb.x1,y1:K.bb.y1};
  var text=K.txt(cx,cy,K.dimensionLabel(label)),plate=text.parentNode; text.setAttribute('fill',color);
- var wrapper=el('g',{'data-vertical-dimension-label':'true',transform:'rotate(-90 '+cx+' '+cy+')'});K.dim.appendChild(wrapper);wrapper.appendChild(plate);
+ var wrapper=el('g',{'data-vertical-dimension-label':'true',transform:'rotate(90 '+cx+' '+cy+')'});K.dim.appendChild(wrapper);wrapper.appendChild(plate);
  var rect=plate.querySelector('rect'),rx=+rect.getAttribute('x'),ry=+rect.getAttribute('y'),rw=+rect.getAttribute('width'),rh=+rect.getAttribute('height');
- K.bb=previous;K.grow(cx+ry-cy,cy-(rx+rw-cx),cx+ry+rh-cy,cy-(rx-cx));
+ K.bb=previous;K.grow(cx-(ry+rh-cy),cy+rx-cx,cx-(ry-cy),cy+rx+rw-cx);
 };
 // برچسب اندازهٔ خود پد (روی پد). وقتی این برچسب روشن است، اندازهٔ پد دیگر
 // با رنگ سفید کنار نقشه تکرار نمی‌شود.
@@ -2232,6 +2252,7 @@ window.SCAM={fit:function(){fitView()},set:function(v){setVB(v)},zoom:function(f
  // نسبت واحد-به-پیکسل محاسبه شود، نه با مختصات نقشه (وگرنه در زوم، پرش می‌کند).
  var drag=null;
  function down(e){
+  if(e.target&&e.target.closest&&e.target.closest('[data-dimension-help]'))return;
   if(e.button!=null&&e.button!==0)return;
   drag={x:e.clientX,y:e.clientY,id:e.pointerId};
   wrap.classList.add('grabbing');
