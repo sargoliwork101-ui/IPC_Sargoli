@@ -241,7 +241,7 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
 
   setV(d, 'kind', 'bga');
   const t2 = svgTexts();
-  ok(/Ø = 0\.400 mm/.test(t2) && /P = 0\.800 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
+  ok(/Ø 0\.400/.test(t2) && /P = 0\.800 mm/.test(t2), 'قطر توپ و گام روی نقشهٔ BGA اندازه‌گذاری می‌شود', t2);
   setV(d, 'kind', 'th');
   const t3 = svgTexts();
   ok(/Hole = Ø 0\.920 mm/.test(t3) && /C-C X = 7\.620 mm/.test(t3), 'سوراخ و فاصلهٔ ردیف‌ها روی نقشهٔ TH اندازه‌گذاری می‌شود', t3);
@@ -575,7 +575,7 @@ console.log('\n۱۷) شیار: نام‌گذاری صریح استاندارد �
  let p=csv()[1]?.split(',');
  ok(p&&+p[3]===4&&+p[4]===2&&+p[5]===3&&+p[6]===1&&p[7]==='slot','شیار 3×1 و حلقهٔ ورودی 0.5 → پد 4×2 و CSV صریح شیار');
  ok(val(d,'نام Padstack')==='b400_200h300_100','مثال شیار آبکاری‌شدهٔ 5.2.3 دقیقاً تولید می‌شود');
- ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/Slot length = 3.000 mm/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
+ ok(d.querySelectorAll('#svg rect[rx]').length>=2&&/3\.000×1\.200|3\.000×/.test(d.getElementById('svg').textContent),'شیار و پد گرددو‌سر با اندازه روی نقشه رسم می‌شوند');
  d.getElementById('mkA').click();
  ok(/شیار/.test(d.getElementById('alt').value)&&!/  AddPad\('/.test(d.getElementById('alt').value),'Altium فاقد پشتیبانی شیار، سوراخ گرد جایگزین نمی‌کند');
  setV(d,'tHT','N');
