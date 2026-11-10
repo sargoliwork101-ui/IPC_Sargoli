@@ -19,7 +19,15 @@ def dim(a,b,label,vertical=False):
  return out+f'<text x="{tx}" y="{ty}"{transform} text-anchor="middle" fill="#d7fff8" font-size="20">{html.escape(label)}</text>'
 def figure(field,body,a,b,caption,family='all',view='نمای آموزشی؛ بدون مقیاس',vertical=False):
  marker='arrow-'+field+'-'+family.replace(' ','-')
- return f'''<figure class="datasheet-figure" data-family-diagram="{family}" data-field-diagram="{field}"><svg viewBox="0 0 640 280" role="img" aria-label="{html.escape(caption,quote=True)}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="{marker}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M9 5L1 1L1 9Z" fill="#65dfcf"/></marker></defs><g direction="ltr" font-family="Tahoma, sans-serif">{body}{dim(a,b,field,vertical).replace("url(#input-arrow)","url(#"+marker+")")}<text x="320" y="260" text-anchor="middle" fill="#a6bbcb" font-size="16">{html.escape(view)}</text></g></svg><figcaption>{html.escape(caption)} <span class="diagram-note">شکل آموزشی است؛ حروف و ابعاد واقعی را از دیتاشیت قطعهٔ دقیق بخوان. نقاط نارنجی دو سر اندازه‌اند، نه محل پد PCB.</span></figcaption></figure>'''
+ comparison='';height=280;viewY=260
+ if field in ['Lmax','Lmin']:
+  # Separate the physical component from an illustrative PCB copper envelope.
+  lx,ly=a;rx,ry=b
+  copper=rect(lx-35,ly-20,95,40,'#447c85')+rect(rx-60,ry-20,95,40,'#447c85')
+  body=copper+body
+  comparison=line(lx-35,ly,lx-35,245)+line(rx+35,ry,rx+35,245)+f'<line data-copper-measurement="true" x1="{lx-35}" y1="245" x2="{rx+35}" y2="245" stroke="#80cfff" stroke-width="3" marker-start="url(#{marker})" marker-end="url(#{marker})"/><text x="320" y="275" text-anchor="middle" fill="#80cfff" font-size="18">Z — PCB copper envelope (output)</text>'
+  height=330;viewY=315
+ return f'''<figure class="datasheet-figure" data-family-diagram="{family}" data-field-diagram="{field}"><svg viewBox="0 0 640 {height}" role="img" aria-label="{html.escape(caption,quote=True)}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="{marker}" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M9 5L1 1L1 9Z" fill="#65dfcf"/></marker></defs><g direction="ltr" font-family="Tahoma, sans-serif">{body}{dim(a,b,field,vertical).replace("url(#input-arrow)","url(#"+marker+")")}{comparison}<text x="320" y="{viewY}" text-anchor="middle" fill="#a6bbcb" font-size="16">{html.escape(view)}</text></g></svg><figcaption>{html.escape(caption)} <span class="diagram-note">شکل آموزشی است؛ حروف و ابعاد واقعی را از دیتاشیت قطعهٔ دقیق بخوان. نقاط نارنجی دو سر اندازه‌اند، نه محل پد PCB.</span></figcaption></figure>'''
 figs={}
 def add(field,*args,**kw):figs.setdefault(field,[]).append(figure(field,*args,**kw))
 for fam in ['gull','chip','qfn']:
@@ -36,8 +44,8 @@ for fam in ['gull','chip','qfn']:
  family='gull sof' if fam=='gull' else fam
  view={'gull':'Gull-wing / SOIC — top view','chip':'Chip — top view','qfn':'QFN / DFN — bottom view'}[fam]
  for field in ['Lmin','Lmax']:
-  cap='از بیرونی‌ترین انتهای ترمینال یک طرف تا بیرونی‌ترین انتهای طرف مقابل؛ نه فقط بدنه.'
-  cap+= ' مثال آموزشی: اگر بازه 5.8 تا 6.2 mm است، Lmax = 6.2 و Lmin = 5.8؛ این اعداد نمونهٔ عمومی برای همهٔ قطعات نیستند.'
+  cap='Lmin/Lmax از خود قطعه و ترمینال‌های آن در نقشهٔ مکانیکی گرفته می‌شود، نه از مس روی برد. فلش بالایی بُعد قطعه است؛ فلش Z پایینی محدودهٔ مس PCB را نشان می‌دهد و خروجی طراحی است. مس آبی فقط برای مقایسه است، نه الگوی ساخت پیشنهادی.'
+  cap+= ' تفکیک بُعد قطعه از land pattern برای SOIC در شکل 3-3 و بندهای 3.1.2 و 3.1.4 استاندارد IPC-7352 آمده است (چاپی 6 تا 8 / PDF 16 تا 18). در مسیر SOIC این برنامه، مثال Lmax=6.20 و افزودهٔ بیرونی 0.35 در هر سمت، Z=6.90 mm می‌دهد؛ اگر افزوده صفر باشد برابری عددی ممکن است، نه یکسانی تعریف. حرف L روی دیتاشیت ممکن است طول یک پایه باشد؛ حروف E/HE هم همگانی نیستند. مثال آموزشی: اگر بازه 5.8 تا 6.2 mm است، Lmax = 6.2 و Lmin = 5.8؛ این اعداد نمونهٔ عمومی برای همهٔ قطعات نیستند.'
   add(field,body,(left,120),(right,120),cap,family,view)
  for field in ['Tmin','Tmax']:
   add(field,body,(left,120),(innerL,120),'طول ناحیهٔ ترمینال یک سر، در امتداد محور طول؛ مقدار حداقل یا حداکثر همان ناحیه را از نقشهٔ مکانیکی بخوان. خم و ارتفاع پایه با این طول یکی نیست.',family,view)
