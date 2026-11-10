@@ -1,0 +1,164 @@
+{
+  "standard": "IPC-7352 May 2023",
+  "cases": 305,
+  "maxNumericalError_mm": 2.220446049250313e-16,
+  "result": "PASS",
+  "scope": [
+    {
+      "component": "capacitor",
+      "package": "chip",
+      "referenceModels": [],
+      "mode": "IPC tables 3-3/3-4"
+    },
+    {
+      "component": "capacitor",
+      "package": "radial",
+      "referenceModels": [
+        "lib-radial"
+      ],
+      "mode": "reference plus configurable section 4"
+    },
+    {
+      "component": "capacitor",
+      "package": "electrolytic",
+      "referenceModels": [
+        "lib-electrolytic"
+      ],
+      "mode": "reference plus configurable IPC table 3-14"
+    },
+    {
+      "component": "capacitor",
+      "package": "chip-polar",
+      "referenceModels": [
+        "lib-chip-polar"
+      ],
+      "mode": "reference geometry only"
+    },
+    {
+      "component": "capacitor",
+      "package": "molded-polar",
+      "referenceModels": [
+        "lib-molded-polar"
+      ],
+      "mode": "reference geometry only"
+    },
+    {
+      "component": "capacitor",
+      "package": "dfn-polar",
+      "referenceModels": [],
+      "mode": "direct geometry only"
+    },
+    {
+      "component": "inductor",
+      "package": "chip",
+      "referenceModels": [],
+      "mode": "IPC tables 3-3/3-4"
+    },
+    {
+      "component": "inductor",
+      "package": "precision-molded",
+      "referenceModels": [
+        "lib-precision-molded"
+      ],
+      "mode": "reference geometry only"
+    }
+  ],
+  "details": [
+    "capacitor Altium name and copper",
+    "capacitor RMS",
+    "inductor Altium name and copper",
+    "inductor RMS",
+    "electrolytic two-pad demo",
+    {
+      "case": "table 3-14",
+      "H": 9.999999,
+      "level": "A",
+      "Z": 7.699999999999999,
+      "G": 3.8,
+      "X": 1.6,
+      "CE": 1
+    },
+    {
+      "case": "table 3-14",
+      "H": 9.999999,
+      "level": "B",
+      "Z": 7.3,
+      "G": 3.8,
+      "X": 1.4,
+      "CE": 0.5
+    },
+    {
+      "case": "table 3-14",
+      "H": 9.999999,
+      "level": "C",
+      "Z": 6.8999999999999995,
+      "G": 3.8,
+      "X": 1.2,
+      "CE": 0.25
+    },
+    {
+      "case": "table 3-14",
+      "H": 10,
+      "level": "A",
+      "Z": 8.3,
+      "G": 3.8,
+      "X": 1.7999999999999998,
+      "CE": 1
+    },
+    {
+      "case": "table 3-14",
+      "H": 10,
+      "level": "B",
+      "Z": 7.699999999999999,
+      "G": 3.8,
+      "X": 1.6,
+      "CE": 0.5
+    },
+    {
+      "case": "table 3-14",
+      "H": 10,
+      "level": "C",
+      "Z": 7.1,
+      "G": 3.8,
+      "X": 1.4,
+      "CE": 0.25
+    },
+    {
+      "case": "table 3-14",
+      "H": 10.000001,
+      "level": "A",
+      "Z": 8.3,
+      "G": 3.8,
+      "X": 1.7999999999999998,
+      "CE": 1
+    },
+    {
+      "case": "table 3-14",
+      "H": 10.000001,
+      "level": "B",
+      "Z": 7.699999999999999,
+      "G": 3.8,
+      "X": 1.6,
+      "CE": 0.5
+    },
+    {
+      "case": "table 3-14",
+      "H": 10.000001,
+      "level": "C",
+      "Z": 7.1,
+      "G": 3.8,
+      "X": 1.4,
+      "CE": 0.25
+    },
+    "electrolytic Altium CAPAE name",
+    "name input never changes copper",
+    "unknown base never guessed for CAPAE",
+    "multi-terminal alc rejected",
+    "all pads of capacitor/radial",
+    "all pads of capacitor/electrolytic",
+    "all pads of capacitor/chip-polar",
+    "all pads of capacitor/molded-polar",
+    "all pads of inductor/precision-molded",
+    "CAPPDFN direct geometry, no IPC claim"
+  ]
+}
