@@ -1,7 +1,7 @@
 {
   "standard": "IPC-7352 May 2023",
   "cases": 305,
-  "maxNumericalError_mm": 2.220446049250313e-16,
+  "maxNumericalError_mm": 4.440892098500626e-16,
   "result": "PASS",
   "scope": [
     {

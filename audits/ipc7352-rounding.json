@@ -1,0 +1,154 @@
+{
+  "result": "PASS",
+  "cases": [
+    {
+      "component": "resistor",
+      "table": "3-3",
+      "raw": {
+        "Z": 1.1516,
+        "G": 0.51017,
+        "X": 0.5134
+      },
+      "IPC": {
+        "Z": 1.15,
+        "G": 0.51,
+        "X": 0.51
+      },
+      "pad": [
+        0.31999999999999995,
+        0.51
+      ]
+    },
+    {
+      "component": "resistor",
+      "table": "3-4 note 1",
+      "raw": {
+        "Z": 1.31674,
+        "G": 0.60123,
+        "X": 0.32147
+      },
+      "IPC": {
+        "Z": 1.32,
+        "G": 0.60123,
+        "X": 0.32147
+      },
+      "pad": [
+        0.359385,
+        0.32147
+      ]
+    },
+    {
+      "component": "capacitor",
+      "table": "3-3",
+      "raw": {
+        "Z": 1.1516,
+        "G": 0.51017,
+        "X": 0.5134
+      },
+      "IPC": {
+        "Z": 1.15,
+        "G": 0.51,
+        "X": 0.51
+      },
+      "pad": [
+        0.31999999999999995,
+        0.51
+      ]
+    },
+    {
+      "component": "capacitor",
+      "table": "3-4 note 1",
+      "raw": {
+        "Z": 1.31674,
+        "G": 0.60123,
+        "X": 0.32147
+      },
+      "IPC": {
+        "Z": 1.32,
+        "G": 0.60123,
+        "X": 0.32147
+      },
+      "pad": [
+        0.359385,
+        0.32147
+      ]
+    },
+    {
+      "component": "inductor",
+      "table": "3-3",
+      "raw": {
+        "Z": 1.1516,
+        "G": 0.51017,
+        "X": 0.5134
+      },
+      "IPC": {
+        "Z": 1.15,
+        "G": 0.51,
+        "X": 0.51
+      },
+      "pad": [
+        0.31999999999999995,
+        0.51
+      ]
+    },
+    {
+      "component": "inductor",
+      "table": "3-4 note 1",
+      "raw": {
+        "Z": 1.31674,
+        "G": 0.60123,
+        "X": 0.32147
+      },
+      "IPC": {
+        "Z": 1.32,
+        "G": 0.60123,
+        "X": 0.32147
+      },
+      "pad": [
+        0.359385,
+        0.32147
+      ]
+    },
+    {
+      "component": "capacitor",
+      "table": "3-14 below 10",
+      "IPC": {
+        "Z": 7.3,
+        "G": 3.8,
+        "X": 1.41
+      },
+      "pad": [
+        1.75,
+        1.41
+      ]
+    },
+    {
+      "component": "capacitor",
+      "table": "3-14 at 10",
+      "IPC": {
+        "Z": 7.7,
+        "G": 3.8,
+        "X": 1.61
+      },
+      "pad": [
+        1.9500000000000002,
+        1.61
+      ]
+    },
+    {
+      "component": "IC control",
+      "table": "3-1 note 4",
+      "IPC": {
+        "Z": 6.903,
+        "G": 4.282,
+        "X": 0.573
+      }
+    }
+  ],
+  "extraChecks": [
+    "display precision cannot change IPC geometry",
+    "table 3-1 exception not applied to chip",
+    "direct dimensions preserved",
+    "TH no invented generic rounding"
+  ]
+}

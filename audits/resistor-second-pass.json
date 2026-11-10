@@ -6,7 +6,7 @@
     "Tables 3-3/3-4",
     "Tables 4-1/4-2/4-3/4-4"
   ],
-  "policy": "No intermediate rounding, per user instruction; thickness extreme adjustment uses disclosed maximum.",
+  "policy": "Final SMD dimensions rounded by IPC table; display precision is independent; TH remains unrounded because section 4 specifies no generic rounding factor.",
   "cases": 176,
   "maxNumericalError_mm": 2.220446049250313e-16,
   "result": "PASS",

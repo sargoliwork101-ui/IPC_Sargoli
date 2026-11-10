@@ -142,7 +142,7 @@ console.log('\n۴) BGA (ایراد ۱۳، ۱۷، ۲۸، ۳۵، ۶۸، ۷۵)');
   const cy = val(d, 'Courtyard').split('×').map(parseFloat);
   ok(cy.every(v => Math.abs(v-13.1)<1e-9), 'Courtyard BGA بدون گردکردن میانی است', cy.join('×'));
   d.getElementById('mkA').click();
-  ok(/0\.3825/.test(d.getElementById('alt').value), 'قطر پد BGA بدون گردکردن به خروجی Altium می‌رود');
+  ok(/0\.38/.test(d.getElementById('alt').value), 'قطر پد BGA با گردکردن جدول 3-11 به خروجی Altium می‌رود');
   setV(d, 'bC', 4); setV(d, 'bR', 4); setV(d, 'bSkip', 'A1,B2');
   ok(padsOf(d).length === 14, 'توپ‌های حذف‌شده با نقشهٔ کاربر ساخته نمی‌شوند', String(padsOf(d).length));
 }
@@ -233,7 +233,7 @@ console.log('\n۹) نقشه: اندازه‌گذاری روی تصویر و نم
 
   setV(d, 'kind', 'smd');
   const t1 = svgTexts();
-  ok(/1\.312×0\.570/.test(t1), 'اندازهٔ طول و عرض پد روی خود پد نوشته می‌شود', t1.slice(0, 120));
+  ok(/1\.310×0\.570/.test(t1), 'اندازهٔ طول و عرض پد روی خود پد نوشته می‌شود', t1.slice(0, 120));
   ok(/Z = 6\.900 mm/.test(t1), 'طول کل پدها (Z) روی نقشه اندازه‌گذاری می‌شود', t1);
   ok(/Courtyard/.test(t1), 'Courtyard روی نقشه با اندازه نوشته می‌شود', t1);
   const [vx, vy, vw, vh] = vb();

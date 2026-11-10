@@ -1,6 +1,7 @@
 /* IPC-7352 May 2023: independently transcribed expectations, not calls to rule()/smax(). */
 const assert=require('node:assert/strict'),fs=require('node:fs'),{JSDOM,VirtualConsole}=require('jsdom');
 const html=fs.readFileSync('IPC-7352/tool.html','utf8'),dom=new JSDOM(html,{runScripts:'dangerously',url:'https://cap-ind-audit.test/tool.html',pretendToBeVisual:true,virtualConsole:new VirtualConsole()}),w=dom.window,d=w.document;
+const round2=v=>Number(v.toFixed(2));
 let count=0,maxError=0;const details=[];
 function set(id,v){const e=d.getElementById(id);assert(e,id);if(e.type==='checkbox')e.checked=!!v;else e.value=String(v);e.dispatchEvent(new w.Event('input',{bubbles:true}));e.dispatchEvent(new w.Event('change',{bubbles:true}))}
 function pads(){const s=d.getElementById('pads').value;assert(s,d.getElementById('emptyReason').textContent);return s.trim().split('\n').slice(1).map(r=>r.split(','))}
@@ -12,7 +13,7 @@ for(const component of ['capacitor','inductor']){
  chip(component);
  for(const width of [.2,.499999,.5,.500001,1.25])for(const height of [.1,1.999999,2,2.000001])for(let i=0;i<3;i++){
   for(const[k,v]of Object.entries({lv:['A','B','C'][i],Lmin:2,Lmax:2.34567,Smax:.789123,W:width,H:height,nameBodyL:2,nameBodyW:1.25}))set(k,v);
-  const jt=width<.5?[height,height/2,height/4][i]:[.55,Math.min(height/4,.5),.15][i],js=width>=.5&&i===0?.05:0,p=pads();assert.equal(p.length,2);near(+p[0][3],(2.34567+2*jt-.789123)/2,'chip length');near(+p[0][4],width+2*js,'chip width');near(+p[1][1],-Number(p[0][1]),'symmetry');assert.equal(row('نام پیشنهادی'),(component==='capacitor'?'CAPC':'INDC')+'2013X'+Math.round(height*100)+['M','N','L'][i]);check();
+  const jt=width<.5?[height,height/2,height/4][i]:[.55,Math.min(height/4,.5),.15][i],js=width>=.5&&i===0?.05:0,p=pads();assert.equal(p.length,2);const z=round2(2.34567+2*jt),g=width<.5?.789123:round2(.789123),x=width<.5?width:round2(width+2*js);near(+p[0][3],(z-g)/2,'chip length');near(+p[0][4],x,'chip width');near(+p[1][1],-Number(p[0][1]),'symmetry');assert.equal(row('نام پیشنهادی'),(component==='capacitor'?'CAPC':'INDC')+'2013X'+Math.round(height*100)+['M','N','L'][i]);check();
  }
  // Three educational sizes × levels; unit conversion and display-only precision.
  for(const sample of ['chip','chip0805','chip0603'])for(const level of ['A','B','C']){
@@ -22,7 +23,7 @@ for(const component of ['capacitor','inductor']){
  }
  set('unit','mm');set('smp','chip');d.getElementById('mkA').click();assert(d.getElementById('alt').value.includes(component==='capacitor'?'CAPC':'INDC'));assert(d.getElementById('alt').value.includes(String(Number(pads()[0][3]))));check(component+' Altium name and copper');
  set('pDec',3);set('smp','chip');set('lv','B');for(const[k,v]of Object.entries({autoS:true,Lmin:5.8,Lmax:6.2,Tmin:.4,Tmax:1.27,W:.8,H:1}))set(k,v);
- const s=(3.26+5.4+Math.hypot(.4,Math.SQRT2*.87))/2;near(+pads()[0][3],(6.7-s)/2,'RMS');check(component+' RMS');
+ const s=(3.26+5.4+Math.hypot(.4,Math.SQRT2*.87))/2;near(+pads()[0][3],(6.7-round2(s))/2,'RMS');check(component+' RMS');
 }
 // Entire table 3-14: below/at/above height 10, all density levels.
 set('component','capacitor');set('package','electrolytic');d.getElementById('leaveReference').click();d.getElementById('previewPackage').click();assert.equal(pads().length,2,'electrolytic demo must have two terminals, not eight');check('electrolytic two-pad demo');
